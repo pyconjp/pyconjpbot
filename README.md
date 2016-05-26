@@ -10,5 +10,5 @@ $ . env/bin/activate
 (env)$ pip install -r requirements.txt
 (env)$ cp slackbot_settings.py.sample slackbot_settings.py
 (env)$ vi slackbot_settings.py
-(env)$ python pyconjpbot.py
+(env)$ python run.py
 ```
