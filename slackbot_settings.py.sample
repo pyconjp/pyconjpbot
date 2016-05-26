@@ -8,5 +8,5 @@ ERRORS_TO = '#pyconjpbot-test'
 
 PLUGINS = [
     'slackbot.plugins',
-#    'pyconjpbot.plugins',
+    'pyconjpbot.plugins',
 ]
