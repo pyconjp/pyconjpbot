@@ -9,7 +9,7 @@ CLEAN_JIRA_URL = settings.JIRA_URL if not settings.JIRA_URL[-1:] == '/' else set
 jira_auth = (settings.JIRA_USER, settings.JIRA_PASS)
 jira = JIRA(CLEAN_JIRA_URL, basic_auth=jira_auth)
 
-@listen_to('([A-Za-z]+)-([0-9]+)')
+@listen_to(r'\b([A-Za-z]+)-([0-9]+)\b')
 def jira_listener(message, project, number):
     # Only attempt to find tickets in projects defined in slackbot_settings
     if project not in settings.JIRA_PROJECTS:
