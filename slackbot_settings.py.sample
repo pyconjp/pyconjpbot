@@ -1,3 +1,5 @@
+## Settings for slackbot
+
 # API Token for Bot integration
 # https://pyconjp.slack.com/services/B15KRL7CY
 API_TOKEN = "<your-api-token>"
@@ -10,3 +12,10 @@ PLUGINS = [
     'slackbot.plugins',
     'pyconjpbot.plugins',
 ]
+
+## Settings or jira plugin
+JIRA_URL = 'https://pyconjp.atlassian.net/'
+JIRA_PROJECTS = ['ISSHA', 'SAR'] # JIRA Project Keys
+# see https://docs.google.com/spreadsheets/d/1YiqErBDdp5QWfTlfDmxc6Vi696b_NGFJKzuyM-v6PDM/edit#gid=0
+JIRA_USER = 'JIRA Username'
+JIRA_PASS = 'JIRA Password'
