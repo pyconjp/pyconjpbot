@@ -44,3 +44,16 @@ def jira_listener(message, project, number):
         status
     )
     )
+
+@respond_to('jira search (.*)')
+def jira_search(message, query):
+    """
+    JIRAをキーワード検索した結果を返す
+    """
+    jql = 'status in (Open, "In Progress", Reopened) AND text ~ "{}"'
+    for issue in jira.search_issues(jql.format(query)):
+        summary = issue.fields.summary
+        key = issue.key
+        url = issue.permalink()
+        # TODO: create attachments and send_webapi
+        message.send('{} {}'.format(url, summary))
