@@ -13,6 +13,8 @@ PLUGINS = [
     'pyconjpbot.plugins',
 ]
 
+ALIASES = '$'
+
 ## Settings or jira plugin
 JIRA_URL = 'https://pyconjp.atlassian.net/'
 JIRA_PROJECTS = ['ISSHA', 'SAR'] # JIRA Project Keys
