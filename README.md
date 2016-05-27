@@ -1,4 +1,26 @@
-# pyconjpbot
+# PyCon JP Bot
+
+Chatbot for Slack of PyCon JP
+
+![](pyconjpbot-image.png)
+
+## Commands
+
+### manual plugin
+
+- `$manual`: マニュアルのURLを返す
+- `$manual keywords`: キーワードでマニュアルを検索するURLを返す
+- `$manual help`: manual コマンドのヘルプを表示
+
+### shuffle plugin
+
+- `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
+- `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
+
+### jira plugin
+
+- `SAR-123`: JIRAのissueの情報を返す
+- `$jira search keywords`: 指定したキーワードでJIRAを検索した結果を返す
 
 ## How to build
 
@@ -12,3 +34,4 @@ $ . env/bin/activate
 (env)$ vi slackbot_settings.py
 (env)$ python run.py
 ```
+
