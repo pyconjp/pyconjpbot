@@ -2,6 +2,10 @@ import random
 
 from slackbot.bot import respond_to, listen_to
 
+@respond_to('help$')
+def help(message):
+    message.send('https://github.com/pyconjp/pyconjpbot#commands')
+
 @respond_to('shuffle (.*)')
 def shuffle(message, words):
     words = words.split()

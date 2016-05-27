@@ -6,16 +6,19 @@ Chatbot for Slack of PyCon JP
 
 ## Commands
 
+コマンドの一覧と簡単な説明
+
+### misc plugin
+
+- `$helps`: ヘルプへのリンクを返す
+- `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
+- `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
+
 ### manual plugin
 
 - `$manual`: マニュアルのURLを返す
 - `$manual keywords`: キーワードでマニュアルを検索するURLを返す
 - `$manual help`: manual コマンドのヘルプを表示
-
-### shuffle plugin
-
-- `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
-- `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
 
 ### jira plugin
 
