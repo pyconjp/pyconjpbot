@@ -4,7 +4,7 @@
 # https://pyconjp.slack.com/services/B15KRL7CY
 API_TOKEN = "<your-api-token>"
 
-DEFAULT_REPLY = "Sorry but I didn't understand you"
+DEFAULT_REPLY = "コマンドが不明です。ヘルプを参照してください https://github.com/pyconjp/pyconjpbot#commands"
 
 ERRORS_TO = 'pyconjpbot-test'
 
