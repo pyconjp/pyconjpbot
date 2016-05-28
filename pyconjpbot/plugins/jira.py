@@ -55,23 +55,49 @@ def jira_listener(message, pre, project, number):
     message.send_webapi('', json.dumps(attachments))
 
 @respond_to('jira search (.*)')
-def jira_search(message, query):
+def jira_search(message, keyword):
     """
     JIRAをキーワード検索した結果を返す
     """
     jql = 'status in (Open, "In Progress", Reopened) AND text ~ "{}"'
-    text = ''
-    for issue in jira.search_issues(jql.format(query)):
+    pretext = '{} の検索結果'.format(keyword),
+    for issue in jira.search_issues(jql.format(keyword)):
         summary = issue.fields.summary
         key = issue.key
         url = issue.permalink()
-        text += '- <{}|{}> {}\n'.format(url, key, summary)
+        pretext += '- <{}|{}> {}\n'.format(url, key, summary)
 
     attachments = [{
-        'fallback': '{} の検索結果'.format(query),
-        'pretext': text,
+        'fallback': '{} の検索結果'.format(keyword),
+        'pretext': pretext,
     }]
     message.send_webapi('', json.dumps(attachments))
 
-   
+@respond_to('jira assignee (.*)')
+def jira_search(message, user):
+    """
+    指定されたユーザーにアサインされた課題の一覧を返す
+    """
+    jql = 'status in (Open, "In Progress", Reopened) AND assignee in ({})'
+    pretext = '{} の担当課題'.format(user)
+    for issue in jira.search_issues(jql.format(user)):
+        summary = issue.fields.summary
+        key = issue.key
+        url = issue.permalink()
+        pretext += '- <{}|{}> {}\n'.format(url, key, summary)
+
+    attachments = [{
+        'fallback': '{} の担当課題'.format(user),
+        'pretext': pretext,
+    }]
+    message.send_webapi('', json.dumps(attachments))
+
+@respond_to('jira help$')
+def jira_search(message):
+    """
+    jiraコマンドのヘルプを返す
+    """
+    message.send('''`SAR-123`: 指定されたチケットの詳細情報を返す
+`$jira search keywords`: 指定されたキーワードで検索する
+`$jira assignee user`: 指定されたユーザーが担当しているissueを返す''')
  
