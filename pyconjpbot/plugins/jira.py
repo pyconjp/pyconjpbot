@@ -1,3 +1,5 @@
+import json
+
 from jira import JIRA, JIRAError
 from slackbot import settings
 from slackbot.bot import respond_to, listen_to
@@ -9,8 +11,11 @@ CLEAN_JIRA_URL = settings.JIRA_URL if not settings.JIRA_URL[-1:] == '/' else set
 jira_auth = (settings.JIRA_USER, settings.JIRA_PASS)
 jira = JIRA(CLEAN_JIRA_URL, basic_auth=jira_auth)
 
-@listen_to(r'\b([A-Za-z]+)-([0-9]+)\b')
-def jira_listener(message, project, number):
+@listen_to(r'(^|[^/])\b([A-Za-z]+)-([0-9]+)\b')
+def jira_listener(message, pre, project, number):
+    """
+    JIRAのissue idっぽいものを取得したら、そのissueの情報を返す
+    """
     # Only attempt to find tickets in projects defined in slackbot_settings
     if project not in settings.JIRA_PROJECTS:
         return
@@ -20,30 +25,34 @@ def jira_listener(message, project, number):
     try:
         issue = jira.issue(issue_id)
     except JIRAError:
-        message.send('%s not found' % issue_id)
+        message.send('%s は存在しません' % issue_id)
         return
 
     # Create variables to display to user
     summary = issue.fields.summary
-    reporter = issue.fields.reporter.displayName if issue.fields.reporter else 'Anonymous'
-    assignee = issue.fields.assignee.displayName if issue.fields.assignee else 'Unassigned'
-    status = issue.fields.status
-    ticket_url = CLEAN_JIRA_URL + '/browse/%s' % issue_id
+    assignee = '未割り当て'
+    if issue.fields.assignee:
+        assignee = issue.fields.assignee.displayName 
+    status = issue.fields.status.name
+    issue_url = issue.permalink()
 
-    # Send message to Slack
-    message.send('''%s:
-    Summary: %s
-    Reporter: %s
-    Assignee: %s
-    Status: %s
-    ''' % (
-        ticket_url,
-        summary,
-        reporter,
-        assignee,
-        status
-    )
-    )
+    attachments = [{
+        'fallback': '{} {}'.format(issue_id, summary),
+        'pretext': '<{}|{}> {}'.format(issue_url, issue_id, summary),
+        'fields': [
+            {
+                'title': '担当者',
+                'value': assignee,
+                'short': True,
+            },
+            {
+                'title': 'ステータス',
+                'value': status,
+                'short': True,
+            },
+        ],
+    }]
+    message.send_webapi('', json.dumps(attachments))
 
 @respond_to('jira search (.*)')
 def jira_search(message, query):
@@ -51,9 +60,18 @@ def jira_search(message, query):
     JIRAをキーワード検索した結果を返す
     """
     jql = 'status in (Open, "In Progress", Reopened) AND text ~ "{}"'
+    text = ''
     for issue in jira.search_issues(jql.format(query)):
         summary = issue.fields.summary
         key = issue.key
         url = issue.permalink()
-        # TODO: create attachments and send_webapi
-        message.send('{} {}'.format(url, summary))
+        text += '- <{}|{}> {}\n'.format(url, key, summary)
+
+    attachments = [{
+        'fallback': '{} の検索結果'.format(query),
+        'pretext': text,
+    }]
+    message.send_webapi('', json.dumps(attachments))
+
+   
+ 
