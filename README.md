@@ -24,6 +24,7 @@ Chatbot for Slack of PyCon JP
 
 - `SAR-123`: JIRAのissueの情報を返す
 - `$jira search keywords`: 指定したキーワードでJIRAを検索した結果を返す
+- `$jira assignee keywords`: 指定されたユーザーが担当しているissueを返す
 
 ## How to build
 
