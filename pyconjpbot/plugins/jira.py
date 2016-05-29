@@ -87,7 +87,8 @@ def _send_jira_search_responce(message, query, title):
     JIRAをqueryで検索した結果を返すメソッド
     """
     pretext = title
-    pretext += '(<{}/issues/?jql={}|JIRAで見る>)\n'.format(CLEAN_JIRA_URL, quote(query))
+    pretext += '(<{}/issues/?jql={}|JIRAで見る>)'.format(CLEAN_JIRA_URL, quote(query))
+    text = ''
     issues = jira.search_issues(query)
     
     if issues:
@@ -96,13 +97,14 @@ def _send_jira_search_responce(message, query, title):
             key = issue.key
             url = issue.permalink()
             status = issue.fields.status.name
-            pretext += '- <{}|{}> {}({})\n'.format(url, key, summary, status)
+            text += '- <{}|{}> {}({})\n'.format(url, key, summary, status)
     else:
-        pretext += '該当するJIRA issueは見つかりませんでした'
+        text += '該当するJIRA issueは見つかりませんでした'
 
     attachments = [{
         'fallback': title,
         'pretext': pretext,
+        'text': text,
     }]
     message.send_webapi('', json.dumps(attachments))
 
