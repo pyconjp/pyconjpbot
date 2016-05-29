@@ -58,10 +58,19 @@ def jira_listener(message, pre, project, number):
 @respond_to('jira search (.*)')
 def jira_search(message, keyword):
     """
-    JIRAをキーワード検索した結果を返す
+    JIRAをキーワード検索した結果を返す(オープン状態のみ)
     """
     jql = 'status in (Open, "In Progress", Reopened) AND text ~ "{}"'
-    title = '「{}」の検索結果'.format(keyword)
+    title = '「{}」の検索結果(オープンのみ)'.format(keyword)
+    _send_jira_search_responce(message, jql.format(keyword), title)
+
+@respond_to('jira allsearch (.*)')
+def jira_allsearch(message, keyword):
+    """
+    JIRAをキーワード検索した結果を返す(全ステータス対象)
+    """
+    jql = 'text ~ "{}"'
+    title = '「{}」の検索結果(全ステータス)'.format(keyword)
     _send_jira_search_responce(message, jql.format(keyword), title)
 
 @respond_to('jira assignee (.*)')
@@ -86,7 +95,8 @@ def _send_jira_search_responce(message, query, title):
             summary = issue.fields.summary
             key = issue.key
             url = issue.permalink()
-            pretext += '- <{}|{}> {}\n'.format(url, key, summary)
+            status = issue.fields.status.name
+            pretext += '- <{}|{}> {}({})\n'.format(url, key, summary, status)
     else:
         pretext += '該当するJIRA issueは見つかりませんでした'
 
@@ -102,5 +112,6 @@ def jira_search(message):
     jiraコマンドのヘルプを返す
     """
     message.send('''- `SAR-123`: 指定されたチケットの詳細情報を返す
-- `$jira search keywords`: 指定されたキーワードで検索する
+- `$jira search keywords`: 指定されたキーワードで検索(オープンのみ)
+- `$jira allsearch keywords`: 指定されたキーワードで検索(全ステータス)
 - `$jira assignee user`: 指定されたユーザーが担当しているissueを返す''')
