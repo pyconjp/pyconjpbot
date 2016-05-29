@@ -1,4 +1,5 @@
 import json
+from urllib.parse import quote
 
 from jira import JIRA, JIRAError
 from slackbot import settings
@@ -60,7 +61,7 @@ def jira_search(message, keyword):
     JIRAをキーワード検索した結果を返す
     """
     jql = 'status in (Open, "In Progress", Reopened) AND text ~ "{}"'
-    title = '{} の検索結果'.format(keyword)
+    title = '「{}」の検索結果'.format(keyword)
     _send_jira_search_responce(message, jql.format(keyword), title)
 
 @respond_to('jira assignee (.*)')
@@ -69,15 +70,17 @@ def jira_assignee(message, user):
     指定されたユーザーにアサインされた課題の一覧を返す
     """
     jql = 'status in (Open, "In Progress", Reopened) AND assignee in ({})'
-    title = '{} の担当課題'.format(user)
+    title = '「{}」の担当課題'.format(user)
     _send_jira_search_responce(message, jql.format(user), title)
 
 def _send_jira_search_responce(message, query, title):
     """
     JIRAをqueryで検索した結果を返すメソッド
     """
-    pretext = title + '\n'
+    pretext = title
+    pretext += '(<{}/issues/?jql={}|JIRAで見る>)\n'.format(CLEAN_JIRA_URL, quote(query))
     issues = jira.search_issues(query)
+    
     if issues:
         for issue in issues:
             summary = issue.fields.summary
@@ -101,4 +104,3 @@ def jira_search(message):
     message.send('''- `SAR-123`: 指定されたチケットの詳細情報を返す
 - `$jira search keywords`: 指定されたキーワードで検索する
 - `$jira assignee user`: 指定されたユーザーが担当しているissueを返す''')
- 
