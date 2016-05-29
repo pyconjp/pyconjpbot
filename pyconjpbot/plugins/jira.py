@@ -140,5 +140,5 @@ def jira_search(message):
     message.send('''- `SAR-123`: 指定されたチケットの詳細情報を返す
 - `$jira search keywords`: 指定されたキーワードで検索(オープンのみ)
 - `$jira allsearch keywords`: 指定されたキーワードで検索(全ステータス)
-- `$jira assignee user`: 指定されたユーザーが担当しているissueを返す''')
+- `$jira assignee user`: 指定されたユーザーが担当しているissueを返す
 - `$jira filter`: フィルターの一覧を返す''')
