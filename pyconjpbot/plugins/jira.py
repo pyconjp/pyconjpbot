@@ -108,6 +108,30 @@ def _send_jira_search_responce(message, query, title):
     }]
     message.send_webapi('', json.dumps(attachments))
 
+@respond_to('jira filters?')
+def jira_filter(message):
+    """
+    フィルターの一覧を返す
+    """
+    pretext = 'フィルター一覧'
+    filters = [
+        ('1.事務局チーム', '10301'),
+        ('2.会場チーム', '10302'),
+        ('3.プログラムチーム', '10300'),
+        ('4.メディアチーム ', '10303'),
+        ('一般社団法人PyCon JP', '11500'),
+        ]
+    flist = []
+    for label, key in filters:
+        flist.append('<{}/issues/?filter={}|{}>'.format(CLEAN_JIRA_URL, key, label))
+        
+    attachments = [{
+        'fallback': pretext,
+        'pretext': pretext,
+        'text': ' / '.join(flist),
+    }]
+    message.send_webapi('', json.dumps(attachments))
+
 @respond_to('jira help$')
 def jira_search(message):
     """
@@ -117,3 +141,4 @@ def jira_search(message):
 - `$jira search keywords`: 指定されたキーワードで検索(オープンのみ)
 - `$jira allsearch keywords`: 指定されたキーワードで検索(全ステータス)
 - `$jira assignee user`: 指定されたユーザーが担当しているissueを返す''')
+- `$jira filter`: フィルターの一覧を返す''')

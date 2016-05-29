@@ -26,6 +26,7 @@ Chatbot for Slack of PyCon JP
 - `$jira search keywords`: 指定したキーワードでJIRAを検索した結果を返す(オープンのみ)
 - `$jira allsearch keywords`: 指定したキーワードでJIRAを検索した結果を返す(全ステータス)
 - `$jira assignee keywords`: 指定されたユーザーが担当しているissueを返す
+- `$jira filter`: フィルターの一覧を返す
 
 ## How to build
 
