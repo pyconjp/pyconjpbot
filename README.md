@@ -1,6 +1,7 @@
 # PyCon JP Bot
 
-Chatbot for Slack of PyCon JP
+* Chatbot for Slack of PyCon JP
+* based on https://github.com/lins05/slackbot
 
 ![](pyconjpbot-image.png)
 
