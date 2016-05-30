@@ -17,6 +17,10 @@ def jira_listener(message, pre, project, number):
     """
     JIRAのissue idっぽいものを取得したら、そのissueの情報を返す
     """
+    # botメッセージの場合は無視する
+    if message.body.get('subtype', '') == 'bot_message':
+        return
+
     # Only attempt to find tickets in projects defined in slackbot_settings
     if project not in settings.JIRA_PROJECTS:
         return
