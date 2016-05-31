@@ -9,12 +9,6 @@
 
 コマンドの一覧と簡単な説明
 
-### misc plugin
-
-- `$helps`: ヘルプへのリンクを返す
-- `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
-- `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
-
 ### manual plugin
 
 - `$manual`: マニュアルのURLを返す
@@ -28,6 +22,18 @@
 - `$jira allsearch keywords`: 指定したキーワードでJIRAを検索した結果を返す(全ステータス)
 - `$jira assignee keywords`: 指定されたユーザーが担当しているissueを返す
 - `$jira filter`: フィルターの一覧を返す
+
+### wikipedia plugin
+
+- `$wikipedia keywords`: 指定されたキーワードの Wikipedia ページの情報を返す
+- `$wikipedia -en keywords`: 指定された言語(en等)の Wikipedia ページの情報を返す
+- `$wikipedia help`: wikipedia コマンドのヘルプを表示
+
+### misc plugin
+
+- `$helps`: ヘルプへのリンクを返す
+- `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
+- `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
 
 ## How to build
 
