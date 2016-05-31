@@ -29,6 +29,17 @@
 - `$wikipedia -en keywords`: 指定された言語(en等)の Wikipedia ページの情報を返す
 - `$wikipedia help`: wikipedia コマンドのヘルプを表示
 
+### calc plugin
+
+- 以下の様な数式の計算結果を返す
+
+```
+1 + 1
+100 * 100
+1 / 10
+sqrt(2)
+```
+
 ### misc plugin
 
 - `$helps`: ヘルプへのリンクを返す
