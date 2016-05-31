@@ -40,6 +40,15 @@
 sqrt(2)
 ```
 
+### greeting plugin
+
+- あいさつを返す
+
+```
+takanory: おはよう
+BOT: @takanory おはようございます
+```
+
 ### misc plugin
 
 - `$helps`: ヘルプへのリンクを返す
