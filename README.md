@@ -18,10 +18,10 @@
 ### jira plugin
 
 - `SAR-123`: JIRAのissueの情報を返す
-- `$jira search keywords`: 指定したキーワードでJIRAを検索した結果を返す(オープンのみ)
-- `$jira allsearch keywords`: 指定したキーワードでJIRAを検索した結果を返す(全ステータス)
-- `$jira assignee keywords`: 指定されたユーザーが担当しているissueを返す
-- `$jira filter`: フィルターの一覧を返す
+- `$jira search|検索 keywords`: 指定したキーワードでJIRAを検索した結果を返す(オープンのみ)
+- `$jira allsearch|全検索 keywords`: 指定したキーワードでJIRAを検索した結果を返す(全ステータス)
+- `$jira assignee|担当 keywords`: 指定されたユーザーが担当しているissueを返す
+- `$jira filter|フィルター`: フィルターの一覧を返す
 
 ### wikipedia plugin
 
@@ -67,4 +67,3 @@ $ . env/bin/activate
 (env)$ vi slackbot_settings.py
 (env)$ python run.py
 ```
-
