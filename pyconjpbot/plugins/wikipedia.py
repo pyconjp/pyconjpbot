@@ -3,8 +3,8 @@ import json
 from slackbot.bot import respond_to, listen_to
 import wikipedia
 
-@respond_to('wikipedia (-\w+)? (.*)')
-def wikipedia_page(message, lang, query):
+@respond_to('wikipedia(\s+-\w+)?\s+(.*)')
+def wikipedia_page(message, option, query):
     """
     Wikipediaで検索した結果を返す
     """
@@ -12,10 +12,10 @@ def wikipedia_page(message, lang, query):
         return
     
     # set language
-    if lang:
-        wikipedia.set_lang(lang[1:])
-    else:
-        wikipedia.set_lang('ja')
+    lang = 'ja'
+    if option:
+        _, lang = option.split('-')
+    wikipedia.set_lang(lang)
 
     try:
         # search with query
