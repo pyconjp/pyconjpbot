@@ -6,7 +6,7 @@ requests==2.10.0
 requests-oauthlib==0.6.1
 requests-toolbelt==0.6.2
 six==1.10.0
-slackbot==0.4.0
+slackbot==0.4.1
 slacker==0.9.15
 sympy==1.0
 tlslite==0.4.9
