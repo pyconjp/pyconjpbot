@@ -19,7 +19,9 @@ def translate(message, cmd, option, text):
     if option:
         # 指定した言語に翻訳する
         _, lang = option.split('-', 1)
-    elif detect(text) == 'ja':
+    elif detect(text) in ('ja', 'ko'):
+        # 漢字が多いと日本語なのに ko と判定される
+        # 日本語の場合は英語に翻訳する
         lang = 'en'
     try:
         message.send(translator.translate(text, lang))
