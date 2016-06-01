@@ -39,7 +39,9 @@ def get_service(name, version, filename, scope):
     # If the credentials don't exist or are invalid run through the native
     # client flow. The Storage object will ensure that if successful the good
     # credentials will get written back to a file.
-    storage = file.Storage(name + '.dat')
+    storagefile = os.path.join(os.path.dirname(filename),
+                               name + '.dat')
+    storage = file.Storage(storagefile)
     credentials = storage.get()
     if credentials is None or credentials.invalid:
         credentials = tools.run_flow(flow, storage, flags)
