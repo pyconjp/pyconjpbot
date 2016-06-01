@@ -49,6 +49,13 @@ takanory: おはよう
 BOT: @takanory おはようございます
 ```
 
+### translator plugin
+
+- `$translate python`, `$翻訳 python`: 指定した文字列を日本語に翻訳
+- `$translate へび`, `$翻訳 蛇`: 指定した文字列を英語に翻訳
+- `$translate -ru へび` `$翻訳 -ru へび`: 指定した言語(ru等)に翻訳
+- `$translate list` `$翻訳 リスト`: 使用できる言語の一覧を返す
+
 ### misc plugin
 
 - `$helps`: ヘルプへのリンクを返す
