@@ -1,5 +1,7 @@
 beautifulsoup4==4.4.1
 jira==1.0.3
+langdetect==1.0.6
+microsofttranslator==0.8
 mpmath==0.19
 oauthlib==1.1.1
 requests==2.10.0
