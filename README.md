@@ -56,6 +56,8 @@ BOT: @takanory おはようございます
 - `$translate -ru へび` `$翻訳 -ru へび`: 指定した言語(ru等)に翻訳
 - `$translate list` `$翻訳 リスト`: 使用できる言語の一覧を返す
 
+- Powered by [Microsoft Translator API](https://www.microsoft.com/en-us/translator/getstarted.aspx "Getting Started with Microsoft Translator")
+
 ### misc plugin
 
 - `$helps`: ヘルプへのリンクを返す
