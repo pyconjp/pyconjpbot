@@ -14,6 +14,7 @@
 - `$manual`: マニュアルのURLを返す
 - `$manual keywords`: キーワードでマニュアルを検索するURLを返す
 - `$manual help`: manual コマンドのヘルプを表示
+- [manual.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/manual.py)
 
 ### jira plugin
 
@@ -22,12 +23,14 @@
 - `$jira allsearch|全検索 keywords`: 指定したキーワードでJIRAを検索した結果を返す(全ステータス)
 - `$jira assignee|担当 keywords`: 指定されたユーザーが担当しているissueを返す
 - `$jira filter|フィルター`: フィルターの一覧を返す
+- [jira.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/jira.py)
 
 ### wikipedia plugin
 
 - `$wikipedia keywords`: 指定されたキーワードの Wikipedia ページの情報を返す
 - `$wikipedia -en keywords`: 指定された言語(en等)の Wikipedia ページの情報を返す
 - `$wikipedia help`: wikipedia コマンドのヘルプを表示
+- [wikipedia.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/wikipedia.py)
 
 ### calc plugin
 
@@ -40,6 +43,13 @@
 sqrt(2)
 ```
 
+- [calc.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/calc.py)
+
+### reaction plugin
+
+- 任意のキーワードに対して emoji でのリアクションを返す
+- [reaction.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/reaction.py)
+
 ### greeting plugin
 
 - あいさつを返す
@@ -49,6 +59,8 @@ takanory: おはよう
 BOT: @takanory おはようございます
 ```
 
+- [greeting.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/greeting.py)
+
 ### translator plugin
 
 - `$translate python`, `$翻訳 python`: 指定した文字列を日本語に翻訳
@@ -56,6 +68,7 @@ BOT: @takanory おはようございます
 - `$translate -ru へび` `$翻訳 -ru へび`: 指定した言語(ru等)に翻訳
 - `$translate list` `$翻訳 リスト`: 使用できる言語の一覧を返す
 
+- [translator.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/translator.py)
 - Powered by [Microsoft Translator API](https://www.microsoft.com/en-us/translator/getstarted.aspx "Getting Started with Microsoft Translator")
 
 ### misc plugin
@@ -63,6 +76,7 @@ BOT: @takanory おはようございます
 - `$helps`: ヘルプへのリンクを返す
 - `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
 - `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
+- [misc.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/misc.py)
 
 ## How to build
 
