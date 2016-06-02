@@ -43,3 +43,7 @@ def react_niku(message):
     _react(message, 'curry')
     _react(message, 'boom')
     
+@listen_to('さくさく')
+def react_niku(message):
+    _react(message, 'panda_face')
+    
