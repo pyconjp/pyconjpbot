@@ -1,5 +1,6 @@
 import os
 import json
+from collections import OrderedDict
 
 from slackbot.bot import respond_to
 import requests
@@ -25,12 +26,12 @@ def get_city_code():
     cityコードの一覧を取得する
     """
 
-    city_dict = {}
+    city_dict = OrderedDict()
 
     # cityコードのjsonファイルが存在する場合はそこから読み込む
     if os.path.exists(CITY_CODE_FILE):
         with open(CITY_CODE_FILE) as f:
-            city_dict = json.load(f)
+            city_dict = json.load(f, object_pairs_hook=OrderedDict)
 
     else:
         r = requests.get(CODE_URL)
