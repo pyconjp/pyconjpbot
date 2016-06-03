@@ -1,4 +1,5 @@
 slackbot_settings.py
+city_code.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
