@@ -71,6 +71,13 @@ BOT: @takanory おはようございます
 - [translator.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/translator.py)
 - Powered by [Microsoft Translator API](https://www.microsoft.com/en-us/translator/getstarted.aspx "Getting Started with Microsoft Translator")
 
+### weather plugin
+
+- `$weather` `$天気`: 東京の天気予報を返す
+- `$weather 釧路` `$天気 釧路`: 指定した地域の天気予報を返す
+- `$weather list` `$天気 list`: 指定可能な地域の一覧を返す
+- [weather.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/weather.py)
+
 ### misc plugin
 
 - `$helps`: ヘルプへのリンクを返す
