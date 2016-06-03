@@ -1,4 +1,5 @@
 import os
+import os.path
 import json
 from collections import OrderedDict
 
@@ -25,12 +26,15 @@ def get_city_code():
     """
     cityコードの一覧を取得する
     """
-
+    
     city_dict = OrderedDict()
 
+    # プラグインと同じディレクトリにファイルを作成する
+    city_code_file = os.path.join(os.path.dirname(__file__), CITY_CODE_FILE)
+
     # cityコードのjsonファイルが存在する場合はそこから読み込む
-    if os.path.exists(CITY_CODE_FILE):
-        with open(CITY_CODE_FILE) as f:
+    if os.path.exists(city_code_file):
+        with open(path) as f:
             city_dict = json.load(f, object_pairs_hook=OrderedDict)
 
     else:
@@ -40,7 +44,8 @@ def get_city_code():
         for city in soup.findAll('city'):
             city_dict[city['title']] = city['id']
 
-        with open(CITY_CODE_FILE, 'w') as f:
+        # json 形式で書き出す
+        with open(city_code_file, 'w') as f:
             json.dump(city_dict, f, indent=2, ensure_ascii=False)
 
     return city_dict
