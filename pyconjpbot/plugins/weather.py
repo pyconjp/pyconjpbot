@@ -34,7 +34,7 @@ def get_city_code():
 
     # cityコードのjsonファイルが存在する場合はそこから読み込む
     if os.path.exists(city_code_file):
-        with open(path) as f:
+        with open(city_code_file) as f:
             city_dict = json.load(f, object_pairs_hook=OrderedDict)
 
     else:
