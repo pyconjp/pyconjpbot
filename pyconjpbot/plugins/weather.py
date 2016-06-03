@@ -1,29 +1,51 @@
+import os
 import json
-
 
 from slackbot.bot import respond_to
 import requests
 from bs4 import BeautifulSoup
 
-URL = 'http://weather.livedoor.com/forecast/webservice/json/v1?city={}'
-
+WEATHER_URL = 'http://weather.livedoor.com/forecast/webservice/json/v1?city={}'
+CODE_URL = 'http://weather.livedoor.com/forecast/rss/primary_area.xml'
+        
 WEATHER_EMOJI = {
     '晴れ': ':sunny:',
+    '晴のち曇': ':mostly_sunny:',
+    '曇時々晴': ':partly_sunny:',
+    '雨時々曇': ':rain_cloud:',
+    '曇のち雨': ':rain_cloud:',
+    '曇時々雨': ':rain_cloud:',
     '雨': ':umbrella:',
     }
+
+CITY_CODE_FILE = 'city_code.json'
 
 def get_city_code():
     """
     cityコードの一覧を取得する
     """
-    r = requests.get('http://weather.livedoor.com/forecast/rss/primary_area.xml')
-    soup = BeautifulSoup(r.content, 'html.parser')
 
     city_dict = {}
-    for city in soup.findAll('city'):
-        city_dict[city['title']] = city['id']
+
+    # cityコードのjsonファイルが存在する場合はそこから読み込む
+    if os.path.exists(CITY_CODE_FILE):
+        with open(CITY_CODE_FILE) as f:
+            city_dict = json.load(f)
+            print('loaded')
+
+    else:
+        r = requests.get(CODE_URL)
+        soup = BeautifulSoup(r.content, 'html.parser')
+
+        for city in soup.findAll('city'):
+            city_dict[city['title']] = city['id']
+
+        with open(CITY_CODE_FILE, 'w') as f:
+            json.dump(city_dict, f, indent=2, ensure_ascii=False)
+
     return city_dict
 
+# cityコードの辞書を取得する
 city_dict = get_city_code()
 
 def _get_forecast_text(forecast):
@@ -54,7 +76,7 @@ def weather(message, command, place='東京'):
         message.send('指定された地域は存在しません')
         return
         
-    r = requests.get(URL.format(code))
+    r = requests.get(WEATHER_URL.format(code))
     data = r.json()
 
     city = data['location']['city']
