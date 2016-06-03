@@ -3,7 +3,7 @@
 * Chatbot for Slack of PyCon JP
 * based on https://github.com/lins05/slackbot
 
-![](pyconjpbot-image.png)
+<img src="pyconjpbot-image.png" width="300">
 
 ## Commands
 
