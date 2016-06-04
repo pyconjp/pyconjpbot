@@ -2,6 +2,7 @@ import argparse
 import httplib2
 import os
 import json
+import sqlite3
 
 from slackbot.bot import respond_to
 from apiclient import discovery
@@ -31,6 +32,7 @@ FOLDER = {
     'mini': '0BzmtypRXAd8zODdjODljOTctOWU5ZS00ZWJjLTk4MjgtNDMyZDExODA1NzQ0',
     }
 
+# MIME_TYPE とそれに対応する名前の辞書
 MIME_TYPE = {
     'application/vnd.google-apps.spreadsheet': 'スプレッドシート',
     'application/vnd.google-apps.document': 'ドキュメント',
@@ -39,7 +41,10 @@ MIME_TYPE = {
     'application/vnd.google-apps.form': 'フォーム',
     }
 
-    
+# MIME_TYPE の key と value を逆にした辞書
+MIME_TYPE_INV = {value: key for key, value in MIME_TYPE.items()}
+
+
 def get_service(name, version, filename, scope):
     """指定された Google API に接続する
 
@@ -109,17 +114,44 @@ def drive_search(message, keywords):
     }]
     message.send_webapi('', json.dumps(attachments))
 
+def walk(service, c, path, folder_id):
+    """
+    フォルダの階層をたどる
+    """
+    #print("フォルダ: {}".format(path))
+    query = "'{}' in parents and mimeType = '{}'"
+    # フォルダのみを取得する
+    q=query.format(folder_id, MIME_TYPE_INV['フォルダ'])
+    response = service.files().list(fields="files(id, name)", q=q).execute()
+
+    for file in response.get('files', []):
+        new_path = path + file.get('name') + '/'
+        # データベースに追加
+        c.execute('INSERT INTO folder_id values(?, ?)',
+                  (new_path, file.get('id')))
+        # 下の階層を処理する
+        walk(service, c, new_path, file.get('id'))
+
 def main():
     """
     Google Drive APIを認証して使用できるようにする
     """
     service = get_service('drive', 'v3', __file__, SCOPES)
 
-    results = service.files().list(
-        pageSize=10, fields="nextPageToken, files", q='fullText contains "名簿" and "{}" in parents or "{}" in parents'.format(FOLDER['2016'], FOLDER['2015'])).execute()
-    for item in results.get('files', []):
-        print(item['name'], item['id'])
-        print(item['webViewLink'])
+    conn = sqlite3.connect('folder_id.db')
+    c = conn.cursor()
+    c.execute('''drop table folder_id''')
+    c.execute('''create table folder_id
+    (path text, id text)''')
+    walk(service, c, 'PyCon JP/', FOLDER['PyCon JP'])
+    conn.commit()
+    conn.close()
+    
+    #results = service.files().list(
+    #    pageSize=10, fields="nextPageToken, files", q='fullText contains "名簿" and "{}" in parents or "{}" in parents'.format(FOLDER['2016'], FOLDER['2015'])).execute()
+    #for item in results.get('files', []):
+    #    print(item['name'], item['id'])
+    #    print(item['webViewLink'])
 
 if __name__ == '__main__':
     main()
