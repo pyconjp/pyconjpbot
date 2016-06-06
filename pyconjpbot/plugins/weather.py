@@ -13,11 +13,15 @@ CODE_URL = 'http://weather.livedoor.com/forecast/rss/primary_area.xml'
 WEATHER_EMOJI = {
     '晴れ': ':sunny:',
     '晴のち曇': ':mostly_sunny:',
+    '曇のち晴': ':mostly_sunny:',
     '曇時々晴': ':partly_sunny:',
+    '晴時々曇': ':partly_sunny:',
     '雨時々曇': ':rain_cloud:',
     '曇のち雨': ':rain_cloud:',
+    '曇り': ':cloud:',
     '曇時々雨': ':rain_cloud:',
     '雨': ':umbrella:',
+    '雪': ':snowman:',
     }
 
 CITY_CODE_FILE = 'city_code.json'
