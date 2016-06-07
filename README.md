@@ -19,10 +19,10 @@
 ### jira plugin
 
 - `SAR-123`: JIRAのissueの情報を返す
-- `$jira search|検索 keywords`: 指定したキーワードでJIRAを検索した結果を返す(オープンのみ)
-- `$jira allsearch|全検索 keywords`: 指定したキーワードでJIRAを検索した結果を返す(全ステータス)
-- `$jira assignee|担当 keywords`: 指定されたユーザーが担当しているissueを返す
-- `$jira filter|フィルター`: フィルターの一覧を返す
+- `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
+- `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
+- `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す
+- `$jira filter` `$jira フィルター`: フィルターの一覧を返す
 - [jira.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/jira.py)
 
 ### wikipedia plugin
