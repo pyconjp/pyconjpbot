@@ -146,7 +146,7 @@ def jira_search(message):
     jiraコマンドのヘルプを返す
     """
     message.send('''- `SAR-123`: 指定されたチケットの詳細情報を返す
-- `$jira search|検索 keywords`: 指定されたキーワードで検索(オープンのみ)
-- `$jira allsearch|全検索 keywords`: 指定されたキーワードで検索(全ステータス)
-- `$jira assignee|担当 user`: 指定されたユーザーが担当しているissueを返す
-- `$jira filter|フィルター`: フィルターの一覧を返す''')
+- `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
+- `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
+- `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す
+- `$jira filter` `$jira フィルター`: フィルターの一覧を返す''')
