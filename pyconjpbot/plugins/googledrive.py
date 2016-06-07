@@ -1,6 +1,7 @@
 import argparse
 import httplib2
 import os
+import os.path
 import json
 import sqlite3
 
@@ -13,24 +14,9 @@ from oauth2client import tools
 # Google Drive API の Scope
 SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly'
 
-# PyCon JP 関連の検索対象とする親フォルダの Id
-FOLDER = {
-    'PyCon JP': '0BzmtypRXAd8zZDZhOWJkNWQtMDNjOC00NjQ1LWI0YzYtZDU3NzY1NTY5NDM3',
-    '一社': '0B_bw8GEmTD5OQmxBZ1l6UzNodmc',
-    '2016': '0B_bw8GEmTD5OTTl1U0pWeW43Sk0',
-    '全体': '0B_bw8GEmTD5OU1BWd0xBZWRkQkk',
-    '事務局': '0B_bw8GEmTD5OTDd6Z2NJWTd0RW8',
-    '会場': '0B_bw8GEmTD5OQjBpc00zRlo3RU0',
-    'プログラム': '0B_bw8GEmTD5OemhocVR1a1ViOFU',
-    'メディア': '0B_bw8GEmTD5OUmFFdVV1S0NKU2c',
-    '議事録': '0B_bw8GEmTD5OZEJxZ2pBc0NmUWs',
-    '2015': '0B_bw8GEmTD5ORXAtU28xNC0tTDg',
-    '2014': '0B_bw8GEmTD5OZ0FCNXlWSTEtOU0',
-    '2013': '0BzmtypRXAd8zR3FQWkhKY3luajg',
-    '2012': '0B08rY0k8XSeVZjEzNzYyYjktNzc1Mi00N2Q0LTgxZjYtMzMyZjk2Yjg3ZDBl',
-    '2011': '0BzmtypRXAd8zNGRiNmQyYTUtZTFjMS00ZGYwLWJhMGItZWU3ZTEyYjJlMWU1',
-    'mini': '0BzmtypRXAd8zODdjODljOTctOWU5ZS00ZWJjLTk4MjgtNDMyZDExODA1NzQ0',
-    }
+# PyCon JP のルートフォルダのID
+ROOT_FOLDER_NAME = 'PyCon JP/'
+ROOT_FOLDER_ID = '0BzmtypRXAd8zZDZhOWJkNWQtMDNjOC00NjQ1LWI0YzYtZDU3NzY1NTY5NDM3'
 
 # MIME_TYPE とそれに対応する名前の辞書
 MIME_TYPE = {
@@ -44,6 +30,9 @@ MIME_TYPE = {
 # MIME_TYPE の key と value を逆にした辞書
 MIME_TYPE_INV = {value: key for key, value in MIME_TYPE.items()}
 
+# sqlite のデータベースファイルとテーブル名
+DB_FILE = os.path.join(os.path.dirname(__file__), 'folder_id.db')
+TABLE = 'folder_id'
 
 def get_service(name, version, filename, scope):
     """指定された Google API に接続する
@@ -91,8 +80,11 @@ service = get_service('drive', 'v3', __file__, SCOPES)
 
 @respond_to('drive (.*)')
 def drive_search(message, keywords):
+    if keywords in ('update', 'help'):
+        return
+    
     query = 'fullText contains "{}"'.format(keywords)
-    query += ' and "{}" in parents'.format(FOLDER['2016'])
+    #query += ' and "{}" in parents'.format(FOLDER['2016'])
     results = service.files().list(
         pageSize=10, fields="files(id, name, mimeType, webViewLink)", q=query).execute()
 
@@ -114,23 +106,47 @@ def drive_search(message, keywords):
     }]
     message.send_webapi('', json.dumps(attachments))
 
-def walk(service, c, path, folder_id):
+@respond_to('drive update')
+def drive_update(message):
+    """
+    フォルダーのパスとidを入れたデータベースを更新する
+    """
+    service = get_service('drive', 'v3', __file__, SCOPES)
+    message.send('データベースを更新します')
+    _create_folder_id_db(service)
+    message.send('データベースを更新を完了しました')
+
+def _create_folder_id_db(service):
+    """
+    Google Drive のフォルダを走査して、フォルダIDの情報を作成/更新する
+    """
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute('''create table if not exists {}
+    (path text primary key, id text)'''.format(TABLE))
+
+    # Google Drive のフォルダ階層を走査する
+    _drive_walk(service, cursor, ROOT_FOLDER_NAME + '/', ROOT_FOLDER_ID)
+    conn.commit()
+    conn.close()
+    
+def _drive_walk(service, cursor, path, folder_id):
     """
     フォルダの階層をたどる
     """
     #print("フォルダ: {}".format(path))
-    query = "'{}' in parents and mimeType = '{}'"
-    # フォルダのみを取得する
-    q=query.format(folder_id, MIME_TYPE_INV['フォルダ'])
+    # フォルダのみを取得する 
+    q = "'{}' in parents and mimeType = '{}'".format(
+        folder_id, MIME_TYPE_INV['フォルダ'])
     response = service.files().list(fields="files(id, name)", q=q).execute()
 
     for file in response.get('files', []):
         new_path = path + file.get('name') + '/'
         # データベースに追加
-        c.execute('INSERT INTO folder_id values(?, ?)',
-                  (new_path, file.get('id')))
+        cursor.execute('insert or replace into {} values (?, ?)'.format(TABLE),
+                       (new_path, file.get('id')))
         # 下の階層を処理する
-        walk(service, c, new_path, file.get('id'))
+        _drive_walk(service, cursor, new_path, file.get('id'))
 
 def main():
     """
@@ -138,14 +154,28 @@ def main():
     """
     service = get_service('drive', 'v3', __file__, SCOPES)
 
-    conn = sqlite3.connect('folder_id.db')
-    c = conn.cursor()
-    c.execute('''drop table folder_id''')
-    c.execute('''create table folder_id
-    (path text, id text)''')
-    walk(service, c, 'PyCon JP/', FOLDER['PyCon JP'])
-    conn.commit()
-    conn.close()
+    _create_folder_id_db(service)
+    
+    #conn = sqlite3.connect('folder_id.db')
+    #c = conn.cursor()
+    #c.execute("select id from folder_id where path like 'PyCon JP/2015/%'")
+    #q = 'fullText contains "名簿" and'
+    #for row in c:
+    #    q += ' or "{}" in parents'.format(row[0])
+    #q = q.replace('and or', 'and')
+    #print(q)
+    #results = service.files().list(
+    #    pageSize=10, fields="nextPageToken, files", q=q).execute()
+    #for item in results.get('files', []):
+    #    print(item['name'], item['id'])
+    #    print(item['webViewLink'])
+
+    #c.execute('''drop table folder_id''')
+    #c.execute('''create table folder_id
+    #(path text, id text)''')
+    #walk(service, c, 'PyCon JP/', FOLDER['PyCon JP'])
+    #conn.commit()
+    #conn.close()
     
     #results = service.files().list(
     #    pageSize=10, fields="nextPageToken, files", q='fullText contains "名簿" and "{}" in parents or "{}" in parents'.format(FOLDER['2016'], FOLDER['2015'])).execute()
