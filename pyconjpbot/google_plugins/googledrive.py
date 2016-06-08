@@ -28,6 +28,16 @@ MIME_TYPE = {
     'application/vnd.google-apps.form': 'フォーム',
     }
 
+# 検索対象のフォルダのパス
+FOLDER = {
+    '2016': 'PyCon JP/2016/',
+    '2015': 'PyCon JP/2015/',
+    '2014': 'PyCon JP/2014/',
+    '2013': 'PyCon JP/2013/',
+    '2012': 'PyCon JP/2012/',
+    '一社': 'PyCon JP/一般社団法人/',
+}
+
 # MIME_TYPE の key と value を逆にした辞書
 MIME_TYPE_INV = {value: key for key, value in MIME_TYPE.items()}
 
@@ -74,20 +84,45 @@ def get_service(name, version, filename, scope):
 
 @respond_to('drive (.*)')
 def drive_search(message, keywords):
-    if keywords in ('update', 'help'):
+    """
+    指定されたキーワードに対して検索を行う
+
+    -n ファイル名のみを検索対象にする
+    -l limit 検索結果の上限
+    -t type ファイル種別
+    -f folder 検索対象のフォルダを指定
+    """
+    if keywords in ('db update', 'db refres', 'help'):
         return
     
     # APIに接続する
     service = get_service('drive', 'v3', __file__, SCOPES)
 
-    query = 'fullText contains "{}"'.format(keywords)
-    #query += ' and "{}" in parents'.format(FOLDER['2016'])
-    results = service.files().list(
-        pageSize=10, fields="files(id, name, mimeType, webViewLink)", q=query).execute()
+    
+    query = 'fullText contains "{}" and'.format(keywords)
+
+    # 対象となるパスのフォルダ一覧を取得
+    folder_option = '2016'
+    path = FOLDER[folder_option] + "*"
+    #print(path)
+    folders = Folder.select().where(Folder.path % path)
+
+    # 検索条件に各フォルダの id を追加
+    for folder in folders:
+        query += ' or "{}" in parents'.format(folder.id)
+    query = query.replace('and or', 'and')
+
+    #print(query)
+
+    # Google Drive API で検索を実行する
+    fields = "files(id, name, mimeType, webViewLink, modifiedTime)"
+    results = service.files().list(pageSize=10, fields=fields, q=query).execute()
+        #pageSize=10, fields="files(id, name, mimeType, webViewLink)", q=query, orderBy='modifiedTime').execute()
+    #print(query)
 
     items = results.get('files', [])
     if not items:
-        message.send('ありませんでした')
+        message.send('`{}` にマッチする項目はありませんでした'.format(keywords))
         return
 
     pretext = '「{}」の検索結果'.format(keywords)
