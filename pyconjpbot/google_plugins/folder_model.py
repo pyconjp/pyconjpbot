@@ -1,7 +1,8 @@
-from peewee import *
-import peewee
+import os.path
 
-folder_db = SqliteDatabase('folder.db')
+from peewee import *
+
+folder_db = SqliteDatabase(os.path.join(os.path.dirname(__file__), 'folder.db'))
 
 class Folder(Model):
     """
