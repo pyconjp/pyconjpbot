@@ -16,9 +16,14 @@ PLUGINS = [
 
 ALIASES = '$'
 
-## Settings or jira plugin
+## Settings for jira plugin
 JIRA_URL = 'https://pyconjp.atlassian.net/'
 JIRA_PROJECTS = ['ISSHA', 'SAR'] # JIRA Project Keys
 # see https://docs.google.com/spreadsheets/d/1YiqErBDdp5QWfTlfDmxc6Vi696b_NGFJKzuyM-v6PDM/edit#gid=0
-JIRA_USER = 'JIRA Username'
-JIRA_PASS = 'JIRA Password'
+JIRA_USER = '<JIRA Username>'
+JIRA_PASS = '<JIRA Password>'
+
+## Settings for translator plugin
+# https://www.microsoft.com/en-us/translator/getstarted.aspx
+TRANSLATOR_ID = '<Your Client ID>'
+TRANSLATOR_SECRET = '<Your Client Secret>'

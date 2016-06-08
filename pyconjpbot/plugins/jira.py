@@ -17,6 +17,10 @@ def jira_listener(message, pre, project, number):
     """
     JIRAのissue idっぽいものを取得したら、そのissueの情報を返す
     """
+    # botメッセージの場合は無視する
+    if message.body.get('subtype', '') == 'bot_message':
+        return
+
     # Only attempt to find tickets in projects defined in slackbot_settings
     if project not in settings.JIRA_PROJECTS:
         return
@@ -56,6 +60,7 @@ def jira_listener(message, pre, project, number):
     message.send_webapi('', json.dumps(attachments))
 
 @respond_to('jira search (.*)')
+@respond_to('jira 検索 (.*)')
 def jira_search(message, keyword):
     """
     JIRAをキーワード検索した結果を返す(オープン状態のみ)
@@ -65,6 +70,7 @@ def jira_search(message, keyword):
     _send_jira_search_responce(message, jql.format(keyword), title)
 
 @respond_to('jira allsearch (.*)')
+@respond_to('jira 全検索 (.*)')
 def jira_allsearch(message, keyword):
     """
     JIRAをキーワード検索した結果を返す(全ステータス対象)
@@ -74,6 +80,7 @@ def jira_allsearch(message, keyword):
     _send_jira_search_responce(message, jql.format(keyword), title)
 
 @respond_to('jira assignee (.*)')
+@respond_to('jira 担当者? (.*)')
 def jira_assignee(message, user):
     """
     指定されたユーザーにアサインされた課題の一覧を返す
@@ -109,6 +116,7 @@ def _send_jira_search_responce(message, query, title):
     message.send_webapi('', json.dumps(attachments))
 
 @respond_to('jira filters?')
+@respond_to('jira フィルター?')
 def jira_filter(message):
     """
     フィルターの一覧を返す
@@ -138,7 +146,7 @@ def jira_search(message):
     jiraコマンドのヘルプを返す
     """
     message.send('''- `SAR-123`: 指定されたチケットの詳細情報を返す
-- `$jira search keywords`: 指定されたキーワードで検索(オープンのみ)
-- `$jira allsearch keywords`: 指定されたキーワードで検索(全ステータス)
-- `$jira assignee user`: 指定されたユーザーが担当しているissueを返す
-- `$jira filter`: フィルターの一覧を返す''')
+- `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
+- `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
+- `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す
+- `$jira filter` `$jira フィルター`: フィルターの一覧を返す''')
