@@ -1,6 +1,7 @@
 slackbot_settings.py
 client_secrets.json
 *.dat
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
