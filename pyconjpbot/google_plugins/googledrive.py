@@ -16,7 +16,7 @@ from .folder_model import Folder
 SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly'
 
 # PyCon JP のルートフォルダのID
-ROOT_FOLDER_NAME = 'PyCon JP/'
+ROOT_FOLDER_NAME = 'PyCon JP'
 ROOT_FOLDER_ID = '0BzmtypRXAd8zZDZhOWJkNWQtMDNjOC00NjQ1LWI0YzYtZDU3NzY1NTY5NDM3'
 
 # MIME_TYPE とそれに対応する名前の辞書
@@ -72,14 +72,14 @@ def get_service(name, version, filename, scope):
     service = discovery.build(name, version, http=http)
     return service
 
-# APIに接続する
-service = get_service('drive', 'v3', __file__, SCOPES)
-
 @respond_to('drive (.*)')
 def drive_search(message, keywords):
     if keywords in ('update', 'help'):
         return
     
+    # APIに接続する
+    service = get_service('drive', 'v3', __file__, SCOPES)
+
     query = 'fullText contains "{}"'.format(keywords)
     #query += ' and "{}" in parents'.format(FOLDER['2016'])
     results = service.files().list(
@@ -103,21 +103,39 @@ def drive_search(message, keywords):
     }]
     message.send_webapi('', json.dumps(attachments))
 
-@respond_to('drive update')
-def drive_update(message):
+def _drive_db_update():
+    """
+    フォルダーのパスとidを入れたデータベースを更新する
+    """
+    service = get_service('drive', 'v3', __file__, SCOPES)
+
+    Folder.create_table(fail_silently=True)
+    # Google Drive のフォルダ階層を走査する
+    _drive_walk(service, ROOT_FOLDER_NAME + '/', ROOT_FOLDER_ID)
+
+@respond_to('drive db update')
+def drive_db_update(message):
     """
     フォルダーのパスとidを入れたデータベースを更新する
     """
     service = get_service('drive', 'v3', __file__, SCOPES)
     message.send('データベースを更新します')
-
-    # テーブルを生成する
-    Folder.drop_table()
-    Folder.create_table(fail_silently=True)
-    # Google Drive のフォルダ階層を走査する
-    _drive_walk(service, ROOT_FOLDER_NAME + '/', ROOT_FOLDER_ID)
+    _drive_db_update()
     
     message.send('データベースを更新を完了しました')
+
+@respond_to('drive db refresh')
+def drive_db_refresh(message):
+    """
+    フォルダーのパスとidを入れたデータベースを最初から作成し直す
+    """
+    message.send('データベースを再構築します')
+
+    # テーブルを削除する
+    Folder.drop_table()
+    _drive_db_update()
+    
+    message.send('データベースを再構築を完了しました')
 
 def _drive_walk(service, path, folder_id):
     """
@@ -138,3 +156,7 @@ def _drive_walk(service, path, folder_id):
 
         # 下の階層を処理する
         _drive_walk(service, new_path, file.get('id'))
+
+@respond_to('drive help$')
+def drive_help(message):
+    message.send('helpを返す')
