@@ -3,13 +3,14 @@ import httplib2
 import os
 import os.path
 import json
-import sqlite3
 
 from slackbot.bot import respond_to
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import file
 from oauth2client import tools
+
+from .folder_model import Folder
 
 # Google Drive API の Scope
 SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly'
@@ -29,10 +30,6 @@ MIME_TYPE = {
 
 # MIME_TYPE の key と value を逆にした辞書
 MIME_TYPE_INV = {value: key for key, value in MIME_TYPE.items()}
-
-# sqlite のデータベースファイルとテーブル名
-DB_FILE = os.path.join(os.path.dirname(__file__), 'folder_id.db')
-TABLE = 'folder_id'
 
 def get_service(name, version, filename, scope):
     """指定された Google API に接続する
@@ -113,24 +110,16 @@ def drive_update(message):
     """
     service = get_service('drive', 'v3', __file__, SCOPES)
     message.send('データベースを更新します')
-    _create_folder_id_db(service)
+
+    # テーブルを生成する
+    Folder.drop_table()
+    Folder.create_table(fail_silently=True)
+    # Google Drive のフォルダ階層を走査する
+    _drive_walk(service, ROOT_FOLDER_NAME + '/', ROOT_FOLDER_ID)
+    
     message.send('データベースを更新を完了しました')
 
-def _create_folder_id_db(service):
-    """
-    Google Drive のフォルダを走査して、フォルダIDの情報を作成/更新する
-    """
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute('''create table if not exists {}
-    (path text primary key, id text)'''.format(TABLE))
-
-    # Google Drive のフォルダ階層を走査する
-    _drive_walk(service, cursor, ROOT_FOLDER_NAME + '/', ROOT_FOLDER_ID)
-    conn.commit()
-    conn.close()
-    
-def _drive_walk(service, cursor, path, folder_id):
+def _drive_walk(service, path, folder_id):
     """
     フォルダの階層をたどる
     """
@@ -142,46 +131,10 @@ def _drive_walk(service, cursor, path, folder_id):
 
     for file in response.get('files', []):
         new_path = path + file.get('name') + '/'
-        # データベースに追加
-        cursor.execute('insert or replace into {} values (?, ?)'.format(TABLE),
-                       (new_path, file.get('id')))
+
+        # データベースに追加(INSERT)または更新(REPLACE)する
+        fields = {'path': new_path, 'id': file.get('id')}
+        Folder.insert(fields).upsert(upsert=True).execute()
+
         # 下の階層を処理する
-        _drive_walk(service, cursor, new_path, file.get('id'))
-
-def main():
-    """
-    Google Drive APIを認証して使用できるようにする
-    """
-    service = get_service('drive', 'v3', __file__, SCOPES)
-
-    _create_folder_id_db(service)
-    
-    #conn = sqlite3.connect('folder_id.db')
-    #c = conn.cursor()
-    #c.execute("select id from folder_id where path like 'PyCon JP/2015/%'")
-    #q = 'fullText contains "名簿" and'
-    #for row in c:
-    #    q += ' or "{}" in parents'.format(row[0])
-    #q = q.replace('and or', 'and')
-    #print(q)
-    #results = service.files().list(
-    #    pageSize=10, fields="nextPageToken, files", q=q).execute()
-    #for item in results.get('files', []):
-    #    print(item['name'], item['id'])
-    #    print(item['webViewLink'])
-
-    #c.execute('''drop table folder_id''')
-    #c.execute('''create table folder_id
-    #(path text, id text)''')
-    #walk(service, c, 'PyCon JP/', FOLDER['PyCon JP'])
-    #conn.commit()
-    #conn.close()
-    
-    #results = service.files().list(
-    #    pageSize=10, fields="nextPageToken, files", q='fullText contains "名簿" and "{}" in parents or "{}" in parents'.format(FOLDER['2016'], FOLDER['2015'])).execute()
-    #for item in results.get('files', []):
-    #    print(item['name'], item['id'])
-    #    print(item['webViewLink'])
-
-if __name__ == '__main__':
-    main()
+        _drive_walk(service, new_path, file.get('id'))
