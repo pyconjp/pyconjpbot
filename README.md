@@ -9,6 +9,26 @@
 
 コマンドの一覧と簡単な説明
 
+### Google drive plugin
+
+- `$drive keywords`: Google ドライブを検索する
+- `$drive help`: drive コマンドのヘルプを表示
+
+```
+$drive [-n] [-l LIMIT] [-a | -f FOLDER] [-t TYPE] keywords...`
+
+オプション引数:
+
+  -n, --name            ファイル名のみを検索対象にする(未指定時は全文検索)
+  -l LIMIT, --limit LIMIT
+                        結果の最大件数を指定する(default: 10)
+  -f FOLDER, --folder FOLDER
+                        検索対象のフォルダーを指定する(default: 2016)
+  -t TYPE, --type TYPE  検索対象のファイル種別を指定する
+```
+
+- [googledrive.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/google_plugins/googledrive.py)
+
 ### manual plugin
 
 - `$manual`: マニュアルのURLを返す
