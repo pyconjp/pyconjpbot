@@ -49,7 +49,7 @@ MIME_TYPE_INV = {value: key for key, value in MIME_TYPE.items()}
 # $dive コマンドの引数処理用 arpparse
 HELP = """
 ```
-$drive [-n] [-l LIMIT] [-a | -f FOLDER] [-t TYPE] keywords...`
+$drive [-n] [-l LIMIT] [-f FOLDER] [-t TYPE] keywords...`
 
 オプション引数:
 
@@ -170,9 +170,10 @@ def drive_search(message, keywords):
         return
 
     # 引数を処理する
-    args, argv = parser.parse_known_args(keywords.split())
-    if argv:
-        message.send('引数が正しくありません')
+    try:
+        args, argv = parser.parse_known_args(keywords.split())
+    except SystemExit:
+        message.send('引数の形式が正しくありません')
         _drive_help(message)
         return
 
