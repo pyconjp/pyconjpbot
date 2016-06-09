@@ -3,6 +3,7 @@ import httplib2
 import os
 import os.path
 import json
+from collections import OrderedDict
 
 from slackbot.bot import respond_to
 from apiclient import discovery
@@ -19,27 +20,58 @@ SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly'
 ROOT_FOLDER_NAME = 'PyCon JP'
 ROOT_FOLDER_ID = '0BzmtypRXAd8zZDZhOWJkNWQtMDNjOC00NjQ1LWI0YzYtZDU3NzY1NTY5NDM3'
 
-# MIME_TYPE とそれに対応する名前の辞書
-MIME_TYPE = {
-    'application/vnd.google-apps.spreadsheet': 'スプレッドシート',
-    'application/vnd.google-apps.document': 'ドキュメント',
-    'application/vnd.google-apps.presentation': 'スライド',
-    'application/vnd.google-apps.folder': 'フォルダ',
-    'application/vnd.google-apps.form': 'フォーム',
-    }
-
 # 検索対象のフォルダのパス
-FOLDER = {
-    '2016': 'PyCon JP/2016/',
-    '2015': 'PyCon JP/2015/',
-    '2014': 'PyCon JP/2014/',
-    '2013': 'PyCon JP/2013/',
-    '2012': 'PyCon JP/2012/',
-    '一社': 'PyCon JP/一般社団法人/',
-}
+FOLDER = OrderedDict([
+    ('2016', 'PyCon JP/2016/'),
+    ('事務局', 'PyCon JP/2016/1.事務局/'),
+    ('会場', 'PyCon JP/2016/2.会場/'),
+    ('プログラム', 'PyCon JP/2016/3.プログラム/'),
+    ('メディア', 'PyCon JP/2016/4.メディア/'),
+    ('2015', 'PyCon JP/2015/'),
+    ('2014', 'PyCon JP/2014/'),
+    ('2013', 'PyCon JP/2013/'),
+    ('2012', 'PyCon JP/2012/'),
+    ('一社', 'PyCon JP/一般社団法人/'),
+])
+
+# ファイルの種類と MIME_TYPE の辞書
+MIME_TYPE = OrderedDict([
+    ('フォルダ', 'application/vnd.google-apps.folder'),
+    ('スプレッドシート', 'application/vnd.google-apps.spreadsheet'),
+    ('ドキュメント', 'application/vnd.google-apps.document'),
+    ('スライド', 'application/vnd.google-apps.presentation'),
+    ('フォーム', 'application/vnd.google-apps.form'),
+])
 
 # MIME_TYPE の key と value を逆にした辞書
 MIME_TYPE_INV = {value: key for key, value in MIME_TYPE.items()}
+
+# $dive コマンドの引数処理用 arpparse
+HELP = """
+```
+$drive [-n] [-l LIMIT] [-a | -f FOLDER] [-t TYPE] keywords...`
+
+オプション引数:
+
+  -n, --name            ファイル名のみを検索対象にする(未指定時は全文検索)
+  -l LIMIT, --limit LIMIT
+                        結果の最大件数を指定する(default: 10)
+  -f FOLDER, --folder FOLDER
+                        検索対象のフォルダーを指定する(default: 2016)
+  -t TYPE, --type TYPE  検索対象のファイル種別を指定する
+```
+"""
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('-n', '--name', default=False, action='store_true',
+                    help='ファイル名のみを検索対象にする(未指定時は全文検索)')
+parser.add_argument('-l', '--limit', default=10, type=int,
+                    help='結果の最大件数を指定する(default: 10)')
+parser.add_argument('-f', '--folder', default='2016', type=str,
+                    help='検索対象のフォルダーを指定する(default: 2016)')
+parser.add_argument('-t', '--type', type=str,
+                    help='検索対象のファイル種別を指定する')
+parser.add_argument('keywords', nargs='+',
+                    help='検索対象のキーワードを指定する')
 
 def get_service(name, version, filename, scope):
     """指定された Google API に接続する
@@ -82,59 +114,105 @@ def get_service(name, version, filename, scope):
     service = discovery.build(name, version, http=http)
     return service
 
+def _build_query(args):
+    """
+    Google Drive を検索するための query を生成する
+
+    args.keywords: キーワードのリスト
+    args.name: True の場合、ファイル名で検索
+    args.folder: 指定されたフォルダーを検索対象とする
+    args.type: ファイルの種類(mimeType)
+
+    参考: https://developers.google.com/drive/v3/web/search-parameters
+    """
+    
+    # デフォルトは全文検索
+    target = 'fullText'
+    if args.name:
+        # ファイル名のみを対象にする
+        target = 'name'
+
+    # キーワードは and 検索
+    # 例: name contains key1 and name contains key2...
+    keyword_queries = ["{} contains '{}'".format(target, x) for x in args.keywords]
+    query = ' and '.join(keyword_queries)
+
+    # mime_type が指定されている場合
+    # 例: mimeType = 'application/vnd.google-apps.folder'
+    if args.type:
+        query += " and mimeType = '{}'".format(MIME_TYPE[args.type])
+
+    # 対象となるパスのフォルダ一覧を取得
+    path = FOLDER[args.folder] + "*"
+    folders = Folder.select().where(Folder.path % path)
+
+    # フォルダーは or 検索
+    # 例: '12345' in parents or '12346' in parents...
+    folder_queries = ["'{}' in parents".format(x.id) for x in folders]
+    query += ' and (' + ' or '.join(folder_queries) + ')'
+
+    return query
+
 @respond_to('drive (.*)')
 def drive_search(message, keywords):
     """
     指定されたキーワードに対して検索を行う
 
-    -n ファイル名のみを検索対象にする
-    -l limit 検索結果の上限
-    -t type ファイル種別
-    -f folder 検索対象のフォルダを指定
+    -n, --name            ファイル名のみを検索対象にする(未指定時は全文検索)
+    -l LIMIT, --limit LIMIT
+                          結果の最大件数を指定する(default: 10)
+    -f FOLDER, --folder FOLDER
+                          検索対象のフォルダーを指定する(default: 2016)
+    -t TYPE, --type TYPE  検索対象のファイル種別を指定する
     """
-    if keywords in ('db update', 'db refres', 'help'):
+
+    if keywords in ('db update', 'db refresh', 'help'):
         return
-    
-    # APIに接続する
-    service = get_service('drive', 'v3', __file__, SCOPES)
 
-    
-    query = 'fullText contains "{}" and'.format(keywords)
+    # 引数を処理する
+    args, argv = parser.parse_known_args(keywords.split())
+    if argv:
+        message.send('引数が正しくありません')
+        _drive_help(message)
+        return
 
-    # 対象となるパスのフォルダ一覧を取得
-    folder_option = '2016'
-    path = FOLDER[folder_option] + "*"
-    #print(path)
-    folders = Folder.select().where(Folder.path % path)
+    if args.folder and args.folder not in FOLDER:
+        folders = ', '.join(["`" + x + "`" for x in FOLDER])
+        message.send('フォルダーの指定が正しくありません。以下のフォルダーが指定可能です。\n' + folders)
+        _drive_help(message)
+        return
+        
+    if args.type and args.type not in MIME_TYPE:
+        mime_types = ', '.join(["`" + x + "`" for x in MIME_TYPE])
+        message.send('ファイル種別の指定が正しくありません。以下のファイルが指定可能です。\n' + mime_types)
+        _drive_help(message)
+        return
 
-    # 検索条件に各フォルダの id を追加
-    for folder in folders:
-        query += ' or "{}" in parents'.format(folder.id)
-    query = query.replace('and or', 'and')
-
-    #print(query)
+    # 引数から query を生成
+    q = _build_query(args)
+    print(q)
 
     # Google Drive API で検索を実行する
+    service = get_service('drive', 'v3', __file__, SCOPES)
     fields = "files(id, name, mimeType, webViewLink, modifiedTime)"
-    results = service.files().list(pageSize=10, fields=fields, q=query).execute()
-        #pageSize=10, fields="files(id, name, mimeType, webViewLink)", q=query, orderBy='modifiedTime').execute()
-    #print(query)
+    results = service.files().list(pageSize=args.limit, fields=fields, q=q).execute()
 
     items = results.get('files', [])
     if not items:
-        message.send('`{}` にマッチする項目はありませんでした'.format(keywords))
+        message.send('パラメーター: `{}` にマッチするファイルはありません'.format(keywords))
         return
 
-    pretext = '「{}」の検索結果'.format(keywords)
+    pretext = 'パラメーター: `{}` の検索結果'.format(keywords)
     text = ''
     for item in items:
-        item['type'] = MIME_TYPE.get(item['mimeType'], item['mimeType'])
+        item['type'] = MIME_TYPE_INV.get(item['mimeType'], item['mimeType'])
         text += '- <{webViewLink}|{name}> ({type}) \n'.format(**item)
 
     attachments = [{
         'fallback': pretext,
         'pretext': pretext,
         'text': text,
+        'mrkdwn_in': ["pretext"],
     }]
     message.send_webapi('', json.dumps(attachments))
 
@@ -194,4 +272,7 @@ def _drive_walk(service, path, folder_id):
 
 @respond_to('drive help$')
 def drive_help(message):
-    message.send('helpを返す')
+    _drive_help(message)
+
+def _drive_help(message):
+    message.send(HELP)
