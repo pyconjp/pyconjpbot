@@ -22,11 +22,7 @@ HELP = """
 $jira {} [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
 $jira {} [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
 
-位置引数:
-  keywords              検索対象のキーワードを指定する
-
 オプション引数:
-  -h, --help            show this help message and exit
   -p PROJECT, --project PROJECT
                         検索対象のプロジェクトを指定する(default: {})
   -c COMPONENT, --component COMPONENT
@@ -232,4 +228,6 @@ def jira_search(message):
 - `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
 - `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
 - `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す
-- `$jira filter` `$jira フィルター`: フィルターの一覧を返す''')
+- `$jira filter` `$jira フィルター`: フィルターの一覧を返す
+
+検索/全検索時に使用できるオプション''' + HELP.format('検索', '全検索', DEFAULT_PROJECT))
