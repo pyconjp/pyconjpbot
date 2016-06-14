@@ -45,6 +45,20 @@ $drive [-n] [-l LIMIT] [-a | -f FOLDER] [-t TYPE] keywords...`
 - `$jira filter` `$jira フィルター`: フィルターの一覧を返す
 - [jira.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/jira.py)
 
+```
+$jira 検索 [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
+$jira 全検索 [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
+
+オプション引数:
+  -p PROJECT, --project PROJECT
+                        検索対象のプロジェクトを指定する(default: SAR)
+  -c COMPONENT, --component COMPONENT
+                        検索対象のコンポーネントを指定する
+  -l LABEL, --label LABEL
+                        検索対象のラベルを指定する
+  -s, --summary         要約(タイトル)のみを検索対象にする(未指定時は全文検索)
+```
+
 ### wikipedia plugin
 
 - `$wikipedia keywords`: 指定されたキーワードの Wikipedia ページの情報を返す
