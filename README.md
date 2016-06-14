@@ -117,6 +117,7 @@ BOT: @takanory おはようございます
 - `$helps`: ヘルプへのリンクを返す
 - `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
 - `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
+- `$ping`: 応答(pong)を返す
 - [misc.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/misc.py)
 
 ## How to build
