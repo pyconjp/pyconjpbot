@@ -16,7 +16,18 @@ jira = JIRA(CLEAN_JIRA_URL, basic_auth=jira_auth)
 # デフォルトの検索対象プロジェクト
 DEFAULT_PROJECT = 'SAR'
 
-# $jira コマンドの引数処理用 arpparse
+# コンポーネントの一覧
+COMPONENT = {
+    '全体': '0.全体',
+    '事務局': '1.事務局',
+    '会場': '2.会場',
+    'プログラム': '3.プログラム',
+    'メディア': '4.メディア',
+    '環境': '5.環境',
+    'その他': '9.その他',
+}
+
+# $jira コマンドの引数処理用 argparse
 HELP = """
 ```
 $jira {} [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
@@ -105,7 +116,8 @@ def _build_jql(args, jql_base=''):
     jql = jql_base
     jql += 'project = {}'.format(args.project)
     if args.component:
-        jql += ' AND component = {}'.format(args.component)
+        component = COMPONENT.get(args.component, args.component)
+        jql += ' AND component = {}'.format(component)
     if args.label:
         jql += ' AND labels = {}'.format(args.label)
     if args.keywords:
