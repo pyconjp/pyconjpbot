@@ -1,3 +1,4 @@
+import argparse
 import json
 from urllib.parse import quote
 
@@ -11,6 +12,42 @@ CLEAN_JIRA_URL = settings.JIRA_URL if not settings.JIRA_URL[-1:] == '/' else set
 # Login to jira
 jira_auth = (settings.JIRA_USER, settings.JIRA_PASS)
 jira = JIRA(CLEAN_JIRA_URL, basic_auth=jira_auth)
+
+# デフォルトの検索対象プロジェクト
+DEFAULT_PROJECT = 'SAR'
+
+# $jira コマンドの引数処理用 arpparse
+HELP = """
+```
+$jira {} [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
+$jira {} [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
+
+位置引数:
+  keywords              検索対象のキーワードを指定する
+
+オプション引数:
+  -h, --help            show this help message and exit
+  -p PROJECT, --project PROJECT
+                        検索対象のプロジェクトを指定する(default: {})
+  -c COMPONENT, --component COMPONENT
+                        検索対象のコンポーネントを指定する
+  -l LABEL, --label LABEL
+                        検索対象のラベルを指定する
+  -s, --summary         要約(タイトル)のみを検索対象にする(未指定時は全文検索)
+```
+"""
+
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('-p', '--project', default=DEFAULT_PROJECT, type=str,
+                    help='検索対象のプロジェクトを指定する(default: {})'.format(DEFAULT_PROJECT))
+parser.add_argument('-c', '--component', type=str,
+                    help='検索対象のコンポーネントを指定する')
+parser.add_argument('-l', '--label', type=str,
+                    help='検索対象のラベルを指定する')
+parser.add_argument('-s', '--summary', default=False, action='store_true',
+                    help='要約(タイトル)のみを検索対象にする(未指定時は全文検索)')
+parser.add_argument('keywords', nargs='*', type=str,
+                    help='検索対象のキーワードを指定する')
 
 @listen_to(r'(^|[^/])\b([A-Za-z]+)-([0-9]+)\b')
 def jira_listener(message, pre, project, number):
@@ -59,25 +96,71 @@ def jira_listener(message, pre, project, number):
     }]
     message.send_webapi('', json.dumps(attachments))
 
+def _drive_help(message, cmd1, cmd2):
+    """
+    jira 検索コマンドのヘルプを返す
+    """
+    message.send(HELP.format(cmd1, cmd2, DEFAULT_PROJECT))
+
+def _build_jql(args, jql_base=''):
+    """
+    引数から JIRA を検索するための JQL を生成する
+    """
+    jql = jql_base
+    jql += 'project = {}'.format(args.project)
+    if args.component:
+        jql += ' AND component = {}'.format(args.component)
+    if args.label:
+        jql += ' AND labels = {}'.format(args.label)
+    if args.keywords:
+        target = 'text'
+        if args.summary:
+            # 要約を検索対象にする
+            target = 'summary'
+        jql += ' AND {} ~ "{}"'.format(target, ' '.join(args.keywords))
+
+    return jql
+    
 @respond_to('jira search (.*)')
 @respond_to('jira 検索 (.*)')
-def jira_search(message, keyword):
+def jira_search(message, keywords):
     """
     JIRAをキーワード検索した結果を返す(オープン状態のみ)
     """
-    jql = 'status in (Open, "In Progress", Reopened) AND text ~ "{}"'
-    title = '「{}」の検索結果(オープンのみ)'.format(keyword)
-    _send_jira_search_responce(message, jql.format(keyword), title)
+
+    # 引数を処理する
+    try:
+        args, argv = parser.parse_known_args(keywords.split())
+    except SystemExit:
+        message.send('引数の形式が正しくありません')
+        _drive_help(message, 'search', '検索')
+        return
+
+    # 引数から query を生成
+    jql = _build_jql(args, 'status in (Open, "In Progress", Reopened) AND ')
+    
+    title = '「{}」の検索結果(オープンのみ)'.format(keywords)
+    _send_jira_search_responce(message, jql, title)
 
 @respond_to('jira allsearch (.*)')
 @respond_to('jira 全検索 (.*)')
-def jira_allsearch(message, keyword):
+def jira_allsearch(message, keywords):
     """
     JIRAをキーワード検索した結果を返す(全ステータス対象)
     """
-    jql = 'text ~ "{}"'
-    title = '「{}」の検索結果(全ステータス)'.format(keyword)
-    _send_jira_search_responce(message, jql.format(keyword), title)
+    # 引数を処理する
+    try:
+        args, argv = parser.parse_known_args(keywords.split())
+    except SystemExit:
+        message.send('引数の形式が正しくありません')
+        _drive_help(message, 'search', '検索')
+        return
+
+    # 引数から query を生成
+    jql = _build_jql(args)
+    
+    title = '「{}」の検索結果(全ステータス)'.format(keywords)
+    _send_jira_search_responce(message, jql, title)
 
 @respond_to('jira assignee (.*)')
 @respond_to('jira 担当者? (.*)')
