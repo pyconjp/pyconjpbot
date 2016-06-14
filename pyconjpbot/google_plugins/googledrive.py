@@ -191,7 +191,6 @@ def drive_search(message, keywords):
 
     # 引数から query を生成
     q = _build_query(args)
-    print(q)
 
     # Google Drive API で検索を実行する
     service = get_service('drive', 'v3', __file__, SCOPES)
