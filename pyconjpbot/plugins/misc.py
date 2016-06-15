@@ -1,6 +1,8 @@
+import json
 import random
 
 from slackbot.bot import respond_to, listen_to
+import git
 
 @respond_to('^help$')
 def help(message):
@@ -38,4 +40,18 @@ def help(message):
     pingに対してpongで応答する
     """
     message.reply('pong')
+
+@respond_to('^version$')
+def help(message):
+    """
+    バージョン情報を返す
+    """
+    obj = git.Repo('').head.object
+    url = "https://github.com/pyconjp/pyconjpbot/commit/{}".format(obj.hexsha)
+    text = "<{}|{}> {} - {}({})".format(url, obj.hexsha[:6], obj.summary,
+                                       obj.committer.name, obj.committed_datetime)
+    attachments = [{
+        'pretext': text,
+    }]
+    message.send_webapi('', json.dumps(attachments))
 
