@@ -17,18 +17,23 @@ def _get_user_name(user_id):
     else:
         return ''
 
-@listen_to(r'(@?[^@]*[^:+-]):?\s*(\+\+|--)')
-def plusplus(message, target, plusplus):
+@listen_to(r'^<@(\w+)>:?\s*(\+\+|--)($|[^+-])')
+def mention_plusplus(message, user_id, plusplus, after):
+    """
+    mentionされたユーザーに対して ++ または -- する
+    """
+    target = _get_user_name(user_id)
+    message.send('name: {}, plusplus: {}'.format(target, plusplus))
+    
+@listen_to(r'^(\w+):?\s*(\+\+|--)($|[^+-])')
+def plusplus(message, target, plusplus, after):
     """
     指定された名前に対して ++ または -- する
+
     takanory++
     takanory:++
     takanory: ++
-    @takanory++
-    @takanory:++
-    @takanory: ++
+    日本語++
     """
-    import pdb
-    # 名前が <@userid> でくる
-    pdb.set_trace()
+
     message.send('name: {}, plusplus: {}'.format(target, plusplus))
