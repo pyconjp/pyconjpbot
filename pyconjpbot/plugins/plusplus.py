@@ -6,6 +6,20 @@ import slacker
 
 from .plusplus_model import Plusplus
 
+PLUS_MESSAGE = (
+    'leveled up!',
+    'レベルが上がりました!',
+    'やったね',
+    '(☝՞ਊ ՞)☝ウェーイ',
+    )
+
+MINUS_MESSAGE = (
+    'leveled down.',
+    'レベルが下がりました',
+    'ドンマイ!',
+    '(´・ω・｀)',
+    )
+
 def _get_user_name(user_id):
     """
     指定された Slack の user_id に対応する username を返す
@@ -25,14 +39,15 @@ def _update_count(message, target, plusplus):
     """
     指定ユーザーのカウンターを更新する
     """
+    target = target.lower()
     plus, created = Plusplus.get_or_create(name=target, defaults={'counter': 0})
     
     if plusplus == '++':
         plus.counter += 1
-        msg = 'leveled up!'
+        msg = random.choice(PLUS_MESSAGE)
     else:
         plus.counter -= 1
-        msg = 'leveled down!'
+        msg = random.choice(MINUS_MESSAGE)
     plus.save()
 
     message.send('{} {} (通算: {})'.format(target, msg, plus.counter))
