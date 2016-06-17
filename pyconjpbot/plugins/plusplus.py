@@ -1,6 +1,10 @@
+import random
+
 from slackbot.bot import listen_to
 from slackbot import settings
 import slacker
+
+from .plusplus_model import Plusplus
 
 def _get_user_name(user_id):
     """
@@ -17,13 +21,29 @@ def _get_user_name(user_id):
     else:
         return ''
 
+def _update_count(message, target, plusplus):
+    """
+    指定ユーザーのカウンターを更新する
+    """
+    plus, created = Plusplus.get_or_create(name=target, defaults={'counter': 0})
+    
+    if plusplus == '++':
+        plus.counter += 1
+        msg = 'leveled up!'
+    else:
+        plus.counter -= 1
+        msg = 'leveled down!'
+    plus.save()
+
+    message.send('{} {} (通算: {})'.format(target, msg, plus.counter))
+    
 @listen_to(r'^<@(\w+)>:?\s*(\+\+|--)($|[^+-])')
 def mention_plusplus(message, user_id, plusplus, after):
     """
     mentionされたユーザーに対して ++ または -- する
     """
     target = _get_user_name(user_id)
-    message.send('name: {}, plusplus: {}'.format(target, plusplus))
+    _update_count(message, target, plusplus)
     
 @listen_to(r'^(\w+):?\s*(\+\+|--)($|[^+-])')
 def plusplus(message, target, plusplus, after):
@@ -35,5 +55,4 @@ def plusplus(message, target, plusplus, after):
     takanory: ++
     日本語++
     """
-
-    message.send('name: {}, plusplus: {}'.format(target, plusplus))
+    _update_count(message, target, plusplus)
