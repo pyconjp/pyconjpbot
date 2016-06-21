@@ -48,6 +48,9 @@ MIME_TYPE_INV = {value: key for key, value in MIME_TYPE.items()}
 
 # $dive コマンドの引数処理用 arpparse
 HELP = """
+- `$drive [options] keywords`: 指定されたキーワードで検索する
+- `$drive db update`: 検索用のフォルダ情報を更新する
+- `$drive db refresh`: 検索用のフォルダ情報を再構築する
 ```
 $drive [-n] [-l LIMIT] [-f FOLDER] [-t TYPE] keywords...`
 
