@@ -9,6 +9,13 @@
 
 コマンドの一覧と簡単な説明
 
+### plusplus plugin
+
+- `名前++`: 指定された名前に +1 する(感謝を伝えるインクリメント)
+- `名前--`: 指定された名前から -1 する
+- `$plusplus init filename`: 指定されたファイル(hubot の brain-dump.json)から値を読み込んでカウントを初期化する
+- [plusplus.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/plusplus.py)
+
 ### Google drive plugin
 
 - `$drive keywords`: Google ドライブを検索する
