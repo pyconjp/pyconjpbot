@@ -1,0 +1,34 @@
+Unreleased
+----------
+- [SAR-862] plusplus pluginのrename対応
+- [SAR-863] plusplus pluginから初期化コマンド削除
+
+Release Notes - 2016-06-21
+--------------------------
+- [SAR-716] plusplus plugin
+
+Release Notes - 2016-06-17
+--------------------------
+- [SAR-798] JIRA plugin オプション追加
+
+Release Notes - 2016-06-09
+--------------------------
+- [SAR-691] drive plugin
+
+Release Notes - 2016-06-03
+--------------------------
+- [SAR-700] calculate, react, weather, wikipedia, greeting plugin
+
+Release Notes - 2016-06-01
+--------------------------
+- [SAR-707] reactionのバグ対応
+- [SAR-704] translate plugin
+
+Release Notes - 2016-05-30
+--------------------------
+- [SAR-699] botの発言を無視する
+
+Release Notes - 2016-05-29
+--------------------------
+- [SAR-690] jira plugin拡張(assignee, help, allsearch, filter)
+- [SAR-568] initial release: manual, jira plugin
