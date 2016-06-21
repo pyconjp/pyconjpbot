@@ -1,6 +1,7 @@
 Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
+- [SAR-866] calc pluginで数字とかは無視する
 
 Release Notes - 2016-06-21
 --------------------------
