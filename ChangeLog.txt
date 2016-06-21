@@ -1,10 +1,10 @@
 Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
-- [SAR-863] plusplus pluginから初期化コマンド削除
 
 Release Notes - 2016-06-21
 --------------------------
+- [SAR-863] plusplus pluginから初期化コマンド削除
 - [SAR-716] plusplus plugin
 
 Release Notes - 2016-06-17

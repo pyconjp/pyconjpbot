@@ -1,5 +1,4 @@
 import random
-import json
 
 from slackbot.bot import respond_to, listen_to
 from slackbot import settings
@@ -72,23 +71,3 @@ def plusplus(message, target, plusplus, after):
     日本語++
     """
     _update_count(message, target, plusplus)
-
-@respond_to('plusplus init (.*)')
-def plusplus_init(message, file):
-    """
-    指定されたファイル(hubotのbrain-dump.json)の値を読み込んで、
-    カウントを初期化する
-    """
-    with open(file) as f:
-        brain = json.load(f)
-        karma = brain['karma']
-        count = 0
-        for name in karma:
-            if not name.startswith('@'):
-                # レコードを追加してカウントを初期化
-                plus, created = Plusplus.get_or_create(name=name)
-                plus.counter = karma[name]
-                plus.save()
-                count += 1
-    message.send('{}件のデータを初期化しました'.format(count))
-        
