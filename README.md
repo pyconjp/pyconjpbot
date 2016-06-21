@@ -17,7 +17,9 @@
 
 ### Google drive plugin
 
-- `$drive keywords`: Google ドライブを検索する
+- `$drive [options] keywords`: 指定されたキーワードで Google ドライブを検索する
+- `$drive db update`: 検索用のフォルダ情報を更新する
+- `$drive db refresh`: 検索用のフォルダ情報を再構築する
 - `$drive help`: drive コマンドのヘルプを表示
 
 ```
