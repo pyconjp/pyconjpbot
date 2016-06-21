@@ -2,6 +2,10 @@ Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
 
+Release Notes - 2016-06-22
+--------------------------
+- [SAR-870] reaction pluginの辞書対応
+
 Release Notes - 2016-06-21
 --------------------------
 - [SAR-867] drive db update コマンドのバグ修正
