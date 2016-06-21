@@ -257,7 +257,7 @@ def _drive_walk(service, path, folder_id):
     #print("フォルダ: {}".format(path))
     # フォルダのみを取得する 
     q = "'{}' in parents and mimeType = '{}'".format(
-        folder_id, MIME_TYPE_INV['フォルダ'])
+        folder_id, MIME_TYPE['フォルダ'])
     response = service.files().list(fields="files(id, name)", q=q).execute()
 
     for file in response.get('files', []):

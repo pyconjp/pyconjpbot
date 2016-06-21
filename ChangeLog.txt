@@ -4,6 +4,7 @@ Unreleased
 
 Release Notes - 2016-06-21
 --------------------------
+- [SAR-867] drive db update コマンドのバグ修正
 - [SAR-866] calc pluginで数字とかは無視する
 - [SAR-863] plusplus pluginから初期化コマンド削除
 - [SAR-716] plusplus plugin
