@@ -3,7 +3,7 @@
 * Chatbot for Slack of PyCon JP
 * based on https://github.com/lins05/slackbot
 
-![](pyconjpbot-image.png)
+<img src="pyconjpbot-image.png" width="300">
 
 ## Commands
 
@@ -16,6 +16,26 @@
 - `$plusplus init filename`: 指定されたファイル(hubot の brain-dump.json)から値を読み込んでカウントを初期化する
 - [plusplus.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/plusplus.py)
 
+### Google drive plugin
+
+- `$drive keywords`: Google ドライブを検索する
+- `$drive help`: drive コマンドのヘルプを表示
+
+```
+$drive [-n] [-l LIMIT] [-a | -f FOLDER] [-t TYPE] keywords...`
+
+オプション引数:
+
+  -n, --name            ファイル名のみを検索対象にする(未指定時は全文検索)
+  -l LIMIT, --limit LIMIT
+                        結果の最大件数を指定する(default: 10)
+  -f FOLDER, --folder FOLDER
+                        検索対象のフォルダーを指定する(default: 2016)
+  -t TYPE, --type TYPE  検索対象のファイル種別を指定する
+```
+
+- [googledrive.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/google_plugins/googledrive.py)
+
 ### manual plugin
 
 - `$manual`: マニュアルのURLを返す
@@ -26,11 +46,25 @@
 ### jira plugin
 
 - `SAR-123`: JIRAのissueの情報を返す
-- `$jira search|検索 keywords`: 指定したキーワードでJIRAを検索した結果を返す(オープンのみ)
-- `$jira allsearch|全検索 keywords`: 指定したキーワードでJIRAを検索した結果を返す(全ステータス)
-- `$jira assignee|担当 keywords`: 指定されたユーザーが担当しているissueを返す
-- `$jira filter|フィルター`: フィルターの一覧を返す
+- `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
+- `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
+- `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す
+- `$jira filter` `$jira フィルター`: フィルターの一覧を返す
 - [jira.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/jira.py)
+
+```
+$jira 検索 [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
+$jira 全検索 [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
+
+オプション引数:
+  -p PROJECT, --project PROJECT
+                        検索対象のプロジェクトを指定する(default: SAR)
+  -c COMPONENT, --component COMPONENT
+                        検索対象のコンポーネントを指定する
+  -l LABEL, --label LABEL
+                        検索対象のラベルを指定する
+  -s, --summary         要約(タイトル)のみを検索対象にする(未指定時は全文検索)
+```
 
 ### wikipedia plugin
 
@@ -90,6 +124,8 @@ BOT: @takanory おはようございます
 - `$helps`: ヘルプへのリンクを返す
 - `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
 - `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
+- `$ping`: 応答(pong)を返す
+- `$version`: バージョン情報を返す
 - [misc.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/misc.py)
 
 ## How to build

@@ -9,8 +9,9 @@ DEFAULT_REPLY = "コマンドが不明です。ヘルプを参照してくださ
 ERRORS_TO = 'pyconjpbot-test'
 
 PLUGINS = [
-    'slackbot.plugins',
+    #'slackbot.plugins',
     'pyconjpbot.plugins',
+    'pyconjpbot.google_plugins',
 ]
 
 ALIASES = '$'
