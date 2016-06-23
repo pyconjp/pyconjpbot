@@ -2,6 +2,10 @@ Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
 
+Release Notes - 2016-06-23
+--------------------------
+- [SAR-880] plusplus の正規表現パターンを修正
+
 Release Notes - 2016-06-22
 --------------------------
 - [SAR-870] reaction pluginの辞書対応
