@@ -26,7 +26,7 @@ class Response(BaseModel):
     """
     term = ForeignKeyField(Term)
     text = CharField()
-    creater = CharField()
+    creator = CharField()
     created = DateTimeField(default=datetime.now())
 
 db.connect()

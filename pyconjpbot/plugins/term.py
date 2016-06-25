@@ -9,51 +9,54 @@ from .term_model import Term, Response
 RESERVED = (
     'drive', 'manual', 'jira', 'wikipedia', 'translate',
     'weather', 'shuffle', 'help', 'choice', 'ping', 'version',
+    'term',
 )
 
 # コマンド一覧を初期化
 commands = {term.command for term in Term.select()}
 
-@respond_to('term\s+create\s+(\S+)')
-def term_create(message, command):
+@respond_to('term\s+(create|add)\s+(\w+)')
+def term_create(message, subcommand, command):
     """
-    指定された用語を追加する
+    指定されたコマンドを生成する
     """
-    # 用語は小文字に統一
+    # コマンドは小文字に統一
     command = command.lower()
+    # 予約語の場合は実行しない
     if command in RESERVED:
-        message.send('用語 `{}` は予約語なので登録できません'.format(command))
+        message.send('コマンド `{}` は予約語なので登録できません'.format(command))
         return
 
     creator = message.body['user']
     term, created = Term.create_or_get(command=command, creator=creator)
     if created == False:
-        # すでに登録してある用語は登録しない
-        message.send('用語 `{}` はすでに登録されています'.format(command))
+        # すでに登録してあるコマンドは登録しない
+        message.send('コマンド `{}` はすでに登録されています'.format(command))
 
     else:
-        msg = '用語 `{}` を作成しました。\n'.format(command)
-        msg += '`${} add (レスポンス)` で用語のレスポンスを追加できます'.format(command)
+        msg = 'コマンド `{}` を作成しました。\n'.format(command)
+        msg += '`${} add (レスポンス)` でレスポンスを追加できます'.format(command)
         message.send(msg)
+
         # コマンド一覧に追加
         commands.add(command)
 
-@respond_to('term\s+drop\s+(\S+)')
-def term_drop(message, term):
+@respond_to('term\s+(drop|del|delete)\s+(\w+)')
+def term_drop(message, subcommand, command):
     """
-    指定された用語を消去する
+    指定されたコマンドを消去する
     """
-    # 用語は小文字に統一
-    term = term.lower()
+    # コマンドは小文字に統一
+    command = command.lower()
     # TODO: 指定された用語が存在しない場合
     message.send('用語 `{}` を消去しました'.format(term))
 
-@respond_to('term\s+search\s+(\S+)')
+@respond_to('term\s+search\s+(\w+)')
 def term_search(message, keyword):
     """
     現在使用可能な用語の一覧を返す
     """
-    # TODO: attachmentsで返す
+    # TODO: 検索してattachmentsで返す
     message.send('`{}` を含む用語の一覧です'.format(keyword))
 
 @respond_to('term\s+list')
@@ -78,6 +81,47 @@ def term_help(message):
     """
     message.send('termコマンドのヘルプです')
 
-#$(用語) add (レスポンス): 用語にレスポンスを追加する
-#$(用語) del (レスポンス): 用語からレスポンスを削除する
-#$(用語): 用語に登録してあるレスポンスをランダムに返す
+@respond_to('^(\w+)\s+(add)\s+(.*)')
+def add_response(message, command, subcommand, text):
+    """
+    用語コマンドに応答を追加する
+    """
+    if command in RESERVED:
+        return
+    if command not in commands:
+        message.send('コマンド `{}` は登録されていません'.format(command))
+        return
+
+    term = Term.get(command=command)
+    creator = message.body['user']
+    Response.create(term=term, text=response, creator=creator)
+
+    message.send('コマンド `{}` に応答を追加しました'.format(text))
+
+@respond_to('^(\w+)\s+(del|delete)\s+(.*)')
+def add_response(message, command, subcommand, response):
+    """
+    用語コマンドから応答を削除する
+    """
+    if command in RESERVED:
+        return
+    if command not in commands:
+        message.send('コマンド `{}` は登録されていません'.format(command))
+        return
+    pass
+
+@respond_to('^(\w+)$')
+def return_response(message, command):
+    """
+    用語コマンドに登録されている応答をランダムに返す
+    """
+    if command in RESERVED:
+        return
+    if command not in commands:
+        message.send('コマンド `{}` は登録されていません'.format(command))
+        return
+
+    term = Term.get(command=command)
+    responses = Response.select().where(term == term)
+    resp = random.choice(responses)
+    message.send(resp.text)
