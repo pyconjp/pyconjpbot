@@ -89,26 +89,31 @@ def add_response(message, command, subcommand, text):
     if command in RESERVED:
         return
     if command not in commands:
-        message.send('コマンド `{}` は登録されていません'.format(command))
+        message.send('コマンド `${}` は登録されていません'.format(command))
         return
 
     term = Term.get(command=command)
     creator = message.body['user']
-    Response.create(term=term, text=response, creator=creator)
+    Response.create(term=term, text=text, creator=creator)
 
-    message.send('コマンド `{}` に応答を追加しました'.format(text))
+    message.send('コマンド `${}` に `{}` を追加した'.format(command, text))
 
 @respond_to('^(\w+)\s+(del|delete)\s+(.*)')
-def add_response(message, command, subcommand, response):
+def add_response(message, command, subcommand, text):
     """
     用語コマンドから応答を削除する
     """
     if command in RESERVED:
         return
     if command not in commands:
-        message.send('コマンド `{}` は登録されていません'.format(command))
+        message.send('コマンド `${}` は登録されていません'.format(command))
         return
-    pass
+
+    term = Term.get(command=command)
+    response = Response.get(term=term, text=text)
+    response.delete_instance()
+
+    message.send('コマンド `${}` から `{}` を削除した'.format(command, text))
 
 @respond_to('^(\w+)$')
 def return_response(message, command):
@@ -118,10 +123,14 @@ def return_response(message, command):
     if command in RESERVED:
         return
     if command not in commands:
-        message.send('コマンド `{}` は登録されていません'.format(command))
+        message.send('コマンド `${}` は登録されていません'.format(command))
         return
 
-    term = Term.get(command=command)
-    responses = Response.select().where(term == term)
-    resp = random.choice(responses)
-    message.send(resp.text)
+    response_set = Term.get(command=command).response_set
+    if len(response_set) == 0:
+        msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
+        msg+= '`${} add (レスポンス)` で応答を登録してくださ'い.format(command)
+        message.send(msg)
+    else:
+        response = random.choice(response_set)
+        message.send(response.text)
