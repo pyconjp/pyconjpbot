@@ -24,17 +24,17 @@ def term_create(message, subcommand, command):
     command = command.lower()
     # 予約語の場合は実行しない
     if command in RESERVED:
-        message.send('コマンド `{}` は予約語なので登録できません'.format(command))
+        message.send('コマンド `${}` は予約語なので登録できません'.format(command))
         return
 
     creator = message.body['user']
     term, created = Term.create_or_get(command=command, creator=creator)
     if created == False:
         # すでに登録してあるコマンドは登録しない
-        message.send('コマンド `{}` はすでに登録されています'.format(command))
+        message.send('コマンド `${}` はすでに登録されています'.format(command))
 
     else:
-        msg = 'コマンド `{}` を作成しました。\n'.format(command)
+        msg = 'コマンド `${}` を作成しました。\n'.format(command)
         msg += '`${} add (レスポンス)` でレスポンスを追加できます'.format(command)
         message.send(msg)
 
@@ -49,26 +49,35 @@ def term_drop(message, subcommand, command):
     # コマンドは小文字に統一
     command = command.lower()
     # TODO: 指定された用語が存在しない場合
-    message.send('用語 `{}` を消去しました'.format(term))
+    message.send('コマンド `${}` を消去しました'.format(term))
 
 @respond_to('term\s+search\s+(\w+)')
 def term_search(message, keyword):
     """
-    現在使用可能な用語の一覧を返す
+    指定したキーワードを含む用語コマンドの一覧を返す
     """
     # TODO: 検索してattachmentsで返す
-    message.send('`{}` を含む用語の一覧です'.format(keyword))
+    command_list = ''
+    for command in sorted(commands):
+        if keyword in command:
+            command_list += '`${}`, '.format(command)
+    attachments = [{
+        'pretext': '`{}` を含む用語コマンドの一覧です'.format(keyword),
+        'text': command_list[:-2],
+        'mrkdwn_in': ['pretext', 'text'],
+    }]
+    message.send_webapi('', json.dumps(attachments))
 
 @respond_to('term\s+list')
 def term_list(message):
     """
-    現在使用可能な用語の一覧を返す
+    現在使用可能な用語コマンドの一覧を返す
     """
     # {'foo', 'bar', 'baz'} -> '`$bar`, `$baz`, `$foo`'
     command_list = ', '.join(['`$' + c + '`' for c in sorted(commands)])
 
     attachments = [{
-        'pretext': '以下の用語がコマンドとして利用可能です',
+        'pretext': '用語コマンドの一覧です',
         'text': command_list,
         'mrkdwn_in': ["text"],
     }]
@@ -129,7 +138,7 @@ def return_response(message, command):
     response_set = Term.get(command=command).response_set
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
-        msg+= '`${} add (レスポンス)` で応答を登録してくださ'い.format(command)
+        msg+= '`${} add (レスポンス)` で応答を登録してください'.format(command)
         message.send(msg)
     else:
         response = random.choice(response_set)
