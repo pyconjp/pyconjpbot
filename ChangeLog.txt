@@ -2,6 +2,10 @@ Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
 
+Release Notes - 2016-06-26
+--------------------------
+- [SAR-887] upgrade requirements.txt
+
 Release Notes - 2016-06-23
 --------------------------
 - [SAR-880] plusplus の正規表現パターンを修正
