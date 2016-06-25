@@ -16,8 +16,8 @@ class Term(BaseModel):
     """
     用語を登録するモデル
     """
-    text = CharField(unique=True)
-    creater = CharField()
+    command = CharField(unique=True)
+    creator = CharField()
     created = DateTimeField(default=datetime.now())
 
 class Response(BaseModel):
