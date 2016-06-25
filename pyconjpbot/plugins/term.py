@@ -61,8 +61,15 @@ def term_list(message):
     """
     現在使用可能な用語の一覧を返す
     """
-    # TODO: attachmentsで返す
-    message.send('用語の一覧です')
+    # {'foo', 'bar', 'baz'} -> '`$bar`, `$baz`, `$foo`'
+    command_list = ', '.join(['`$' + c + '`' for c in sorted(commands)])
+
+    attachments = [{
+        'pretext': '以下の用語がコマンドとして利用可能です',
+        'text': command_list,
+        'mrkdwn_in': ["text"],
+    }]
+    message.send_webapi('', json.dumps(attachments))
 
 @respond_to('term\s+help')
 def term_help(message):
