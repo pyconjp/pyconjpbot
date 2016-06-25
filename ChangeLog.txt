@@ -4,6 +4,7 @@ Unreleased
 
 Release Notes - 2016-06-26
 --------------------------
+- [SAR-886] fix: plusplus で空白入りでカウントされる
 - [SAR-887] upgrade requirements.txt
 
 Release Notes - 2016-06-23

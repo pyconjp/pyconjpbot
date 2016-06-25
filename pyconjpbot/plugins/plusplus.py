@@ -52,15 +52,18 @@ def _update_count(message, target, plusplus):
 
     message.send('{} {} (通算: {})'.format(target, msg, plus.counter))
     
-@listen_to(r'^<@(.*[^+-])>:?\s*(\+\+|--)\B')
+@listen_to(r'^<@(.+)>:?\s*(\++|-+)')
 def mention_plusplus(message, user_id, plusplus):
     """
     mentionされたユーザーに対して ++ または -- する
     """
+    if len(plusplus) != 2:
+        return
+
     target = _get_user_name(user_id)
     _update_count(message, target, plusplus)
     
-@listen_to(r'^([^<].*[^+-]):?\s*(\+\+|--)\B')
+@listen_to(r'^(\w.*[^\s:+-]):?\s*(\++|-+)')
 def plusplus(message, target, plusplus):
     """
     指定された名前に対して ++ または -- する
@@ -70,5 +73,8 @@ def plusplus(message, target, plusplus):
     takanory: ++
     日本語++
     takanory++ コメント
+    takanory ++
     """
+    if len(plusplus) != 2:
+        return
     _update_count(message, target, plusplus)
