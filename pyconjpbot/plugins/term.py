@@ -90,20 +90,31 @@ def term_help(message):
     """
     message.send('termコマンドのヘルプです')
 
+def _available_command(message, command):
+    """
+    指定されたコマンドが有効化どうかを返す
+    """
+    result = True
+    
+    if command in RESERVED:
+        result = False
+    elif command not in commands:
+        message.send('コマンド `${}` は登録されていません'.format(command))
+        result = False
+
+    return result
+
 @respond_to('^(\w+)\s+(add)\s+(.*)')
 def add_response(message, command, subcommand, text):
     """
     用語コマンドに応答を追加する
     """
-    if command in RESERVED:
+    if _available_command(message, command) == False:
         return
-    if command not in commands:
-        message.send('コマンド `${}` は登録されていません'.format(command))
-        return
-
+    
     term = Term.get(command=command)
     creator = message.body['user']
-    # 用語を登録数
+    # 用語を登録する
     resp, created = Response.get_or_create(term=term, text=text, creator=creator)
     if created == False:
         message.send('コマンド `${}` に `${}` は登録済みです'.format(command, text))
@@ -117,29 +128,23 @@ def add_response(message, command, subcommand, text):
     """
     用語コマンドから応答を削除する
     """
-    if command in RESERVED:
+    if _available_command(message, command) == False:
         return
-    if command not in commands:
-        message.send('コマンド `${}` は登録されていません'.format(command))
-        return
-
+    
     term = Term.get(command=command)
     response = Response.get(term=term, text=text)
     response.delete_instance()
 
-    message.send('コマンド `${}` から `{}` を削除した'.format(command, text))
+    message.send('コマンド `${}` から `{}` を削除しました'.format(command, text))
 
 @respond_to('^(\w+)$')
 def return_response(message, command):
     """
     用語コマンドに登録されている応答をランダムに返す
     """
-    if command in RESERVED:
+    if _available_command(message, command) == False:
         return
-    if command not in commands:
-        message.send('コマンド `${}` は登録されていません'.format(command))
-        return
-
+    
     response_set = Term.get(command=command).response_set
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
