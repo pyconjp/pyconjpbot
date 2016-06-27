@@ -56,7 +56,6 @@ def term_search(message, keyword):
     """
     指定したキーワードを含む用語コマンドの一覧を返す
     """
-    # TODO: 検索してattachmentsで返す
     command_list = ''
     for command in sorted(commands):
         if keyword in command:
@@ -82,13 +81,6 @@ def term_list(message):
         'mrkdwn_in': ["text"],
     }]
     message.send_webapi('', json.dumps(attachments))
-
-@respond_to('term\s+help')
-def term_help(message):
-    """
-    term pluginのヘルプを返す
-    """
-    message.send('termコマンドのヘルプです')
 
 def _available_command(message, command):
     """
@@ -153,3 +145,31 @@ def return_response(message, command):
     else:
         response = random.choice(response_set)
         message.send(response.text)
+
+@respond_to('term\s+help')
+def term_help(message):
+    """
+    term pluginのヘルプを返す
+    """
+    message.send('''- `$term create (用語)`: 用語コマンドを作成する
+- `$term search (キーワード)`: キーワードを含む用語コマンドの一覧を返す
+- `$term list`: 用語コマンドの一覧を返す
+- `$(用語) add (応答)`: 用語コマンドに応答を追加する
+- `$(用語) del (応答)`: 用語コマンドから応答を削除する
+- `$(用語)`: 登録してある応答をランダムに返す
+
+```
+
+Takanori Suzuki [18:44]  $term create 酒
+BOT [18:44]  コマンド `$酒` を作成しました。
+`$酒 add (レスポンス)` でレスポンスを追加できます
+Takanori Suzuki [18:44]  $酒 add ビール
+BOT [18:45]  コマンド `$酒` に `ビール` を追加しました
+Takanori Suzuki [18:45]  $酒 add ワイン
+BOT [18:45]  コマンド `$酒` に `ワイン` を追加しました
+Takanori Suzuki [18:45]  $酒
+BOT [18:45]  
+ビール
+```
+''')
+
