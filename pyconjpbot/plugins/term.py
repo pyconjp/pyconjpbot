@@ -103,9 +103,14 @@ def add_response(message, command, subcommand, text):
 
     term = Term.get(command=command)
     creator = message.body['user']
-    Response.create(term=term, text=text, creator=creator)
+    # 用語を登録数
+    resp, created = Response.get_or_create(term=term, text=text, creator=creator)
+    if created == False:
+        message.send('コマンド `${}` に `${}` は登録済みです'.format(command, text))
+        return
+        
 
-    message.send('コマンド `${}` に `{}` を追加した'.format(command, text))
+    message.send('コマンド `${}` に `{}` を追加しました'.format(command, text))
 
 @respond_to('^(\w+)\s+(del|delete)\s+(.*)')
 def add_response(message, command, subcommand, text):
