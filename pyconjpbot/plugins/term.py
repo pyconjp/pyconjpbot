@@ -38,7 +38,7 @@ def term_create(message, subcommand, command):
         msg += '`${} add (レスポンス)` でレスポンスを追加できます'.format(command)
         message.send(msg)
 
-        # コマンド一覧に追加
+        # コマンド一覧の set に追加
         commands.add(command)
 
 @respond_to('term\s+(drop|del|delete)\s+(\w+)')
@@ -48,8 +48,19 @@ def term_drop(message, subcommand, command):
     """
     # コマンドは小文字に統一
     command = command.lower()
-    # TODO: 指定された用語が存在しない場合
-    message.send('コマンド `${}` を消去しました'.format(term))
+
+    # コマンドの存在チェック
+    if _available_command(message, command) == False:
+        return
+
+    # 用語コマンドと応答をまとめて削除
+    term = Term.get(command=command)
+    term.delete_instance(recursive=False)
+    term.save()
+
+    # コマンド一覧の set から削除
+    commands.remove(command)
+    message.send('コマンド `${}` を消去しました'.format(command))
 
 @respond_to('term\s+search\s+(\w+)')
 def term_search(message, keyword):
