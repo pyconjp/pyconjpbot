@@ -2,6 +2,10 @@ Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
 
+Release Notes - 2016-06-28
+--------------------------
+- [SAR-908] JIRAError 発生時にエラーメッセージを返す
+
 Release Notes - 2016-06-26
 --------------------------
 - [SAR-886] fix: plusplus で空白入りでカウントされる

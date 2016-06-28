@@ -187,7 +187,13 @@ def _send_jira_search_responce(message, query, title):
     pretext = title
     pretext += '(<{}/issues/?jql={}|JIRAで見る>)'.format(CLEAN_JIRA_URL, quote(query))
     text = ''
-    issues = jira.search_issues(query)
+
+    try:
+        issues = jira.search_issues(query)
+    except JIRAError as err:
+        # なんらかのエラーが発生
+        message.send('JIRAError: `{}`'.format(err.text))
+        return
     
     if issues:
         for issue in issues:
