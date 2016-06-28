@@ -3,6 +3,15 @@ Unreleased
 - [SAR-862] plusplus pluginのrename対応
 - [SAR-868] term plugin
 
+Release Notes - 2016-06-28
+--------------------------
+- [SAR-908] JIRAError 発生時にエラーメッセージを返す
+
+Release Notes - 2016-06-26
+--------------------------
+- [SAR-886] fix: plusplus で空白入りでカウントされる
+- [SAR-887] upgrade requirements.txt
+
 Release Notes - 2016-06-23
 --------------------------
 - [SAR-880] plusplus の正規表現パターンを修正
