@@ -62,36 +62,45 @@ def term_drop(message, subcommand, command):
     commands.remove(command)
     message.send('コマンド `${}` を消去しました'.format(command))
 
+def _create_attachments_for_list(pretext, data, command=True):
+    """
+    指定されたリストの一覧を message.send_webapi で送信するための
+    attachments を生成する
+    """
+    if command:
+        # ['foo', 'bar', 'baz'] -> '`$far`, `$bar`, `$baz`'
+        list_text = ', '.join(['`${}`'.format(x) for x in data])
+    else:
+        list_text = ', '.join(['`{}`'.format(x) for x in data])
+    attachments = [{
+        'pretext': pretext,
+        'text': list_text,
+        'mrkdwn_in': ['pretext', 'text'],
+    }]
+    return json.dumps(attachments)
+    
+        
 @respond_to('term\s+search\s+(\w+)')
 def term_search(message, keyword):
     """
     指定したキーワードを含む用語コマンドの一覧を返す
     """
-    command_list = ''
+    pretext = '`{}` を含む用語コマンドの一覧です'.format(keyword)
+    data = []
     for command in sorted(commands):
         if keyword in command:
-            command_list += '`${}`, '.format(command)
-    attachments = [{
-        'pretext': '`{}` を含む用語コマンドの一覧です'.format(keyword),
-        'text': command_list[:-2],
-        'mrkdwn_in': ['pretext', 'text'],
-    }]
-    message.send_webapi('', json.dumps(attachments))
+            data.append(command)
+    attachments = _create_attachments_for_list(pretext, data)
+    message.send_webapi('', attachments)
 
 @respond_to('term\s+list')
 def term_list(message):
     """
     現在使用可能な用語コマンドの一覧を返す
     """
-    # {'foo', 'bar', 'baz'} -> '`$bar`, `$baz`, `$foo`'
-    command_list = ', '.join(['`$' + c + '`' for c in sorted(commands)])
-
-    attachments = [{
-        'pretext': '用語コマンドの一覧です',
-        'text': command_list,
-        'mrkdwn_in': ["text"],
-    }]
-    message.send_webapi('', json.dumps(attachments))
+    pretext = '用語コマンドの一覧です'
+    attachments = _create_attachments_for_list(pretext, sorted(commands))
+    message.send_webapi('', attachments)
 
 def _available_command(message, command):
     """
@@ -127,7 +136,7 @@ def add_response(message, command, subcommand, text):
     message.send('コマンド `${}` に `{}` を追加しました'.format(command, text))
 
 @respond_to('^(\w+)\s+(del|delete)\s+(.*)')
-def add_response(message, command, subcommand, text):
+def del_response(message, command, subcommand, text):
     """
     用語コマンドから応答を削除する
     """
@@ -156,6 +165,25 @@ def return_response(message, command):
     else:
         response = random.choice(response_set)
         message.send(response.text)
+
+@respond_to('^(\w+)\s+list')
+def get_responses(message, command):
+    """
+    用語コマンドに登録されている応答の一覧を返す
+    """
+    if _available_command(message, command) == False:
+        return
+
+    response_set = Term.get(command=command).response_set
+    if len(response_set) == 0:
+        msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
+        msg+= '`${} add (レスポンス)` で応答を登録してください'.format(command)
+        message.send(msg)
+    else:
+        pretext = 'コマンド `${}` の応答一覧です\n'.format(command)
+        data = [x.text for x in response_set]
+        attachments = _create_attachments_for_list(pretext, data, False)
+        message.send_webapi('', attachments)
 
 @respond_to('term\s+help')
 def term_help(message):
