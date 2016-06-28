@@ -1,10 +1,10 @@
 Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
-- [SAR-868] term plugin
 
 Release Notes - 2016-06-28
 --------------------------
+- [SAR-868] term plugin
 - [SAR-908] JIRAError 発生時にエラーメッセージを返す
 
 Release Notes - 2016-06-26
