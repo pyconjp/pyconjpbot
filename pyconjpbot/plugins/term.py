@@ -166,6 +166,26 @@ def return_response(message, command):
         response = random.choice(response_set)
         message.send(response.text)
 
+@respond_to('^(\w+)\s+search\s+(\w+)')
+def search_responses(message, command, keyword):
+    """
+    用語コマンドに登録されている応答のうち、キーワードにまっちするものを返す
+    """
+    if _available_command(message, command) == False:
+        return
+
+    term = Term.get(command=command)
+    pat = '%{}%'.format(keyword)
+    responses = Response.select().where(term == term, Response.text ** pat)
+
+    if len(responses) == 0:
+        message.send('コマンド `${}` に `{}` を含む応答はありません'.format(command, keyword))
+    else:
+        pretext = 'コマンド `${}` の `{}` を含む応答の一覧です\n'.format(command, keyword)
+        data = [x.text for x in responses]
+        attachments = _create_attachments_for_list(pretext, data, False)
+        message.send_webapi('', attachments)
+
 @respond_to('^(\w+)\s+list')
 def get_responses(message, command):
     """
