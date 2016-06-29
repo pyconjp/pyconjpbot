@@ -149,7 +149,7 @@ BOT: @takanory おはようございます
 
 ### misc plugin
 
-- `$helps`: ヘルプへのリンクを返す
+- `$help`: ヘルプへのリンクを返す
 - `$shuffle spam ham eggs`: 指定された単語をシャッフルした結果を返す
 - `$choice spam ham eggs`: 指定された単語から一つをランダムに選んで返す
 - `$ping`: 応答(pong)を返す

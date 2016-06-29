@@ -5,11 +5,13 @@ from slackbot.bot import respond_to
 
 from .term_model import Term, Response
 
-# すでに存在するコマンドは登録できない
+# すでに存在するコマンドは無視する
 RESERVED = (
-    'drive', 'manual', 'jira', 'wikipedia', 'translate',
-    'weather', 'shuffle', 'help', 'choice', 'ping', 'version',
+    'drive', 'manual', 'jira', 'wikipedia', 'plusplus',
+    'translate', '翻訳',
+    'weather', '天気',
     'term',
+    'shuffle', 'help', 'choice', 'ping', 'version',
 )
 
 # コマンド一覧を初期化

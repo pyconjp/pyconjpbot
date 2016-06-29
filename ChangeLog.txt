@@ -2,6 +2,10 @@ Unreleased
 ----------
 - [SAR-862] plusplus pluginのrename対応
 
+Release Notes - 2016-06-29
+--------------------------
+- [SAR-923] term pluginで無視するコマンド名を追加する
+
 Release Notes - 2016-06-28
 --------------------------
 - [SAR-868] term plugin
