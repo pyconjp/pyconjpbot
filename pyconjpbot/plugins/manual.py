@@ -5,14 +5,14 @@ from slackbot.bot import respond_to, listen_to
 # マニュアルのURL
 URL = 'http://manual.pycon.jp/'
 
-@respond_to('manual$')
+@respond_to('^manual$')
 def manual(message):
     """
     マニュアルのURLを返す
     """
     message.send('PyCon JP 運営マニュアル {}'.format(URL))
 
-@respond_to('manual (.*)')
+@respond_to('^manual\s+(.*)')
 def manual_search(message, query):
     """
     マニュアルをキーワード検索したURLを返す
@@ -20,7 +20,7 @@ def manual_search(message, query):
     if query != 'help':
         message.send('{}search.html?q={}'.format(URL, quote_plus(query)))
 
-@respond_to('manual help$')
+@respond_to('^manual\s+help$')
 def manual_help(message):
     """
     マニュアルコマンドのヘルプを返す

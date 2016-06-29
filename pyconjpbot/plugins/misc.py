@@ -11,7 +11,7 @@ def help(message):
     """
     message.send('ヘルプはこちら→ https://github.com/pyconjp/pyconjpbot#commands')
 
-@respond_to('shuffle (.*)')
+@respond_to('^shuffle\s+(.*)')
 def shuffle(message, words):
     """
     指定したキーワードをシャッフルして返す
@@ -23,7 +23,7 @@ def shuffle(message, words):
         random.shuffle(words)
         message.send(' '.join(words))
 
-@respond_to('choice (.*)')
+@respond_to('^choice\s+(.*)')
 def choice(message, words):
     """
     指定したキーワードから一つを選んで返す

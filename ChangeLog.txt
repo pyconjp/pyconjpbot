@@ -4,6 +4,7 @@ Unreleased
 
 Release Notes - 2016-06-29
 --------------------------
+- [SAR-924] コマンドは先頭でだけ反応するように修正
 - [SAR-923] term pluginで無視するコマンド名を追加する
 
 Release Notes - 2016-06-28

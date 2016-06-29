@@ -17,7 +17,7 @@ RESERVED = (
 # コマンド一覧を初期化
 commands = {term.command for term in Term.select()}
 
-@respond_to('term\s+(create|add)\s+(\w+)')
+@respond_to('^term\s+(create|add)\s+(\w+)')
 def term_create(message, subcommand, command):
     """
     指定されたコマンドを生成する
@@ -43,7 +43,7 @@ def term_create(message, subcommand, command):
         # コマンド一覧の set に追加
         commands.add(command)
 
-@respond_to('term\s+(drop|del|delete)\s+(\w+)')
+@respond_to('^term\s+(drop|del|delete)\s+(\w+)')
 def term_drop(message, subcommand, command):
     """
     指定されたコマンドを消去する
@@ -82,7 +82,7 @@ def _create_attachments_for_list(pretext, data, command=True):
     return json.dumps(attachments)
     
         
-@respond_to('term\s+search\s+(\w+)')
+@respond_to('^term\s+search\s+(\w+)')
 def term_search(message, keyword):
     """
     指定したキーワードを含む用語コマンドの一覧を返す
@@ -95,7 +95,7 @@ def term_search(message, keyword):
     attachments = _create_attachments_for_list(pretext, data)
     message.send_webapi('', attachments)
 
-@respond_to('term\s+list')
+@respond_to('^term\s+list')
 def term_list(message):
     """
     現在使用可能な用語コマンドの一覧を返す

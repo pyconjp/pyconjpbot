@@ -129,8 +129,8 @@ def _build_jql(args, jql_base=''):
 
     return jql
     
-@respond_to('jira search (.*)')
-@respond_to('jira 検索 (.*)')
+@respond_to('^jira\s+search\s+(.*)')
+@respond_to('^jira\s+検索\s+(.*)')
 def jira_search(message, keywords):
     """
     JIRAをキーワード検索した結果を返す(オープン状態のみ)
@@ -150,8 +150,8 @@ def jira_search(message, keywords):
     title = '「{}」の検索結果(オープンのみ)'.format(keywords)
     _send_jira_search_responce(message, jql, title)
 
-@respond_to('jira allsearch (.*)')
-@respond_to('jira 全検索 (.*)')
+@respond_to('^jira\s+allsearch\s+(.*)')
+@respond_to('^jira\s+全検索\s+(.*)')
 def jira_allsearch(message, keywords):
     """
     JIRAをキーワード検索した結果を返す(全ステータス対象)
@@ -170,8 +170,8 @@ def jira_allsearch(message, keywords):
     title = '「{}」の検索結果(全ステータス)'.format(keywords)
     _send_jira_search_responce(message, jql, title)
 
-@respond_to('jira assignee (.*)')
-@respond_to('jira 担当者? (.*)')
+@respond_to('^jira\s+assignee\s+(.*)')
+@respond_to('^jira\s+担当者?\s+(.*)')
 def jira_assignee(message, user):
     """
     指定されたユーザーにアサインされた課題の一覧を返す
@@ -212,8 +212,8 @@ def _send_jira_search_responce(message, query, title):
     }]
     message.send_webapi('', json.dumps(attachments))
 
-@respond_to('jira filters?')
-@respond_to('jira フィルター?')
+@respond_to('^jira\s+filters?')
+@respond_to('^jira\s+フィルター?')
 def jira_filter(message):
     """
     フィルターの一覧を返す
@@ -237,7 +237,7 @@ def jira_filter(message):
     }]
     message.send_webapi('', json.dumps(attachments))
 
-@respond_to('jira help$')
+@respond_to('^jira\s+help$')
 def jira_search(message):
     """
     jiraコマンドのヘルプを返す

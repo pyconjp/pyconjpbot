@@ -73,8 +73,8 @@ def _get_forecast_text(forecast):
 
     return text
 
-@respond_to('(weather|天気)$')
-@respond_to('(weather|天気)\s+(.*)')
+@respond_to('^(weather|天気)$')
+@respond_to('^(weather|天気)\s+(.*)')
 def weather(message, command, place='東京'):
     """
     天気予報を返す
@@ -105,12 +105,12 @@ def weather(message, command, place='東京'):
 
     message.send_webapi('', json.dumps(attachments))
 
-@respond_to('(weather|天気)\s+list')
+@respond_to('^(weather|天気)\s+list')
 def weather(message, command):
     reply = ' '.join(['`{}`'.format(x) for x in city_dict])
     message.send('指定可能な地域: {}'.format(reply))
     
-@respond_to('(weather|天気)\s+help')
+@respond_to('^(weather|天気)\s+help')
 def weather(message, command):
     message.send('''`$weather` `$天気`: 東京の天気予報を返す
 `$weather 釧路` `$天気 釧路`: 指定した地域の天気予報を返す
