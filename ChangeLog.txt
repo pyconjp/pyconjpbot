@@ -1,5 +1,8 @@
 Unreleased
 ----------
+
+Release Notes - 2016-06-30
+--------------------------
 - [SAR-862] plusplus pluginのrename対応
 
 Release Notes - 2016-06-29
