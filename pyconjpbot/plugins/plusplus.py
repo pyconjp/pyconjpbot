@@ -63,7 +63,7 @@ def mention_plusplus(message, user_id, plusplus):
     target = _get_user_name(user_id)
     _update_count(message, target, plusplus)
     
-@listen_to(r'^(\w.*[^\s:+-]):?\s*(\++|-+)')
+@listen_to(r'^(\w\S*[^\s:+-]):?\s*(\++|-+)')
 def plusplus(message, target, plusplus):
     """
     指定された名前に対して ++ または -- する
@@ -78,3 +78,55 @@ def plusplus(message, target, plusplus):
     if len(plusplus) != 2:
         return
     _update_count(message, target, plusplus)
+
+@respond_to(r'^plusplus\s+(del|delete)\s+(\S+)')
+def plusplus_delete(message, subcommand, name):
+    """
+    指定された名前を削除する
+    カウントが10未満のもののみ削除する
+    """
+
+    try:
+        plus = Plusplus.get(name=name)
+    except Plusplus.DoesNotExist:
+        message.send('`{}` という名前は登録されていません'.format(name))
+        return
+
+    if abs(plus.counter) > 10:
+        message.send('`{}` のカウントが多いので削除を取り消しました(count: {})'.format(name, plus.counter))
+        return
+
+    plus.delete_instance()
+    message.send('`{}` を削除しました'.format(name))
+
+@respond_to(r'^plusplus\s+rename\s+(\S+)\s+(\S+)')
+def plusplus_rename(message, old, new):
+    """
+    指定された old から new に名前を変更する
+    """
+    try:
+        oldplus = Plusplus.get(name=old)
+    except Plusplus.DoesNotExist:
+        message.send('`{}` という名前は登録されていません'.format(old))
+        return
+
+    newplus, created = Plusplus.create_or_get(name=new, counter=oldplus.counter)
+    if not created:
+        # すでに存在している
+        message.send('`{}` という名前はすでに登録されています'.format(new))
+        return
+
+    # 入れ替える
+    oldplus.delete_instance()
+    message.send('`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, old.counter))
+
+@respond_to(r'^plusplus\s+help+')
+def plusplus_help(message):
+    """
+    ヘルプメッセージを返す
+    """
+    message.send('''- `名前++`: 指定された名前に +1 カウントする
+- `名前--`: 指定された名前に -1 カウントする
+- `$pluplus rename (変更前) (変更後)`: カウントする名前を変更する
+- `$pluplus rename (名前)`: カウントを削除する(カウント10未満のみ)
+''')
