@@ -121,6 +121,33 @@ def plusplus_rename(message, old, new):
     oldplus.delete_instance()
     message.send('`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, old.counter))
 
+@respond_to(r'^plusplus\s+merge\s+(\S+)\s+(\S+)')
+def plusplus_merge(message, old, new):
+    """
+    指定された old と new を一つにまとめる
+    """
+    try:
+        oldplus = Plusplus.get(name=old)
+    except Plusplus.DoesNotExist:
+        message.send('`{}` という名前は登録されていません'.format(old))
+        return
+
+    try:
+        newplus = Plusplus.get(name=new)
+    except Plusplus.DoesNotExist:
+        message.send('`{}` という名前は登録されていません'.format(new))
+        return
+
+    oldcount = oldplus.counter
+    newcount = newplus.counter
+
+    # 値を統合する
+    newplus.counter += oldplus.counter
+    newplus.save()
+    oldplus.delete_instance()
+    
+    message.send('`{}` を `{}` に統合しました(count: {} + {} = {})'.format(old, new, oldcount, newcount, newplus.counter))
+
 @respond_to(r'^plusplus\s+search\s+(\S+)')
 def plusplus_search(message, keyword):
     """
@@ -150,7 +177,8 @@ def plusplus_help(message):
     """
     message.send('''- `名前++`: 指定された名前に +1 カウントする
 - `名前--`: 指定された名前に -1 カウントする
-- `$pluplus rename (変更前) (変更後)`: カウントする名前を変更する
-- `$pluplus delete (名前)`: カウントを削除する(カウント10未満のみ)
 - `$pluplus search (キーワード)`: 名前にキーワードを含む一覧を返す
+- `$pluplus delete (名前)`: カウントを削除する(カウント10未満のみ)
+- `$pluplus rename (変更前) (変更後)`: カウントする名前を変更する
+- `$pluplus merge (統合元) (統合先)`: 2つの名前のカウントを統合先の名前にまとめる
 ''')
