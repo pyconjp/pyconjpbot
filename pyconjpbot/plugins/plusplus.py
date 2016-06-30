@@ -1,3 +1,4 @@
+import json
 import random
 
 from slackbot.bot import respond_to, listen_to
@@ -120,6 +121,28 @@ def plusplus_rename(message, old, new):
     oldplus.delete_instance()
     message.send('`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, old.counter))
 
+@respond_to(r'^plusplus\s+search\s+(\S+)')
+def plusplus_search(message, keyword):
+    """
+    指定されたキーワードを含む名前とカウントの一覧を返す
+    """
+    pattern = '%{}%'.format(keyword)
+    pluses = Plusplus.select().where(Plusplus.name ** pattern)
+
+    if len(pluses) == 0:
+        message.send('`{}` を含む名前はありません'.format(keyword))
+    else:
+        pretext = '`{}` を含む名前とカウントの一覧です\n'.format(keyword)
+        text = ''
+        for plus in pluses:
+            text += '- {}(count: {})\n'.format(plus.name, plus.counter)
+        attachments = [{
+            'pretext': pretext,
+            'text': text,
+            'mrkdwn_in': ['pretext', 'text'],
+        }]
+        message.send_webapi('', json.dumps(attachments))
+
 @respond_to(r'^plusplus\s+help+')
 def plusplus_help(message):
     """
@@ -128,5 +151,6 @@ def plusplus_help(message):
     message.send('''- `名前++`: 指定された名前に +1 カウントする
 - `名前--`: 指定された名前に -1 カウントする
 - `$pluplus rename (変更前) (変更後)`: カウントする名前を変更する
-- `$pluplus rename (名前)`: カウントを削除する(カウント10未満のみ)
+- `$pluplus delete (名前)`: カウントを削除する(カウント10未満のみ)
+- `$pluplus search (キーワード)`: 名前にキーワードを含む一覧を返す
 ''')
