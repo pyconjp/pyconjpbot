@@ -11,7 +11,7 @@ RESERVED = (
     'translate', '翻訳',
     'weather', '天気',
     'term',
-    'shuffle', 'help', 'choice', 'ping', 'version',
+    'shuffle', 'help', 'choice', 'ping', 'version', 'random,
 )
 
 # コマンド一覧を初期化
