@@ -31,12 +31,13 @@ def _react(message, emojis):
             else:
                 raise
 
-@listen_to('(.*)')
-def reaction(message, text):
+@listen_to('.')
+def reaction(message):
     """
     メッセージの中にリアクションする文字列があれば、emojiでリアクションする
     """
-    text = text.lower()
+    # テキスト全体をとりだす
+    text = message.body['text'].lower()
     for words, emojis in REACTION.items():
         if isinstance(words, str):
             if words in text:

@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-07-01
+--------------------------
+- [SAR-934] reaction で2行目以降でも反応する
+
 Release Notes - 2016-06-30
 --------------------------
 - [SAR-862] plusplus pluginのrename対応
