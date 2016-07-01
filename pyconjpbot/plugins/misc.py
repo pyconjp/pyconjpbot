@@ -2,6 +2,8 @@ import json
 import random
 
 from slackbot.bot import respond_to, listen_to
+from slackbot import settings
+import slacker
 import git
 
 @respond_to('^help$')
@@ -35,14 +37,14 @@ def choice(message, words):
         message.send(random.choice(words))
         
 @respond_to('^ping$')
-def help(message):
+def ping(message):
     """
     pingに対してpongで応答する
     """
     message.reply('pong')
 
 @respond_to('^version$')
-def help(message):
+def version(message):
     """
     バージョン情報を返す
     """
@@ -55,3 +57,25 @@ def help(message):
     }]
     message.send_webapi('', json.dumps(attachments))
 
+@respond_to('^random$')
+def random_command(message):
+    """
+    チャンネルにいるメンバーからランダムに一人を選んで返す
+
+    - https://github.com/os/slacker
+    - https://api.slack.com/methods/channels.info
+    - https://api.slack.com/methods/users.info
+    """
+    webapi = slacker.Slacker(settings.API_TOKEN)
+
+    # チャンネルのメンバー一覧を取得
+    channel = message.body['channel']
+    cinfo = webapi.channels.info(channel)
+    members = cinfo.body['channel']['members']
+
+    # メンバーをランダムに選んで返す
+    member_id = random.choice(members)
+    info = webapi.users.info(member_id)
+    name = info.body['user']['name']
+    message.send('{} さん、君に決めた！'.format(name))
+    
