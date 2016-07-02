@@ -73,9 +73,13 @@ def random_command(message):
     cinfo = webapi.channels.info(channel)
     members = cinfo.body['channel']['members']
 
-    # メンバーをランダムに選んで返す
+    # bot の id は除く
+    bot_id = message._client.login_data['self']['id']
+    members.remove(bot_id)
+
+    # メンバー一覧からランダムに選んで返す
     member_id = random.choice(members)
-    info = webapi.users.info(member_id)
-    name = info.body['user']['name']
+    user_info = webapi.users.info(member_id)
+    name = user_info.body['user']['name']
     message.send('{} さん、君に決めた！'.format(name))
     
