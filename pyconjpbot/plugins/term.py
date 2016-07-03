@@ -18,6 +18,7 @@ RESERVED = (
 # コマンド一覧を初期化
 commands = {term.command for term in Term.select()}
 
+
 @respond_to('^term\s+(create|add)\s+(\w+)')
 def term_create(message, subcommand, command):
     """
@@ -32,7 +33,7 @@ def term_create(message, subcommand, command):
 
     creator = message.body['user']
     term, created = Term.create_or_get(command=command, creator=creator)
-    if created == False:
+    if not created:
         # すでに登録してあるコマンドは登録しない
         message.send('コマンド `${}` はすでに登録されています'.format(command))
 
@@ -44,6 +45,7 @@ def term_create(message, subcommand, command):
         # コマンド一覧の set に追加
         commands.add(command)
 
+
 @respond_to('^term\s+(drop|del|delete)\s+(\w+)')
 def term_drop(message, subcommand, command):
     """
@@ -53,7 +55,7 @@ def term_drop(message, subcommand, command):
     command = command.lower()
 
     # コマンドの存在チェック
-    if _available_command(message, command) == False:
+    if not _available_command(message, command):
         return
 
     # 用語コマンドと応答をまとめて削除
@@ -64,6 +66,7 @@ def term_drop(message, subcommand, command):
     # コマンド一覧の set から削除
     commands.remove(command)
     message.send('コマンド `${}` を消去しました'.format(command))
+
 
 def _create_attachments_for_list(pretext, data, command=True):
     """
@@ -81,8 +84,8 @@ def _create_attachments_for_list(pretext, data, command=True):
         'mrkdwn_in': ['pretext', 'text'],
     }]
     return json.dumps(attachments)
-    
-        
+
+
 @respond_to('^term\s+search\s+(\w+)')
 def term_search(message, keyword):
     """
@@ -96,6 +99,7 @@ def term_search(message, keyword):
     attachments = _create_attachments_for_list(pretext, data)
     message.send_webapi('', attachments)
 
+
 @respond_to('^term\s+list')
 def term_list(message):
     """
@@ -105,12 +109,13 @@ def term_list(message):
     attachments = _create_attachments_for_list(pretext, sorted(commands))
     message.send_webapi('', attachments)
 
+
 def _available_command(message, command):
     """
     指定されたコマンドが有効化どうかを返す
     """
     result = True
-    
+
     if command in RESERVED:
         result = False
     elif command not in commands:
@@ -118,6 +123,7 @@ def _available_command(message, command):
         result = False
 
     return result
+
 
 def _send_markdown_text(message, text):
     """
@@ -130,34 +136,36 @@ def _send_markdown_text(message, text):
         'mrkdwn_in': ['pretext'],
     }]
     message.send_webapi('', json.dumps(attachments))
-    
+
+
 @respond_to('^(\w+)\s+(add)\s+(.*)', re.DOTALL)
 def add_response(message, command, subcommand, text):
     """
     用語コマンドに応答を追加する
     """
-    if _available_command(message, command) == False:
+    if not _available_command(message, command):
         return
 
     term = Term.get(command=command)
     creator = message.body['user']
     # 用語を登録する
     resp, created = Response.get_or_create(term=term, text=text, creator=creator)
-    if created == False:
+    if not created:
         message.send('コマンド `${}` に「{}」は登録済みです'.format(command, text))
         return
-        
+
     text = 'コマンド `${}` に「{}」を追加しました'.format(command, text)
     _send_markdown_text(message, text)
+
 
 @respond_to('^(\w+)\s+(del|delete)\s+(.*)', re.DOTALL)
 def del_response(message, command, subcommand, text):
     """
     用語コマンドから応答を削除する
     """
-    if _available_command(message, command) == False:
+    if not _available_command(message, command):
         return
-    
+
     term = Term.get(command=command)
     try:
         response = Response.get(term=term, text=text)
@@ -165,35 +173,37 @@ def del_response(message, command, subcommand, text):
         text = 'コマンド `${}` に指定された応答は登録されていません'.format(command)
         message.send(text)
         return
-        
+
     response.delete_instance()
 
     text = 'コマンド `${}` から「{}」を削除しました'.format(command, text)
     _send_markdown_text(message, text)
+
 
 @respond_to('^(\w+)$')
 def return_response(message, command):
     """
     用語コマンドに登録されている応答をランダムに返す
     """
-    if _available_command(message, command) == False:
+    if not _available_command(message, command):
         return
-    
+
     response_set = Term.get(command=command).response_set
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
-        msg+= '`${} add (レスポンス)` で応答を登録してください'.format(command)
+        msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
         message.send(msg)
     else:
         response = random.choice(response_set)
         _send_markdown_text(message, response.text)
+
 
 @respond_to('^(\w+)\s+search\s+(\w+)')
 def search_responses(message, command, keyword):
     """
     用語コマンドに登録されている応答のうち、キーワードにマッチするものを返す
     """
-    if _available_command(message, command) == False:
+    if not _available_command(message, command):
         return
 
     term = Term.get(command=command)
@@ -208,24 +218,26 @@ def search_responses(message, command, keyword):
         attachments = _create_attachments_for_list(pretext, data, False)
         message.send_webapi('', attachments)
 
+
 @respond_to('^(\w+)\s+list')
 def get_responses(message, command):
     """
     用語コマンドに登録されている応答の一覧を返す
     """
-    if _available_command(message, command) == False:
+    if not _available_command(message, command):
         return
 
     response_set = Term.get(command=command).response_set
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
-        msg+= '`${} add (レスポンス)` で応答を登録してください'.format(command)
+        msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
         message.send(msg)
     else:
         pretext = 'コマンド `${}` の応答は {} 件あります\n'.format(command, len(response_set))
         data = [x.text for x in response_set]
         attachments = _create_attachments_for_list(pretext, data, False)
         message.send_webapi('', attachments)
+
 
 @respond_to('term\s+help')
 def term_help(message):
@@ -254,4 +266,3 @@ def term_help(message):
 ビール
 ```
 ''')
-
