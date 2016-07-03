@@ -1,6 +1,6 @@
 import random
 import json
-import re
+from datetime import datetime
 
 from slackbot.bot import respond_to
 
@@ -147,11 +147,14 @@ def add_response(message, command, subcommand, text):
     term = Term.get(command=command)
     creator = message.body['user']
     # 用語を登録する
-    resp, created = Response.get_or_create(term=term, text=text, creator=creator)
+    resp, created = Response.get_or_create(term=term, text=text,
+                                           creator=creator,
+                                           created=datetime.now())
     if not created:
         message.send('コマンド `${}` に「{}」は登録済みです'.format(command, text))
         return
 
+    resp.save()
     text = 'コマンド `${}` に「{}」を追加しました'.format(command, text)
     _send_markdown_text(message, text)
 
@@ -174,8 +177,25 @@ def del_response(message, command, subcommand, text):
 
     response.delete_instance()
 
-    text = 'コマンド `${}` から「{}」を削除しました'.format(command, text)
-    _send_markdown_text(message, text)
+    reply = 'コマンド `${}` から「{}」を削除しました'.format(command, text)
+    _send_markdown_text(message, reply)
+
+
+@respond_to('^(\w+)\s+(pop)')
+def pop_response(message, command, subcommand):
+    """
+    用語コマンドで最後に登録された応答を削除する
+    """
+    if not _available_command(message, command):
+        return
+
+    response_set = Term.get(command=command).response_set
+    last_response = response_set.order_by(Response.created.desc())[0]
+    text = last_response.text
+    last_response.delete_instance()
+
+    reply = 'コマンド `${}` から「{}」を削除しました'.format(command, text)
+    _send_markdown_text(message, reply)
 
 
 @respond_to('^(\w+)$')
@@ -211,7 +231,8 @@ def search_responses(message, command, keyword):
     if len(responses) == 0:
         message.send('コマンド `${}` に `{}` を含む応答はありません'.format(command, keyword))
     else:
-        pretext = 'コマンド `${}` の `{}` を含む応答は {} 件あります\n'.format(command, keyword, len(responses))
+        pretext = 'コマンド `${}` の `{}` を含む応答は {} 件あります\n'.format(
+            command, keyword, len(responses))
         data = [x.text for x in responses]
         attachments = _create_attachments_for_list(pretext, data, False)
         message.send_webapi('', attachments)
@@ -231,7 +252,8 @@ def get_responses(message, command):
         msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
         message.send(msg)
     else:
-        pretext = 'コマンド `${}` の応答は {} 件あります\n'.format(command, len(response_set))
+        pretext = 'コマンド `${}` の応答は {} 件あります\n'.format(
+            command, len(response_set))
         data = [x.text for x in response_set]
         attachments = _create_attachments_for_list(pretext, data, False)
         message.send_webapi('', attachments)
@@ -250,6 +272,7 @@ def term_help(message):
 - `$(用語)`: 用語コマンドに登録してある応答からランダムに一つ返す
 - `$(用語) add (応答)`: 用語コマンドに応答を追加する
 - `$(用語) del (応答)`: 用語コマンドから応答を削除する
+- `$(用語) pop`: 用語コマンドの最後に登録した応答を削除する
 - `$(用語) list`: 用語コマンドの応答一覧を返す
 - `$(用語) search (キーワード)`: 用語コマンドのうちキーワードを含む応答一覧を返す
 ```
