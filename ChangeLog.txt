@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-07-03
+--------------------------
+- [SAR-912] term plugin の URL 対応
+
 Release Notes - 2016-07-02
 --------------------------
 - [SAR-931] random command
