@@ -129,8 +129,6 @@ def _send_markdown_text(message, text):
     """
     指定されたtextをmarkdown形式で送信する
     """
-    import pdb
-    pdb.set_trace()
     attachments = [{
         'pretext': text,
         'mrkdwn_in': ['pretext'],
@@ -138,7 +136,7 @@ def _send_markdown_text(message, text):
     message.send_webapi('', json.dumps(attachments))
 
 
-@respond_to('^(\w+)\s+(add)\s+(.*)', re.DOTALL)
+@respond_to('^(\w+)\s+(add)\s+(.*)')
 def add_response(message, command, subcommand, text):
     """
     用語コマンドに応答を追加する
@@ -158,7 +156,7 @@ def add_response(message, command, subcommand, text):
     _send_markdown_text(message, text)
 
 
-@respond_to('^(\w+)\s+(del|delete)\s+(.*)', re.DOTALL)
+@respond_to('^(\w+)\s+(del|delete)\s+(.+)')
 def del_response(message, command, subcommand, text):
     """
     用語コマンドから応答を削除する
