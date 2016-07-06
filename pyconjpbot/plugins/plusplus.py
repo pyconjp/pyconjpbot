@@ -119,7 +119,7 @@ def plusplus_rename(message, old, new):
 
     # 入れ替える
     oldplus.delete_instance()
-    message.send('`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, old.counter))
+    message.send('`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, oldplus.counter))
 
 @respond_to(r'^plusplus\s+merge\s+(\S+)\s+(\S+)')
 def plusplus_merge(message, old, new):
