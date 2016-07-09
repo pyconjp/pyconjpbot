@@ -19,11 +19,16 @@ RESERVED = (
 commands = {term.command for term in Term.select()}
 
 
-@respond_to('^term\s+(create|add)\s+(\w+)')
-def term_create(message, subcommand, command):
+@respond_to('^term\s+(\w+)$')
+@respond_to('^term\s+create\s+(\w+)$')
+@respond_to('^term\s+add\s+(\w+)$')
+def term_create(message, command):
     """
     指定されたコマンドを生成する
     """
+    if command in ('list', 'help'):
+        return
+    
     # コマンドは小文字に統一
     command = command.lower()
     # 予約語の場合は実行しない
@@ -46,7 +51,7 @@ def term_create(message, subcommand, command):
         commands.add(command)
 
 
-@respond_to('^term\s+(drop|del|delete)\s+(\w+)')
+@respond_to('^term\s+(drop|del|delete)\s+(\w+)$')
 def term_drop(message, subcommand, command):
     """
     指定されたコマンドを消去する
@@ -86,7 +91,7 @@ def _create_attachments_for_list(pretext, data, command=True):
     return json.dumps(attachments)
 
 
-@respond_to('^term\s+search\s+(\w+)')
+@respond_to('^term\s+search\s+(\w+)$')
 def term_search(message, keyword):
     """
     指定したキーワードを含む用語コマンドの一覧を返す
@@ -100,7 +105,7 @@ def term_search(message, keyword):
     message.send_webapi('', attachments)
 
 
-@respond_to('^term\s+list')
+@respond_to('^term\s+list$')
 def term_list(message):
     """
     現在使用可能な用語コマンドの一覧を返す
@@ -136,7 +141,25 @@ def _send_markdown_text(message, text):
     message.send_webapi('', json.dumps(attachments))
 
 
-@respond_to('^(\w+)\s+(add)\s+(.*)')
+@respond_to('^(\w+)$')
+def return_response(message, command):
+    """
+    用語コマンドに登録されている応答をランダムに返す
+    """
+    if not _available_command(message, command):
+        return
+
+    response_set = Term.get(command=command).response_set
+    if len(response_set) == 0:
+        msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
+        msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
+        message.send(msg)
+    else:
+        response = random.choice(response_set)
+        _send_markdown_text(message, response.text)
+
+
+@respond_to('^(\w+)\s+(add)\s+(.+)')
 def add_response(message, command, subcommand, text):
     """
     用語コマンドに応答を追加する
@@ -181,8 +204,8 @@ def del_response(message, command, subcommand, text):
     _send_markdown_text(message, reply)
 
 
-@respond_to('^(\w+)\s+(pop)')
-def pop_response(message, command, subcommand):
+@respond_to('^(\w+)\s+pop$')
+def pop_response(message, command):
     """
     用語コマンドで最後に登録された応答を削除する
     """
@@ -196,24 +219,6 @@ def pop_response(message, command, subcommand):
 
     reply = 'コマンド `${}` から「{}」を削除しました'.format(command, text)
     _send_markdown_text(message, reply)
-
-
-@respond_to('^(\w+)$')
-def return_response(message, command):
-    """
-    用語コマンドに登録されている応答をランダムに返す
-    """
-    if not _available_command(message, command):
-        return
-
-    response_set = Term.get(command=command).response_set
-    if len(response_set) == 0:
-        msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
-        msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
-        message.send(msg)
-    else:
-        response = random.choice(response_set)
-        _send_markdown_text(message, response.text)
 
 
 @respond_to('^(\w+)\s+search\s+(\w+)')
@@ -264,7 +269,8 @@ def term_help(message):
     """
     term pluginのヘルプを返す
     """
-    message.send('''- `$term create (用語)`: 用語コマンドを作成する
+    message.send('''- `$term (用語)`: 用語コマンドを作成する
+- `$term create (用語)`: 用語コマンドを作成する
 - `$term drop (用語)`: 用語コマンドを消去する
 - `$term search (キーワード)`: キーワードを含む用語コマンドの一覧を返す
 - `$term list`: 用語コマンドの一覧を返す

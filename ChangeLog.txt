@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-07-09
+--------------------------
+- [SAR-1022] add term command without create subcommand
+
 Release Notes - 2016-07-06
 --------------------------
 - [SAR-994] fix: plusplus rename bug
