@@ -27,3 +27,7 @@ JIRA_PASS = '<JIRA Password>'
 # https://www.microsoft.com/en-us/translator/getstarted.aspx
 TRANSLATOR_ID = '<Your Client ID>'
 TRANSLATOR_SECRET = '<Your Client Secret>'
+
+## Settings for github plugin
+GITHUB_TOKEN = '<Your Github Token>'
+GITHUB_ORGANIZATION = '<Your organization>'
