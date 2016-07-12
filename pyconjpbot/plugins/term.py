@@ -19,9 +19,9 @@ RESERVED = (
 commands = {term.command for term in Term.select()}
 
 
-@respond_to('^term\s+(\w+)$')
-@respond_to('^term\s+create\s+(\w+)$')
-@respond_to('^term\s+add\s+(\w+)$')
+@respond_to('^term\s+([\w-]+)$')
+@respond_to('^term\s+create\s+([\w-]+)$')
+@respond_to('^term\s+add\s+([\w-]+)$')
 def term_create(message, command):
     """
     指定されたコマンドを生成する
@@ -51,7 +51,7 @@ def term_create(message, command):
         commands.add(command)
 
 
-@respond_to('^term\s+(drop|del|delete)\s+(\w+)$')
+@respond_to('^term\s+(drop|del|delete)\s+([\w-]+)$')
 def term_drop(message, subcommand, command):
     """
     指定されたコマンドを消去する
@@ -91,7 +91,7 @@ def _create_attachments_for_list(pretext, data, command=True):
     return json.dumps(attachments)
 
 
-@respond_to('^term\s+search\s+(\w+)$')
+@respond_to('^term\s+search\s+([\w-]+)$')
 def term_search(message, keyword):
     """
     指定したキーワードを含む用語コマンドの一覧を返す
@@ -141,7 +141,7 @@ def _send_markdown_text(message, text):
     message.send_webapi('', json.dumps(attachments))
 
 
-@respond_to('^(\w+)$')
+@respond_to('^([\w-]+)$')
 def return_response(message, command):
     """
     用語コマンドに登録されている応答をランダムに返す
@@ -159,7 +159,7 @@ def return_response(message, command):
         _send_markdown_text(message, response.text)
 
 
-@respond_to('^(\w+)\s+(add)\s+(.+)')
+@respond_to('^([\w-]+)\s+(add)\s+(.+)')
 def add_response(message, command, subcommand, text):
     """
     用語コマンドに応答を追加する
@@ -182,7 +182,7 @@ def add_response(message, command, subcommand, text):
     _send_markdown_text(message, text)
 
 
-@respond_to('^(\w+)\s+(del|delete)\s+(.+)')
+@respond_to('^([\w-]+)\s+(del|delete)\s+(.+)')
 def del_response(message, command, subcommand, text):
     """
     用語コマンドから応答を削除する
@@ -204,7 +204,7 @@ def del_response(message, command, subcommand, text):
     _send_markdown_text(message, reply)
 
 
-@respond_to('^(\w+)\s+pop$')
+@respond_to('^([\w-]+)\s+pop$')
 def pop_response(message, command):
     """
     用語コマンドで最後に登録された応答を削除する
@@ -221,7 +221,7 @@ def pop_response(message, command):
     _send_markdown_text(message, reply)
 
 
-@respond_to('^(\w+)\s+search\s+(\w+)')
+@respond_to('^([\w-]+)\s+search\s+(\w+)')
 def search_responses(message, command, keyword):
     """
     用語コマンドに登録されている応答のうち、キーワードにマッチするものを返す
@@ -243,7 +243,7 @@ def search_responses(message, command, keyword):
         message.send_webapi('', attachments)
 
 
-@respond_to('^(\w+)\s+list')
+@respond_to('^([\w-]+)\s+list')
 def get_responses(message, command):
     """
     用語コマンドに登録されている応答の一覧を返す
