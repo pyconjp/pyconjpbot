@@ -3,6 +3,7 @@ Unreleased
 
 Release Notes - 2016-07-12
 --------------------------
+- [SAR-1069] fix: remove responses with term drop command
 - [SAR-1041] term plugin: command name with "-" support
 
 Release Notes - 2016-07-09

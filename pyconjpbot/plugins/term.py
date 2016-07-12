@@ -65,7 +65,7 @@ def term_drop(message, subcommand, command):
 
     # 用語コマンドと応答をまとめて削除
     term = Term.get(command=command)
-    term.delete_instance(recursive=False)
+    term.delete_instance(recursive=True)
     term.save()
 
     # コマンド一覧の set から削除
