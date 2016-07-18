@@ -158,15 +158,44 @@ def return_response(message, command):
         response = random.choice(response_set)
         _send_markdown_text(message, response.text)
 
-
-@respond_to('^([\w-]+)\s+(add)\s+(.+)')
-def add_response(message, command, subcommand, text):
+@respond_to('^([\w-]+)\s+(.*)')
+def response(message, command, params):
     """
-    用語コマンドに応答を追加する
+    用語コマンドの処理をする
     """
     if not _available_command(message, command):
         return
 
+    data = params.split(maxsplit=1)
+    subcommand = data[0]
+    try:
+        if subcommand == 'pop':
+            # 最後に登録された応答を削除
+            pop_response(message, command)
+        elif subcommand == 'list':
+            # 応答の一覧を返す
+            get_responses(message, command)
+        elif subcommand == 'search':
+            # 応答を検索
+            search_responses(message, command, data[1])
+        elif subcommand in ('del', 'delete', 'remove'):
+            # 応答を削除
+            del_response(message, command, data[1])
+        elif subcommand == 'add':
+            # 応答を追加
+            add_response(message, command, data[1])
+        else:
+            # サブコマンドが存在しない場合も追加
+            add_response(message, command, params)
+    except IndexError:
+        # ヘルプを返す
+        term_help(message)
+        pass
+
+def add_response(message, command, text):
+    """
+    用語コマンドに応答を追加する
+    """
     term = Term.get(command=command)
     creator = message.body['user']
     # 用語を登録する
@@ -182,19 +211,15 @@ def add_response(message, command, subcommand, text):
     _send_markdown_text(message, text)
 
 
-@respond_to('^([\w-]+)\s+(del|delete)\s+(.+)')
-def del_response(message, command, subcommand, text):
+def del_response(message, command, text):
     """
     用語コマンドから応答を削除する
     """
-    if not _available_command(message, command):
-        return
-
     term = Term.get(command=command)
     try:
         response = Response.get(term=term, text=text)
     except Response.DoesNotExist:
-        text = 'コマンド `${}` に指定された応答は登録されていません'.format(command)
+        text = 'コマンド `${}` に「{}」は登録されていません'.format(command, text)
         message.send(text)
         return
 
@@ -204,14 +229,10 @@ def del_response(message, command, subcommand, text):
     _send_markdown_text(message, reply)
 
 
-@respond_to('^([\w-]+)\s+pop$')
 def pop_response(message, command):
     """
     用語コマンドで最後に登録された応答を削除する
     """
-    if not _available_command(message, command):
-        return
-
     response_set = Term.get(command=command).response_set
     last_response = response_set.order_by(Response.created.desc())[0]
     text = last_response.text
@@ -221,14 +242,10 @@ def pop_response(message, command):
     _send_markdown_text(message, reply)
 
 
-@respond_to('^([\w-]+)\s+search\s+(\w+)')
 def search_responses(message, command, keyword):
     """
     用語コマンドに登録されている応答のうち、キーワードにマッチするものを返す
     """
-    if not _available_command(message, command):
-        return
-
     term = Term.get(command=command)
     pat = '%{}%'.format(keyword)
     responses = Response.select().where(term == term, Response.text ** pat)
@@ -243,14 +260,10 @@ def search_responses(message, command, keyword):
         message.send_webapi('', attachments)
 
 
-@respond_to('^([\w-]+)\s+list')
 def get_responses(message, command):
     """
     用語コマンドに登録されている応答の一覧を返す
     """
-    if not _available_command(message, command):
-        return
-
     response_set = Term.get(command=command).response_set
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
