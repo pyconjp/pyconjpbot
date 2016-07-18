@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-07-18
+--------------------------
+- [SAR-1022] term command without add sub command support
+
 Release Notes - 2016-07-12
 --------------------------
 - [SAR-1069] fix: remove responses with term drop command
