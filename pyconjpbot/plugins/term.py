@@ -251,6 +251,13 @@ def pop_response(message, command):
     用語コマンドで最後に登録された応答を削除する
     """
     response_set = Term.get(command=command).response_set
+    # 応答が登録されていない
+    if len(response_set) == 0:
+        msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
+        msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
+        message.send(msg)
+        return
+        
     last_response = response_set.order_by(Response.created.desc())[0]
     text = last_response.text
     last_response.delete_instance()
