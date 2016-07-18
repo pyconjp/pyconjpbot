@@ -192,19 +192,31 @@ def response(message, command, params):
         term_help(message)
         pass
 
+
+def _exist_response(command, text):
+    """
+    指定されたコマンドに応答が登録されているかを調べて返す
+    """
+    term = Term.get(command=command)
+    count = Response.select().where(Response.term == term,
+                                    Response.text == text).count()
+    if count == 0:
+        return False
+    else:
+        return True
+        
 def add_response(message, command, text):
     """
     用語コマンドに応答を追加する
     """
-    
-    term = Term.get(command=command)
+
     # 登録済かどうかを確認する
-    count = Response.select().where(Response.term == term, Response.text == text).count()
-    if count:
-        text = 'コマンド `${}` に「{}」は登録済みです'.format(command, text)
-        message.send(text)
+    if _exist_response(command, text):
+        reply = 'コマンド `${}` に「{}」は登録済みです'.format(command, text)
+        _send_markdown_text(message, reply)
         return
 
+    term = Term.get(command=command)
     creator = message.body['user']
     # 用語を登録する
     resp, created = Response.get_or_create(term=term, text=text,
@@ -223,10 +235,11 @@ def del_response(message, command, text):
     try:
         response = Response.get(term=term, text=text)
     except Response.DoesNotExist:
-        text = 'コマンド `${}` に「{}」は登録されていません'.format(command, text)
-        message.send(text)
+        reply = 'コマンド `${}` に「{}」は登録されていません'.format(command, text)
+        _send_markdown_text(message, reply)
         return
 
+    # 応答を削除する
     response.delete_instance()
 
     reply = 'コマンド `${}` から「{}」を削除しました'.format(command, text)
