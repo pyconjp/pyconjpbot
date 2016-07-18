@@ -196,16 +196,20 @@ def add_response(message, command, text):
     """
     用語コマンドに応答を追加する
     """
+    
     term = Term.get(command=command)
+    # 登録済かどうかを確認する
+    count = Response.select().where(Response.term == term, Response.text == text).count()
+    if count:
+        text = 'コマンド `${}` に「{}」は登録済みです'.format(command, text)
+        message.send(text)
+        return
+
     creator = message.body['user']
     # 用語を登録する
     resp, created = Response.get_or_create(term=term, text=text,
                                            creator=creator,
                                            created=datetime.now())
-    if not created:
-        message.send('コマンド `${}` に「{}」は登録済みです'.format(command, text))
-        return
-
     resp.save()
     text = 'コマンド `${}` に「{}」を追加しました'.format(command, text)
     _send_markdown_text(message, text)
