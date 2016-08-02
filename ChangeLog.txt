@@ -1,9 +1,13 @@
 Unreleased
 ----------
 
+Release Notes - 2016-08-02
+--------------------------
+- [SAR-1198] fix: calc plugin: ignore not number result
+
 Release Notes - 2016-07-18
 --------------------------
-- [SAR-1022] term command without add sub command support
+- [SAR-1022] term plugin: term command without add sub command support
 
 Release Notes - 2016-07-12
 --------------------------
@@ -12,11 +16,11 @@ Release Notes - 2016-07-12
 
 Release Notes - 2016-07-09
 --------------------------
-- [SAR-1022] add term command without create subcommand
+- [SAR-1022] term plugin: add term command without create subcommand
 
 Release Notes - 2016-07-06
 --------------------------
-- [SAR-994] fix: plusplus rename bug
+- [SAR-994] fix: plusplus plugin: rename bug
 
 Release Notes - 2016-07-03
 --------------------------
@@ -24,7 +28,7 @@ Release Notes - 2016-07-03
 
 Release Notes - 2016-07-02
 --------------------------
-- [SAR-931] random command
+- [SAR-931] misc plugin: random command
 
 Release Notes - 2016-07-01
 --------------------------

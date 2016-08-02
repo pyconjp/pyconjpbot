@@ -12,7 +12,7 @@ def calc(message, expression, dummy_):
     数式っぽい文字列だったら計算して結果を返す
     """
 
-    # 数字っぽいパターンの場合は無視する
+    # 単一の数字っぽいパターンは無視する
     if NUM_PATTERN.match(expression):
         return
     try:
@@ -22,8 +22,10 @@ def calc(message, expression, dummy_):
         return
     
     if result.is_Integer:
+        # 整数だったらそのまま出力
         message.send(str(result))
-    else:
-        message.send(str(float(result.evalf())))
+    elif result.is_Number:
+        # 数値だったら float にして出力
+        message.send(str(float(result)))
 
 
