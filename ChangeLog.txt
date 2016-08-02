@@ -3,7 +3,8 @@ Unreleased
 
 Release Notes - 2016-08-02
 --------------------------
-- [SAR-1198] fix: calc plugin: ignore not number result
+- [SAR-1199] update 3rd party packages
+- [SAR-1198] calc plugin: ignore not number result
 
 Release Notes - 2016-07-18
 --------------------------
