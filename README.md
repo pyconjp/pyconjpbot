@@ -9,6 +9,14 @@
 
 コマンドの一覧と簡単な説明
 
+### google plugin
+
+- `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
+- `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す
+- `$map keywords`: 指定したキーワードでgoogleマップの検索結果を返す
+
+- [google.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/google_plugins/google.py)
+
 ### term plugin
 
 - `$term (用語)`: 用語コマンドを作成する
