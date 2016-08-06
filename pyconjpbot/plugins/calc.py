@@ -6,7 +6,7 @@ from sympy import sympify, SympifyError
 # 単一の数字っぽい文字列を表すパターン
 NUM_PATTERN = re.compile('^\s*[-+]?[\d.]+\s*$')
 
-@listen_to('^(([-+*/^%!()\d\s]|pi|e|sqrt|sin|cos|tan)+)$')
+@listen_to('^(([-+*/^%!().\d\s]|pi|e|sqrt|sin|cos|tan)+)$')
 def calc(message, expression, dummy_):
     """
     数式っぽい文字列だったら計算して結果を返す

@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-08-06
+--------------------------
+- [SAR-1234] fix: calc plugin: add point
+
 Release Notes - 2016-08-02
 --------------------------
 - [SAR-1199] update 3rd party packages
