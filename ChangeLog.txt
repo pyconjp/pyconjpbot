@@ -3,6 +3,7 @@ Unreleased
 
 Release Notes - 2016-08-06
 --------------------------
+- [SAR-1243] add google plugin(google, image command)
 - [SAR-1234] fix: calc plugin: add point
 
 Release Notes - 2016-08-02
