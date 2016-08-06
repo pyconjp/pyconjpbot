@@ -23,7 +23,7 @@ def google(message, keywords):
 
     answer = soup.findAll("h3", attrs={"class": "r"})
     if not answer:
-        message.send("`{}` での検索結果はありませんでした".format(keywords)
+        message.send("`{}` での検索結果はありませんでした".format(keywords))
 
     try:
         _, url = answer[0].a['href'].split('=', 1)
@@ -35,7 +35,9 @@ def google(message, keywords):
         return ' '.join(answer[0].stripped_strings)
 
 def unescape(url):
-    # for unclear reasons, google replaces url escapes with \x escapes
+    """
+    for unclear reasons, google replaces url escapes with \\x escapes
+    """
     return url.replace(r"\x", "%")
 
 @respond_to('image\s+(.*)')
@@ -59,9 +61,10 @@ def image(message, keywords):
     if images:
         message.send(choice(images))
     else:
-        message.send("`{}` での検索結果はありませんでした".format(keywords)
+        message.send("`{}` での検索結果はありませんでした".format(keywords))
 
 @respond_to('google\s+help$')
 def google_help(message):
     message.send('''- `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
-- `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す''')
+- `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す
+''')
