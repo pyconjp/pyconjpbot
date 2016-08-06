@@ -13,7 +13,7 @@ RESERVED = (
     'weather', '天気',
     'term',
     'shuffle', 'help', 'choice', 'ping', 'version', 'random',
-    'google', 'image',
+    'google', 'image', 'map',
 )
 
 # コマンド一覧を初期化
