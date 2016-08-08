@@ -42,14 +42,13 @@ def unescape(url):
     return url.replace(r"\x", "%")
 
 @respond_to('image\s+(.*)')
-def image(message, keywords):
+def google_image(message, keywords):
     """
     google で画像検索した結果を返す
 
     https://github.com/llimllib/limbo/blob/master/limbo/plugins/image.py
     """
 
-    #safe = "&safe=" if unsafe else "&safe=active"
     query = quote(keywords)
     searchurl = "https://www.google.com/search?tbm=isch&q={0}".format(query)
 
@@ -65,7 +64,7 @@ def image(message, keywords):
         message.send("`{}` での検索結果はありませんでした".format(keywords))
 
 @respond_to('map\s+(.*)')
-def map(message, keywords):
+def google_map(message, keywords):
     """
     google マップで検索した結果を返す
 

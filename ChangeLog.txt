@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-08-08
+--------------------------
+- [SAR-1253] fix: google plugin: image command error
+
 Release Notes - 2016-08-06
 --------------------------
 - [SAR-1243] add google plugin(google, image and map command)
