@@ -1,5 +1,6 @@
 Unreleased
 ----------
+- [SAR-988] github plugin
 
 Release Notes - 2016-08-08
 --------------------------

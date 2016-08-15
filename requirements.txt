@@ -12,6 +12,7 @@ oauthlib==1.1.2
 peewee==2.8.1
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
+PyGithub==1.26.0
 requests==2.10.0
 requests-oauthlib==0.6.2
 requests-toolbelt==0.7.0
