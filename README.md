@@ -9,6 +9,14 @@
 
 コマンドの一覧と簡単な説明
 
+### github plugin
+
+- `$gihub repos`: pyconjp organization のリポジトリ一覧を返す
+- `$github search keywords`: 指定されたキーワードにマッチするissueを返す
+- `$github code keywords`: 指定されたキーワードにマッチするコードを返す
+
+- [github.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/github.py)
+
 ### google plugin
 
 - `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
