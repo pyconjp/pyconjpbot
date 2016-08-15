@@ -50,6 +50,33 @@ def github_search(message, keywords):
     else:
         message.send('`{}` にマッチするissueはありません'.format(keywords))
 
+@respond_to('^github\s+code\s+(.*)')
+def github_code(message, keywords):
+    """
+    指定されたキーワードでコードを検索する
+    """
+
+    text = ""
+    for repo in org.get_repos():
+        # リポジトリを指定して検索
+        files = list(github.search_code(keywords, repo=repo.full_name))
+        if files:
+            text += "リポジトリ: <{}|{}>\n".format(repo.html_url, repo.name)
+            for f in files:
+                text += "- <{}|{}>\n".format(f.html_url, f.name)
+
+    if text:
+        attachments = [{
+            'pretext': '`{}` の検索結果'.format(keywords),
+            'text': text,
+            'mrkdwn_in': ['pretext', 'text'],
+        }]
+        message.send_webapi('', json.dumps(attachments))
+    
+    # 結果が一つもない場合
+    else:
+        message.send('`{}` にマッチするコードはありません'.format(keywords))
+
 @respond_to('^github\s+help$')
 def github_help(message):
     """
@@ -57,4 +84,5 @@ def github_help(message):
     """
     message.send('''- `$gihub repos`: pyconjp organization のリポジトリ一覧を返す
 - `$github search keywords`: 指定されたキーワードにマッチするissueを返す
+- `$github code keywords`: 指定されたキーワードにマッチするコードを返す
 ''')
