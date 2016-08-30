@@ -12,7 +12,7 @@ RESERVED = (
     'translate', '翻訳',
     'weather', '天気',
     'term',
-    'shuffle', 'help', 'choice', 'ping', 'version', 'random',
+    'shuffle', 'help', 'choice', 'ping', 'version', 'random', 'cal',
     'google', 'image', 'map',
     'github',
 )

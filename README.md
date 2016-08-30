@@ -179,6 +179,9 @@ BOT: @takanory おはようございます
 - `$version`: バージョン情報を返す
 - `$random`: チャンネルにいるメンバーからランダムに一人を選ぶ
 - `$random active`: チャンネルにいるactiveなメンバーからランダムに一人を選ぶ
+- `$cal`: 今月のカレンダーを返す
+- `$cal 9`: 今年の指定された月のカレンダーを返す
+- `$cal 9 2016`: 指定された年月のカレンダーを返す
 - [misc.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/misc.py)
 
 ## How to build

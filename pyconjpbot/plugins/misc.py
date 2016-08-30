@@ -1,3 +1,5 @@
+import calendar
+from datetime import date
 import json
 import random
 
@@ -100,3 +102,30 @@ def random_command(message, subcommand=None):
     name = user_info.body['user']['name']
     message.send('{} さん、君に決めた！'.format(name))
     
+@respond_to('^cal$')
+@respond_to('^cal\s+(\d+)$')
+@respond_to('^cal\s+(\d+)\s+(\d+)$')
+def cal_command(message, month=None, year=None):
+    """
+    一ヶ月のカレンダーを返す
+    """
+    today = date.today()
+    month = int(month) if month else today.month
+    year = int(year) if year else today.year
+        
+    cal = calendar.TextCalendar(firstweekday=calendar.SUNDAY)
+    try:
+        message.send('```{}```'.format(cal.formatmonth(year, month)))
+    except IndexError:
+        # 数字が範囲外の場合は無視する
+        pass
+
+@respond_to('^cal\s+help$')
+def cal_help(message):
+    """
+    cal コマンドのヘルプを返す
+    """
+    message.send('''- `$cal`: 今月のカレンダーを返す
+- `$cal 9`: 今年の指定された月のカレンダーを返す
+- `$cal 9 2016`: 指定された年月のカレンダーを返す
+''')
