@@ -1,5 +1,10 @@
 Unreleased
 ----------
+- [SAR-1346] add cal command
+
+Release Notes - 2016-08-31
+--------------------------
+- [SAR-1342] add random active command
 
 Release Notes - 2016-08-15
 --------------------------

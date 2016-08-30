@@ -178,6 +178,7 @@ BOT: @takanory おはようございます
 - `$ping`: 応答(pong)を返す
 - `$version`: バージョン情報を返す
 - `$random`: チャンネルにいるメンバーからランダムに一人を選ぶ
+- `$random active`: チャンネルにいるactiveなメンバーからランダムに一人を選ぶ
 - [misc.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/misc.py)
 
 ## How to build
