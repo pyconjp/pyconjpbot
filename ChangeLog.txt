@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-09-01
+--------------------------
+- [SAR-1354] add comma support to calc plugin
+
 Release Notes - 2016-08-31
 --------------------------
 - [SAR-1346] add cal command
