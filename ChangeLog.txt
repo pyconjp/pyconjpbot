@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-09-04
+--------------------------
+- [SAR-1399] update 3rd party packages
+
 Release Notes - 2016-09-01
 --------------------------
 - [SAR-1354] add comma support to calc plugin
