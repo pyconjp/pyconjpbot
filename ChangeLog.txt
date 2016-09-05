@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-09-05
+--------------------------
+- [SAR-1398] fix: sqrt support for calc plugin
+
 Release Notes - 2016-09-04
 --------------------------
 - [SAR-1399] update 3rd party packages

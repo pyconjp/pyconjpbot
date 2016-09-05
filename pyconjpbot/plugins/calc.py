@@ -4,7 +4,7 @@ from slackbot.bot import respond_to, listen_to
 from sympy import sympify, SympifyError
 
 # 単一の数字っぽい文字列を表すパターン
-NUM_PATTERN = re.compile('^\s*[-+]?[\d.]+\s*$')
+NUM_PATTERN = re.compile('^\s*[-+]?[\d.,]+\s*$')
 
 @listen_to('^(([-+*/^%!(),.\d\s]|pi|e|sqrt|sin|cos|tan)+)$')
 def calc(message, expression, dummy_):
@@ -26,12 +26,12 @@ def calc(message, expression, dummy_):
     if result.is_Integer:
         # 整数だったらそのまま出力
         answer = int(result)
-    elif result.is_Number:
-        # 数値だったら float にして出力
-        answer = float(result)
     else:
-        # それ以外の時は結果を出力しない
-        return
+        try:
+            answer = float(result)
+        except SympifyError:
+            # 答えが数値じゃなかったら無視する
+            return
 
     # カンマをつけて出力する
     message.send('{:,}'.format(answer))
