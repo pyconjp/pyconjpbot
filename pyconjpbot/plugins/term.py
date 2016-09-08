@@ -15,6 +15,7 @@ RESERVED = (
     'shuffle', 'help', 'choice', 'ping', 'version', 'random', 'cal',
     'google', 'image', 'map',
     'github',
+    'suddendeath',
 )
 
 # コマンド一覧を初期化

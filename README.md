@@ -170,6 +170,12 @@ BOT: @takanory おはようございます
 - `$weather list` `$天気 list`: 指定可能な地域の一覧を返す
 - [weather.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/weather.py)
 
+### suddendeath plugin
+
+- `$suddendeath`: 突然の死のメッセージを返す
+- `$suddendeath words`: words を使って突然の死のメッセージを返す
+- [suddendeath.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/suddendeath.py)
+
 ### misc plugin
 
 - `$help`: ヘルプへのリンクを返す
