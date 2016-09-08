@@ -10,9 +10,9 @@ def _message_length(message):
     length = 0
     for char in message:
         width = east_asian_width(char)
-        if width == 'W':
+        if width in ('W', 'F', 'A'):
             length += 2
-        elif width == 'Na':
+        elif width in ('Na', 'H'):
             length += 1
 
     return length
