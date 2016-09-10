@@ -1,4 +1,5 @@
 from unicodedata import east_asian_width
+import re
 
 from slackbot.bot import respond_to
 
@@ -26,7 +27,9 @@ def suddendeath(message, words='突然の死'):
     if words == 'help':
         return
 
-    length = _message_length(words)
+    # slack の絵文字っぽいパターンは全角文字と同じ長さとする
+    words_for_length = re.sub(':[-+\w]+:', '蛇', words)
+    length = _message_length(words_for_length)
 
     header = '＿' + '人' * (length // 2 + 2) + '＿'
     footer = '￣' + 'Y^' * (length // 2) + 'Y￣'

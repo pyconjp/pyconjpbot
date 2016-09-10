@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-09-19
+--------------------------
+- [SAR-1431]: add emoji support for suddendath command
+
 Release Notes - 2016-09-08
 --------------------------
 - [SAR-1407]: add suddendeath command
