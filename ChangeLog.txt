@@ -1,13 +1,17 @@
 Unreleased
 ----------
 
+Release Notes - 2016-09-29
+--------------------------
+- [TRI-26] move default project for JIRA to slackbot_settings.py
+
 Release Notes - 2016-09-19
 --------------------------
-- [SAR-1431]: add emoji support for suddendath command
+- [SAR-1431] add emoji support for suddendath command
 
 Release Notes - 2016-09-08
 --------------------------
-- [SAR-1407]: add suddendeath command
+- [SAR-1407] add suddendeath command
 
 Release Notes - 2016-09-05
 --------------------------

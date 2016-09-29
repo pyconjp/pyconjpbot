@@ -13,8 +13,8 @@ CLEAN_JIRA_URL = settings.JIRA_URL if not settings.JIRA_URL[-1:] == '/' else set
 jira_auth = (settings.JIRA_USER, settings.JIRA_PASS)
 jira = JIRA(CLEAN_JIRA_URL, basic_auth=jira_auth)
 
-# デフォルトの検索対象プロジェクト
-DEFAULT_PROJECT = 'SAR'
+# デフォルトの検索対象プロジェクトを設定ファイルから読み込む
+DEFAULT_PROJECT = settings.JIRA_DEFAULT_PROJECT
 
 # コンポーネントの一覧
 COMPONENT = {
