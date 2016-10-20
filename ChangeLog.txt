@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-10-20
+--------------------------
+- [SAR-1617] add emoji reaction(tea, coffee and etc.)
+
 Release Notes - 2016-09-29
 --------------------------
 - [TRI-26] move default project for JIRA to slackbot_settings.py

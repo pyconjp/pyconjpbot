@@ -12,6 +12,10 @@ REACTION = {
     '酒': 'sake',
     ('ビール', 'beer'): 'beer',
     'さくさく': 'panda_face',
+    'お茶': 'tea',
+    ('コーヒー', 'coffee'): 'coffee',
+    'ケーキ': 'cake',
+    ('ラーメン', 'ramen'): 'ramen',
 }
 
 def _react(message, emojis):
