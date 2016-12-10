@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2016-12-10
+--------------------------
+- [ISSHA-398] update 3rd party packages
+
 Release Notes - 2016-10-20
 --------------------------
 - [SAR-1617] add emoji reaction(tea, coffee and etc.)
