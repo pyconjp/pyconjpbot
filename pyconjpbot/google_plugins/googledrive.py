@@ -76,7 +76,7 @@ parser.add_argument('-t', '--type', type=str,
 parser.add_argument('keywords', nargs='+',
                     help='検索対象のキーワードを指定する')
 
-def get_service(name, version, filename, scope):
+def get_service(name, version, filename, scope, secret='client_secrets.json'):
     """指定された Google API に接続する
 
     name: APIの名前
@@ -93,8 +93,7 @@ def get_service(name, version, filename, scope):
     # application, including client_id and client_secret, which are found
     # on the API Access tab on the Google APIs
     # Console <http://code.google.com/apis/console>.
-    client_secrets = os.path.join(os.path.dirname(filename),
-                                  'client_secrets.json')
+    client_secrets = os.path.join(os.path.dirname(filename), secret)
 
     # Set up a Flow object to be used if we need to authenticate.
     flow = client.flow_from_clientsecrets(
