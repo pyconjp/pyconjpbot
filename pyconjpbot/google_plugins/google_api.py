@@ -1,5 +1,7 @@
-import httplib2
+from datetime import datetime
+import os.path
 
+import httplib2
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
@@ -22,18 +24,38 @@ SCOPES = [
     ]
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'pyconjpbot'
-CREDENTIAL_PATH = 'credentials.json'
+CREDENTIAL_FILE = 'credentials.json'
+
+
+def get_service(name, version):
+    """指定された Google API に接続する
+
+    name: APIの名前
+    version: APIのバージョン
+    scope: OAuth のスコープを指定する
+
+    serviceオブジェクトを返す
+    """
+    credentials = get_credentials()
+    http = credentials.authorize(http=httplib2.Http())
+    service = discovery.build(name, version, http=http)
+    return service
 
 
 def get_credentials():
     """
     credentialsファイルを生成する
     """
-    credential_path = CREDENTIAL_PATH
+    import pdb
+    pdb.set_trace()
+    dirname = os.path.dirname(__file__)
+    credential_path = os.path.join(dirname, CREDENTIAL_FILE)
+    client_secret_file = os.path.join(dirname, CLIENT_SECRET_FILE)
+
     store = Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow = client.flow_from_clientsecrets(client_secret_file, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
         print('credentialsを{}に保存しました'.format(credential_path))
@@ -45,7 +67,7 @@ def main():
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
-    now = datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    now = datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
     print('直近の5件のイベントを表示')
     eventsResult = service.events().list(
         calendarId='primary', timeMin=now, maxResults=5, singleEvents=True,
