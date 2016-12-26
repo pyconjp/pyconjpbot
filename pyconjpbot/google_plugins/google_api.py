@@ -46,8 +46,6 @@ def get_credentials():
     """
     credentialsファイルを生成する
     """
-    import pdb
-    pdb.set_trace()
     dirname = os.path.dirname(__file__)
     credential_path = os.path.join(dirname, CREDENTIAL_FILE)
     client_secret_file = os.path.join(dirname, CLIENT_SECRET_FILE)
