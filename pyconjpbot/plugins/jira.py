@@ -7,7 +7,9 @@ from slackbot import settings
 from slackbot.bot import respond_to, listen_to
 
 # Clean JIRA Url to not have trailing / if exists
-CLEAN_JIRA_URL = settings.JIRA_URL if not settings.JIRA_URL[-1:] == '/' else settings.JIRA_URL[:-1]
+CLEAN_JIRA_URL = settings.JIRA_URL
+if settings.JIRA_URL[-1:] == '/':
+    CLEAN_JIRA_URL = CLEAN_JIRA_URL[:-1]
 
 # Login to jira
 jira_auth = (settings.JIRA_USER, settings.JIRA_PASS)
@@ -56,6 +58,7 @@ parser.add_argument('-s', '--summary', default=False, action='store_true',
 parser.add_argument('keywords', nargs='*', type=str,
                     help='検索対象のキーワードを指定する')
 
+
 @listen_to(r'(^|[^/])\b([A-Za-z]+)-([0-9]+)\b')
 def jira_listener(message, pre, project, number):
     """
@@ -81,7 +84,7 @@ def jira_listener(message, pre, project, number):
     summary = issue.fields.summary
     assignee = '未割り当て'
     if issue.fields.assignee:
-        assignee = issue.fields.assignee.displayName 
+        assignee = issue.fields.assignee.displayName
     status = issue.fields.status.name
     issue_url = issue.permalink()
 
@@ -103,11 +106,13 @@ def jira_listener(message, pre, project, number):
     }]
     message.send_webapi('', json.dumps(attachments))
 
+
 def _drive_help(message, cmd1, cmd2):
     """
     jira 検索コマンドのヘルプを返す
     """
     message.send(HELP.format(cmd1, cmd2, DEFAULT_PROJECT))
+
 
 def _build_jql(args, jql_base=''):
     """
@@ -128,7 +133,8 @@ def _build_jql(args, jql_base=''):
         jql += ' AND {} ~ "{}"'.format(target, ' '.join(args.keywords))
 
     return jql
-    
+
+
 @respond_to('^jira\s+search\s+(.*)')
 @respond_to('^jira\s+検索\s+(.*)')
 def jira_search(message, keywords):
@@ -150,6 +156,7 @@ def jira_search(message, keywords):
     title = '「{}」の検索結果(オープンのみ)'.format(keywords)
     _send_jira_search_responce(message, jql, title)
 
+
 @respond_to('^jira\s+allsearch\s+(.*)')
 @respond_to('^jira\s+全検索\s+(.*)')
 def jira_allsearch(message, keywords):
@@ -170,6 +177,7 @@ def jira_allsearch(message, keywords):
     title = '「{}」の検索結果(全ステータス)'.format(keywords)
     _send_jira_search_responce(message, jql, title)
 
+
 @respond_to('^jira\s+assignee\s+(.*)')
 @respond_to('^jira\s+担当者?\s+(.*)')
 def jira_assignee(message, user):
@@ -179,6 +187,7 @@ def jira_assignee(message, user):
     jql = 'status in (Open, "In Progress", Reopened) AND assignee in ({})'
     title = '「{}」の担当課題'.format(user)
     _send_jira_search_responce(message, jql.format(user), title)
+
 
 def _send_jira_search_responce(message, query, title):
     """
@@ -194,7 +203,7 @@ def _send_jira_search_responce(message, query, title):
         # なんらかのエラーが発生
         message.send('JIRAError: `{}`'.format(err.text))
         return
-    
+
     if issues:
         for issue in issues:
             summary = issue.fields.summary
@@ -211,6 +220,7 @@ def _send_jira_search_responce(message, query, title):
         'text': text,
     }]
     message.send_webapi('', json.dumps(attachments))
+
 
 @respond_to('^jira\s+filters?')
 @respond_to('^jira\s+フィルター?')
@@ -229,7 +239,7 @@ def jira_filter(message):
     flist = []
     for label, key in filters:
         flist.append('<{}/issues/?filter={}|{}>'.format(CLEAN_JIRA_URL, key, label))
-        
+
     attachments = [{
         'fallback': pretext,
         'pretext': pretext,
@@ -237,8 +247,9 @@ def jira_filter(message):
     }]
     message.send_webapi('', json.dumps(attachments))
 
+
 @respond_to('^jira\s+help$')
-def jira_search(message):
+def jira_help(message):
     """
     jiraコマンドのヘルプを返す
     """

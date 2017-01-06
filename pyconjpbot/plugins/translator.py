@@ -1,11 +1,12 @@
 from slackbot import settings
-from slackbot.bot import respond_to, listen_to
+from slackbot.bot import respond_to
 
 from microsofttranslator import Translator, ArgumentOutOfRangeException
 from langdetect import detect
 
 # Connect to Microsoft Translator
 translator = Translator(settings.TRANSLATOR_ID, settings.TRANSLATOR_SECRET)
+
 
 @respond_to('^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)')
 def translate(message, cmd, option, text):
@@ -28,6 +29,7 @@ def translate(message, cmd, option, text):
     except ArgumentOutOfRangeException:
         message.send('`{}` は無効な言語です'.format(lang))
 
+
 @respond_to('^(translate|翻訳)\s+(list|リスト)')
 def translate_list(message, cmd, option):
     """
@@ -36,7 +38,8 @@ def translate_list(message, cmd, option):
     languages = translator.get_languages()
     reply = ' '.join(['`{}`'.format(x) for x in languages])
     message.send('使用できる言語: {}'.format(reply))
-    
+
+
 @respond_to('^(translate|翻訳)\s+help')
 def translate_help(message, cmd):
     message.send('''`$translate python`, `$翻訳 python`: 指定した文字列を日本語に翻訳

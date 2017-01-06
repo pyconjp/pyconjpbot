@@ -1,10 +1,11 @@
 import re
 
-from slackbot.bot import respond_to, listen_to
+from slackbot.bot import listen_to
 from sympy import sympify, SympifyError
 
 # 単一の数字っぽい文字列を表すパターン
 NUM_PATTERN = re.compile('^\s*[-+]?[\d.,]+\s*$')
+
 
 @listen_to('^(([-+*/^%!(),.\d\s]|pi|e|sqrt|sin|cos|tan)+)$')
 def calc(message, expression, dummy_):
@@ -22,7 +23,7 @@ def calc(message, expression, dummy_):
     except SympifyError:
         # 数式じゃなかったら無視する
         return
-    
+
     if result.is_Integer:
         # 整数だったらそのまま出力
         answer = int(result)

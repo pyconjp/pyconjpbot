@@ -18,6 +18,7 @@ def _message_length(message):
 
     return length
 
+
 @respond_to('^suddendeath$')
 @respond_to('^suddendeath\s+(.*)')
 def suddendeath(message, words='突然の死'):
@@ -36,6 +37,7 @@ def suddendeath(message, words='突然の死'):
     middle = "＞　" + words + "　＜"
 
     message.send("\n".join([header, middle, footer]))
+
 
 @respond_to('^suddendeath\s+help')
 def suddendeath_help(message):

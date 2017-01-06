@@ -7,6 +7,7 @@ from slackbot.bot import respond_to
 github = Github(settings.GITHUB_TOKEN)
 org = github.get_organization(settings.GITHUB_ORGANIZATION)
 
+
 @respond_to('^github\s+repos')
 def github_repos(message):
     """
@@ -14,7 +15,9 @@ def github_repos(message):
     """
     text = ""
     for repo in org.get_repos():
-        text += "- <{}|{}> {}\n".format(repo.html_url, repo.name, repo.description)
+        text += "- <{}|{}> {}\n".format(repo.html_url,
+                                        repo.name,
+                                        repo.description)
 
     attachments = [{
         'pretext': '{} のリポジトリ一覧'.format(settings.GITHUB_ORGANIZATION),
@@ -22,6 +25,7 @@ def github_repos(message):
         'mrkdwn_in': ['text'],
     }]
     message.send_webapi('', json.dumps(attachments))
+
 
 @respond_to('^github\s+search\s+(.*)')
 def github_search(message, keywords):
@@ -45,10 +49,11 @@ def github_search(message, keywords):
             'mrkdwn_in': ['pretext', 'text'],
         }]
         message.send_webapi('', json.dumps(attachments))
-    
+
     # 結果が一つもない場合
     else:
         message.send('`{}` にマッチするissueはありません'.format(keywords))
+
 
 @respond_to('^github\s+code\s+(.*)')
 def github_code(message, keywords):
@@ -72,10 +77,11 @@ def github_code(message, keywords):
             'mrkdwn_in': ['pretext', 'text'],
         }]
         message.send_webapi('', json.dumps(attachments))
-    
+
     # 結果が一つもない場合
     else:
         message.send('`{}` にマッチするコードはありません'.format(keywords))
+
 
 @respond_to('^github\s+help$')
 def github_help(message):

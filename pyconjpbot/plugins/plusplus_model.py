@@ -1,8 +1,9 @@
 import os.path
 
-from peewee import *
+from peewee import *  # NOQA
 
 db = SqliteDatabase(os.path.join(os.path.dirname(__file__), 'plusplus.db'))
+
 
 class Plusplus(Model):
     """
@@ -13,6 +14,7 @@ class Plusplus(Model):
 
     class Meta:
         database = db
+
 
 db.connect()
 db.create_tables([Plusplus], safe=True)

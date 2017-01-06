@@ -161,6 +161,7 @@ def return_response(message, command):
         response = random.choice(response_set)
         _send_markdown_text(message, response.text)
 
+
 @respond_to('^([\w-]+)\s+(.*)')
 def response(message, command, params):
     """
@@ -207,7 +208,8 @@ def _exist_response(command, text):
         return False
     else:
         return True
-        
+
+
 def add_response(message, command, text):
     """
     用語コマンドに応答を追加する

@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 WEATHER_URL = 'http://weather.livedoor.com/forecast/webservice/json/v1?city={}'
 CODE_URL = 'http://weather.livedoor.com/forecast/rss/primary_area.xml'
-        
+
 WEATHER_EMOJI = {
     '晴れ': ':sunny:',
     '晴のち曇': ':mostly_sunny:',
@@ -25,6 +25,7 @@ WEATHER_EMOJI = {
     }
 
 CITY_CODE_FILE = 'city_code.json'
+
 
 def get_city_code():
     """
@@ -54,8 +55,10 @@ def get_city_code():
 
     return city_dict
 
+
 # cityコードの辞書を取得する
 city_dict = get_city_code()
+
 
 def _get_forecast_text(forecast):
     """
@@ -64,7 +67,7 @@ def _get_forecast_text(forecast):
     date = forecast['dateLabel']
     telop = forecast['telop']
     temp = forecast['temperature']
-    
+
     text = '{} は {}{}'.format(date, WEATHER_EMOJI.get(telop, ''), telop)
     if temp['min']:
         text += ' 最低気温{}℃'.format(temp['min']['celsius'])
@@ -72,6 +75,7 @@ def _get_forecast_text(forecast):
         text += ' 最高気温{}℃'.format(temp['max']['celsius'])
 
     return text
+
 
 @respond_to('^(weather|天気)$')
 @respond_to('^(weather|天気)\s+(.*)')
@@ -81,18 +85,18 @@ def weather(message, command, place='東京'):
     """
     if place in ('help', 'list'):
         return
-    
+
     code = city_dict.get(place)
 
     if code is None:
         message.send('指定された地域は存在しません')
         return
-        
+
     r = requests.get(WEATHER_URL.format(code))
     data = r.json()
 
     city = data['location']['city']
-    #time = parser.parse(data['publicTime'])
+    # time = parser.parse(data['publicTime'])
     link = data['link']
     text = _get_forecast_text(data['forecasts'][0]) + '\n'
     text += _get_forecast_text(data['forecasts'][1])
@@ -105,13 +109,15 @@ def weather(message, command, place='東京'):
 
     message.send_webapi('', json.dumps(attachments))
 
+
 @respond_to('^(weather|天気)\s+list')
-def weather(message, command):
+def weather_list(message, command):
     reply = ' '.join(['`{}`'.format(x) for x in city_dict])
     message.send('指定可能な地域: {}'.format(reply))
-    
+
+
 @respond_to('^(weather|天気)\s+help')
-def weather(message, command):
+def weather_help(message, command):
     message.send('''`$weather` `$天気`: 東京の天気予報を返す
 `$weather 釧路` `$天気 釧路`: 指定した地域の天気予報を返す
 `$weather list` `$天気 list`: 指定可能な地域の一覧を返す

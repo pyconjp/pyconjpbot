@@ -21,6 +21,7 @@ MINUS_MESSAGE = (
     '(´・ω・｀)',
     )
 
+
 def _get_user_name(user_id):
     """
     指定された Slack の user_id に対応する username を返す
@@ -36,13 +37,14 @@ def _get_user_name(user_id):
     else:
         return ''
 
+
 def _update_count(message, target, plusplus):
     """
     指定ユーザーのカウンターを更新する
     """
     target = target.lower()
     plus, created = Plusplus.get_or_create(name=target, defaults={'counter': 0})
-    
+
     if plusplus == '++':
         plus.counter += 1
         msg = random.choice(PLUS_MESSAGE)
@@ -52,7 +54,8 @@ def _update_count(message, target, plusplus):
     plus.save()
 
     message.send('{} {} (通算: {})'.format(target, msg, plus.counter))
-    
+
+
 @listen_to(r'^<@(.+)>:?\s*(\++|-+)')
 def mention_plusplus(message, user_id, plusplus):
     """
@@ -63,7 +66,8 @@ def mention_plusplus(message, user_id, plusplus):
 
     target = _get_user_name(user_id)
     _update_count(message, target, plusplus)
-    
+
+
 @listen_to(r'^(\w\S*[^\s:+-]):?\s*(\++|-+)')
 def plusplus(message, target, plusplus):
     """
@@ -79,6 +83,7 @@ def plusplus(message, target, plusplus):
     if len(plusplus) != 2:
         return
     _update_count(message, target, plusplus)
+
 
 @respond_to(r'^plusplus\s+(del|delete)\s+(\S+)')
 def plusplus_delete(message, subcommand, name):
@@ -100,6 +105,7 @@ def plusplus_delete(message, subcommand, name):
     plus.delete_instance()
     message.send('`{}` を削除しました'.format(name))
 
+
 @respond_to(r'^plusplus\s+rename\s+(\S+)\s+(\S+)')
 def plusplus_rename(message, old, new):
     """
@@ -120,6 +126,7 @@ def plusplus_rename(message, old, new):
     # 入れ替える
     oldplus.delete_instance()
     message.send('`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, oldplus.counter))
+
 
 @respond_to(r'^plusplus\s+merge\s+(\S+)\s+(\S+)')
 def plusplus_merge(message, old, new):
@@ -145,8 +152,9 @@ def plusplus_merge(message, old, new):
     newplus.counter += oldplus.counter
     newplus.save()
     oldplus.delete_instance()
-    
+
     message.send('`{}` を `{}` に統合しました(count: {} + {} = {})'.format(old, new, oldcount, newcount, newplus.counter))
+
 
 @respond_to(r'^plusplus\s+search\s+(\S+)')
 def plusplus_search(message, keyword):
@@ -169,6 +177,7 @@ def plusplus_search(message, keyword):
             'mrkdwn_in': ['pretext', 'text'],
         }]
         message.send_webapi('', json.dumps(attachments))
+
 
 @respond_to(r'^plusplus\s+help+')
 def plusplus_help(message):

@@ -18,6 +18,7 @@ REACTION = {
     ('ラーメン', 'ramen'): 'ramen',
 }
 
+
 def _react(message, emojis):
     """
     指定された emoji を reaction で返す
@@ -34,6 +35,7 @@ def _react(message, emojis):
                 pass
             else:
                 raise
+
 
 @listen_to('.')
 def reaction(message):

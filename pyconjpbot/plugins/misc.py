@@ -3,10 +3,11 @@ from datetime import date
 import json
 import random
 
-from slackbot.bot import respond_to, listen_to
+from slackbot.bot import respond_to
 from slackbot import settings
 import slacker
 import git
+
 
 @respond_to('^help$')
 def help(message):
@@ -14,6 +15,7 @@ def help(message):
     helpページのURLを返す
     """
     message.send('ヘルプはこちら→ https://github.com/pyconjp/pyconjpbot#commands')
+
 
 @respond_to('^shuffle\s+(.*)')
 def shuffle(message, words):
@@ -27,6 +29,7 @@ def shuffle(message, words):
         random.shuffle(words)
         message.send(' '.join(words))
 
+
 @respond_to('^choice\s+(.*)')
 def choice(message, words):
     """
@@ -37,13 +40,15 @@ def choice(message, words):
         message.send('キーワードを複数指定してください\n`$choice word1 word2...`')
     else:
         message.send(random.choice(words))
-        
+
+
 @respond_to('^ping$')
 def ping(message):
     """
     pingに対してpongで応答する
     """
     message.reply('pong')
+
 
 @respond_to('^version$')
 def version(message):
@@ -58,6 +63,7 @@ def version(message):
         'pretext': text,
     }]
     message.send_webapi('', json.dumps(attachments))
+
 
 @respond_to('^random$')
 @respond_to('^random\s+(active|help)$')
@@ -101,7 +107,8 @@ def random_command(message, subcommand=None):
     user_info = webapi.users.info(member_id)
     name = user_info.body['user']['name']
     message.send('{} さん、君に決めた！'.format(name))
-    
+
+
 @respond_to('^cal$')
 @respond_to('^cal\s+(\d+)$')
 @respond_to('^cal\s+(\d+)\s+(\d+)$')
@@ -119,6 +126,7 @@ def cal_command(message, month=None, year=None):
     except IndexError:
         # 数字が範囲外の場合は無視する
         pass
+
 
 @respond_to('^cal\s+help$')
 def cal_help(message):
