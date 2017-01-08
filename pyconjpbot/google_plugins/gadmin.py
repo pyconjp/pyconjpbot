@@ -117,23 +117,14 @@ def _remove_email_link(email):
     return email
 
 
-@respond_to('^gadmin\s+member\s+insert\s+(.*)\s+(.*)')
-def gadmin_member_insert(message, key, email):
+def _gadmin_member_insert(message, service, group, email):
     """
     指定したメンバーを指定したグループに追加する
 
-    :param key: グループのメールアドレス(@の前の部分)
-    :param mail: 追加するメンバーのメールアドレス
+    :param service: Google API との接続
+    :param group: グループのメールアドレスまたは@の前の部分
+    :param mail: 追加/削除するメンバーのメールアドレス
     """
-    # コマンドを実行したユーザーのIDを取得
-    user = message.body['user']
-    if not _is_admin(user):
-        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
-
-    # 追加するメンバーの情報を作成する
-    email = _remove_email_link(email)
-    group = '{}@{}'.format(key, DOMAIN)
-    service = _get_service()
     body = {
         'email': email,
     }
@@ -145,29 +136,48 @@ def gadmin_member_insert(message, key, email):
     message.send('`{}` グループに `{}` を追加しました'.format(group, email))
 
 
-@respond_to('^gadmin\s+member\s+delete\s+(.*)\s+(.*)')
-def gadmin_member_delete(message, key, email):
+def _gadmin_member_delete(message, service, group, email):
     """
     指定したメンバーを指定したグループから削除する
 
-    :param key: グループのメールアドレス(@の前の部分)
-    :param mail: 削除するメンバーのメールアドレス
+    :param service: Google API との接続
+    :param group: グループのメールアドレスまたは@の前の部分
+    :param mail: 追加/削除するメンバーのメールアドレス
     """
-    # コマンドを実行したユーザーのIDを取得
-    user = message.body['user']
-    if not _is_admin(user):
-        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
-
-    # 追加するメンバーの情報を作成する
-    email = _remove_email_link(email)
-    group = '{}@{}'.format(key, DOMAIN)
-    service = _get_service()
     try:
         service.members().delete(groupKey=group, memberKey=email).execute()
     except HttpError as e:
         message.send('メンバーの削除に失敗しました\n`{}`'.format(e))
         return
     message.send('`{}` グループから `{}` を削除しました'.format(group, email))
+
+
+@respond_to('^gadmin\s+member\s+(insert|delete)\s+(.*)\s+(.*)')
+def gadmin_member_insert_delete(message, command, group, email):
+    """
+    指定したメンバーを指定したグループに追加/削除する
+
+    - `$gadmin member insert (group) (email)`
+    - `$gadmin member delete (group) (email)`
+
+    :param group: グループのメールアドレスまたは@の前の部分
+    :param mail: 追加/削除するメンバーのメールアドレス
+    """
+    # コマンドを実行したユーザーのIDを取得
+    user = message.body['user']
+    if not _is_admin(user):
+        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
+
+    # グループ、メンバー情報の前処理
+    email = _remove_email_link(email)
+    group = _remove_email_link(group)
+    if '@' not in group:
+        group += '@' + DOMAIN
+    service = _get_service()
+    if command == 'insert':
+        _gadmin_member_insert(message, service, group, email)
+    elif command == 'delete':
+        _gadmin_member_delete(message, service, group, email)
 
 
 @respond_to('^gadmin\s+help')
