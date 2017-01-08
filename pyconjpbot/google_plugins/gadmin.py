@@ -14,6 +14,8 @@ HELP = '''
 - `$gadmin user list`: ユーザーの一覧を返す
 
 - `$gadmin group list`: グループの一覧を返す
+- `$gadmin group insert (group) (name)`: 指定したグループを追加する
+- `$gadmin group delete (group)`: 指定したグループを削除する
 
 - `$gadmin member list (group)`: 指定したグループのメンバー一覧を返す
 - `$gadmin member insert (group) (email)`: 指定したグループにメンバーを追加する
@@ -27,6 +29,29 @@ def _get_service():
     """
     service = get_service('admin', 'directory_v1')
     return service
+
+
+def _is_admin(user):
+    """
+    ユーザーがSlackのAdminかどうかを返す
+
+    :param user: SlackのユーザーID
+    """
+    slack = Slacker(settings.API_TOKEN)
+    user_info = slack.users.info(user)
+    return user_info.body['user']['is_admin']
+
+
+def _remove_email_link(email):
+    """
+    slack の email 記法 <mailto:hoge@example.com|hoge@example.com> を
+    メールアドレスのみに戻す
+    """
+
+    email = email.replace('<mailto:', '')
+    if '|' in email:
+        email, _ = email.split('|', 2)
+    return email
 
 
 @respond_to('^gadmin\s+user\s+list')
@@ -69,19 +94,95 @@ def gadmin_group_list(message):
     message.send(msg)
 
 
+def _gadmin_group_insert(message, service, group, name):
+    """
+    指定したグループを追加する
+
+    :param service: Google API との接続
+    :param group: グループのメールアドレス
+    :param name: グループの名前
+    """
+    body = {
+        'name': name,
+        'email': group,
+    }
+    try:
+        service.groups().insert(body=body).execute()
+    except HttpError as e:
+        message.send('グループの追加に失敗しました\n`{}`'.format(e))
+        return
+    message.send('`{}` グループを追加しました'.format(group))
+    message.send('`$gadmin member insert {} メールアドレス` コマンドでメンバーを追加してください'.format(group))
+
+
+def _gadmin_group_delete(message, service, group):
+    """
+    指定したグループを削除する
+
+    :param service: Google API との接続
+    :param group: グループのメールアドレス
+    """
+    try:
+        result = service.groups().get(groupKey=group).execute()
+        count = result['directMembersCount']
+        if count != '0':
+            # メンバーがいる場合は削除できない
+            message.send('''
+`{group}` グループはメンバーがいるので削除できません
+`$gadmin member delete {group} メールアドレス` コマンドでメンバーを削除してから実行してください
+`$gadmin member list {group}` コマンドでメンバー一覧が確認できます
+'''.format(group=group))
+        else:
+            service.groups().delete(groupKey=group).execute()
+            message.send('`{}` グループを削除しました'.format(group))
+    except HttpError as e:
+        message.send('グループの削除に失敗しました\n`{}`'.format(e))
+        return
+
+
+@respond_to('^gadmin\s+group\s+(insert)\s+(.*)\s+(.*)')
+@respond_to('^gadmin\s+group\s+(delete)\s+(.*)')
+def gadmin_group_insert_delete(message, command, group, name=None):
+    """
+    指定したグループを追加/削除する
+
+    - `$gadmin group insert (group) (name)`
+    - `$gadmin group delete (group)`
+
+    :param group: グループのメールアドレスまたは@の前の部分
+    :param name: グループの名前
+    """
+    # コマンドを実行したユーザーのIDを取得
+    user = message.body['user']
+    if not _is_admin(user):
+        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
+
+    # グループ、メンバー情報の前処理
+    group = _remove_email_link(group)
+    if '@' not in group:
+        group += '@' + DOMAIN
+    service = _get_service()
+    if command == 'insert':
+        _gadmin_group_insert(message, service, group, name)
+    elif command == 'delete':
+        _gadmin_group_delete(message, service, group)
+
+
 @respond_to('^gadmin\s+member\s+list\s+(.*)')
-def gadmin_member_list(message, key):
+def gadmin_member_list(message, group):
     """
     グループのメンバー一覧を返す
 
     :param key: グループのメールアドレス(@の前の部分)
     """
     service = _get_service()
-    group = '{}@{}'.format(key, DOMAIN)
+    group = _remove_email_link(group)
+    if '@' not in group:
+        group += '@' + DOMAIN
     try:
         members_list = service.members().list(groupKey=group).execute()
     except HttpError:
-        message.send('`{}` に合致するグループはありません'.format(key))
+        message.send('`{}` に合致するグループはありません'.format(group))
         return
 
     count = 0
@@ -90,31 +191,8 @@ def gadmin_member_list(message, key):
         email = member['email']
         msg += '- {}\n'.format(email)
         count += 1
-    msg = '*{}* グループのメンバー({}ユーザー)\n'.format(key, count) + msg
+    msg = '*{}* グループのメンバー({}ユーザー)\n'.format(group, count) + msg
     message.send(msg)
-
-
-def _is_admin(user):
-    """
-    ユーザーがSlackのAdminかどうかを返す
-
-    :param user: SlackのユーザーID
-    """
-    slack = Slacker(settings.API_TOKEN)
-    user_info = slack.users.info(user)
-    return user_info.body['user']['is_admin']
-
-
-def _remove_email_link(email):
-    """
-    slack の email 記法 <mailto:hoge@example.com|hoge@example.com> を
-    メールアドレスのみに戻す
-    """
-
-    email = email.replace('<mailto:', '')
-    if '|' in email:
-        email, _ = email.split('|', 2)
-    return email
 
 
 def _gadmin_member_insert(message, service, group, email):
@@ -122,7 +200,7 @@ def _gadmin_member_insert(message, service, group, email):
     指定したメンバーを指定したグループに追加する
 
     :param service: Google API との接続
-    :param group: グループのメールアドレスまたは@の前の部分
+    :param group: グループのメールアドレス
     :param mail: 追加/削除するメンバーのメールアドレス
     """
     body = {
@@ -141,7 +219,7 @@ def _gadmin_member_delete(message, service, group, email):
     指定したメンバーを指定したグループから削除する
 
     :param service: Google API との接続
-    :param group: グループのメールアドレスまたは@の前の部分
+    :param group: グループのメールアドレス
     :param mail: 追加/削除するメンバーのメールアドレス
     """
     try:
