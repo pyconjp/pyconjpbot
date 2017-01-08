@@ -19,8 +19,8 @@ SCOPES = [
     'https://www.googleapis.com/auth/calendar.readonly',
     # Google Directory
     # https://developers.google.com/admin-sdk/directory/v1/guides/authorizing
-    'https://www.googleapis.com/auth/admin.directory.group.readonly',
-    'https://www.googleapis.com/auth/admin.directory.user.readonly',
+    'https://www.googleapis.com/auth/admin.directory.group',
+    'https://www.googleapis.com/auth/admin.directory.user',
     ]
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'pyconjpbot'
