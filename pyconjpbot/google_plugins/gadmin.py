@@ -18,8 +18,8 @@ HELP = '''
 - `$gadmin group delete (group)`: 指定したグループを削除する
 
 - `$gadmin member list (group)`: 指定したグループのメンバー一覧を返す
-- `$gadmin member insert (group) (email)`: 指定したグループにメンバーを追加する
-- `$gadmin member delete (group) (email)`: 指定したグループからメンバーを削除する
+- `$gadmin member insert (group) (email...)`: 指定したグループにメンバーを追加する
+- `$gadmin member delete (group) (email...)`: 指定したグループからメンバーを削除する
 '''
 
 
@@ -195,7 +195,7 @@ def gadmin_member_list(message, group):
     message.send(msg)
 
 
-def _gadmin_member_insert(message, service, group, email):
+def _gadmin_member_insert(message, service, group, emails):
     """
     指定したメンバーを指定したグループに追加する
 
@@ -203,18 +203,20 @@ def _gadmin_member_insert(message, service, group, email):
     :param group: グループのメールアドレス
     :param mail: 追加/削除するメンバーのメールアドレス
     """
-    body = {
-        'email': email,
-    }
-    try:
-        service.members().insert(groupKey=group, body=body).execute()
-    except HttpError as e:
-        message.send('メンバーの追加に失敗しました\n`{}`'.format(e))
-        return
-    message.send('`{}` グループに `{}` を追加しました'.format(group, email))
+
+    for email in emails:
+        body = {
+            'email': email,
+        }
+        try:
+            service.members().insert(groupKey=group, body=body).execute()
+            message.send('`{}` グループに `{}` を追加しました'.format(group, email))
+        except HttpError as e:
+            # TODO: グループが間違っている場合とメンバーのエラーの場合わけ
+            message.send('メンバーの追加に失敗しました\n`{}`'.format(e))
 
 
-def _gadmin_member_delete(message, service, group, email):
+def _gadmin_member_delete(message, service, group, emails):
     """
     指定したメンバーを指定したグループから削除する
 
@@ -222,21 +224,23 @@ def _gadmin_member_delete(message, service, group, email):
     :param group: グループのメールアドレス
     :param mail: 追加/削除するメンバーのメールアドレス
     """
-    try:
-        service.members().delete(groupKey=group, memberKey=email).execute()
-    except HttpError as e:
-        message.send('メンバーの削除に失敗しました\n`{}`'.format(e))
-        return
-    message.send('`{}` グループから `{}` を削除しました'.format(group, email))
+    for email in emails:
+
+        try:
+            service.members().delete(groupKey=group, memberKey=email).execute()
+            message.send('`{}` グループから `{}` を削除しました'.format(group, email))
+        except HttpError as e:
+            # TODO: グループが間違っている場合とメンバーのエラーの場合わけ
+            message.send('メンバーの削除に失敗しました\n`{}`'.format(e))
 
 
-@respond_to('^gadmin\s+member\s+(insert|delete)\s+(.*)\s+(.*)')
+@respond_to('^gadmin\s+member\s+(insert|delete)\s+(\S*)\s+(.*)')
 def gadmin_member_insert_delete(message, command, group, email):
     """
     指定したメンバーを指定したグループに追加/削除する
 
-    - `$gadmin member insert (group) (email)`
-    - `$gadmin member delete (group) (email)`
+    - `$gadmin member insert (group) (email...)`
+    - `$gadmin member delete (group) (email...)`
 
     :param group: グループのメールアドレスまたは@の前の部分
     :param mail: 追加/削除するメンバーのメールアドレス
@@ -247,15 +251,24 @@ def gadmin_member_insert_delete(message, command, group, email):
         message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
 
     # グループ、メンバー情報の前処理
-    email = _remove_email_link(email)
+    emails = []
+    for email in email.split():
+        email = _remove_email_link(email)
+        if '@' in email:
+            emails.append(email)
     group = _remove_email_link(group)
     if '@' not in group:
         group += '@' + DOMAIN
     service = _get_service()
-    if command == 'insert':
-        _gadmin_member_insert(message, service, group, email)
-    elif command == 'delete':
-        _gadmin_member_delete(message, service, group, email)
+
+    # 対象となるメールアドレスがある場合のみ処理する
+    if emails:
+        if command == 'insert':
+            _gadmin_member_insert(message, service, group, emails)
+        elif command == 'delete':
+            _gadmin_member_delete(message, service, group, emails)
+    else:
+        message.send('正しいメールアドレスを指定してください')
 
 
 @respond_to('^gadmin\s+help')
