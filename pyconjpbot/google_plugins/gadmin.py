@@ -13,6 +13,10 @@ DOMAIN = 'pycon.jp'
 HELP = '''
 - `$gadmin user list`: ユーザーの一覧を返す
 
+- `$gadmin alias list (email)`: ユーザーのエイリアスの一覧を返す
+- `$gadmin alias insert (email) (alias)`: ユーザーにエイリアスを追加する
+- `$gadmin alias delete (email) (alias)`: ユーザーからエイリアスを削除する
+
 - `$gadmin group list`: グループの一覧を返す
 - `$gadmin group insert (group) (name)`: 指定したグループを追加する
 - `$gadmin group delete (group)`: 指定したグループを削除する
@@ -72,6 +76,92 @@ def gadmin_user_list(message):
         count += 1
     msg = '{}ドメインのユーザー一覧({}ユーザー)\n'.format(DOMAIN, count) + msg
     message.send(msg)
+
+
+@respond_to('^gadmin\s+alias\s+list\s+(.*)')
+def gadmin_alias_list(message, email):
+    """
+    指定したユーザーのエイリアスの一覧を返す
+
+    :param email: メールアドレス
+    """
+
+    service = _get_service()
+    email = _remove_email_link(email)
+    if '@' not in email:
+        email += '@' + DOMAIN
+    try:
+        result = service.users().aliases().list(userKey=email).execute()
+        msg = ''
+        aliases = result.get('aliases', [])
+        if aliases:
+            msg = '`{}` のエイリアス一覧\n'.format(email)
+            msg += ', '.join('`{}`'.format(alias['alias']) for alias in aliases)
+            message.send(msg)
+        else:
+            msg = '`{}` のエイリアスはありません'.format(email)
+            message.send(msg)
+    except HttpError as e:
+        message.send('エイリアスの取得失敗しました\n`{}`'.format(e))
+
+
+def _gadmin_alias_insert(service, message, email, alias):
+    """
+    指定したユーザーにエイリアスを追加する
+
+    :param service: Google API との接続
+    :param email: 追加対象のメールアドレス
+    :param alias: エイリアスのメールアドレス
+    """
+    body = {
+        'alias': alias,
+    }
+    try:
+        service.users().aliases().insert(userKey=email, body=body).execute()
+        message.send('`{}` にエイリアス `{}` を追加しました'.format(email, alias))
+    except HttpError as e:
+        message.send('エイリアスの追加に失敗しました\n`{}`'.format(e))
+
+
+def _gadmin_alias_delete(service, message, email, alias):
+    """
+    指定したユーザーからエイリアスを削除する
+
+    :param service: Google API との接続
+    :param email: 追加対象のメールアドレス
+    :param alias: エイリアスのメールアドレス
+    """
+    try:
+        service.users().aliases().delete(userKey=email, alias=alias).execute()
+        message.send('`{}` からエイリアス `{}` を削除しました'.format(email, alias))
+    except HttpError as e:
+        message.send('エイリアスの削除に失敗しました\n`{}`'.format(e))
+
+
+@respond_to('^gadmin\s+alias\s+(insert|delete)\s+(.*)\s+(.*)')
+def gadmin_alias_insert_delete(message, command, email, alias):
+    """
+    指定したユーザーにエイリアスを追加/削除する
+
+    - `$gadmin alias insert (email) (alias)`
+    - `$gadmin alias delete (email) (alias)`
+
+    :param command: コマンド
+    :param email: メールアドレス
+    :param alias: エイリアスのメールアドレス
+    """
+    service = _get_service()
+    email = _remove_email_link(email)
+    if '@' not in email:
+        email += '@' + DOMAIN
+    alias = _remove_email_link(alias)
+    if '@' not in alias:
+        alias += '@' + DOMAIN
+
+    if command == 'insert':
+        _gadmin_alias_insert(service, message, email, alias)
+    elif command == 'delete':
+        _gadmin_alias_delete(service, message, email, alias)
 
 
 @respond_to('^gadmin\s+group\s+list')
