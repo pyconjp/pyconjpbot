@@ -1,3 +1,6 @@
+import string
+import random
+
 from slackbot.bot import respond_to
 from slackbot import settings
 from slacker import Slacker
@@ -16,7 +19,10 @@ HELP = '''
 
 - `$gadmin user list`: ユーザーの一覧を返す
 - `$gadmin user insert user firstname lastname`: ユーザーを追加する
-- `$gadmin user delete user`: ユーザーを削除する
+- `$gadmin user delete user`: ユーザーを削除する(停止中のみ削除可)
+- `$gadmin user reset user`: ユーザーのパスワードをリセットする
+- `$gadmin user suspend user`: ユーザーを停止する(停止中にする)
+- `$gadmin user resume user`: ユーザーを再開する(アクティブにする)
 
 メールのエイリアス管理
 
@@ -69,6 +75,27 @@ def _remove_email_link(email):
     return email
 
 
+def _get_default_domain_email(email):
+    """
+    ドメインがない場合は、デフォルトのドメインを追加したメールアドレスを返す
+    """
+    email = _remove_email_link(email)
+    if '@' not in email:
+        email += '@' + DOMAIN
+    return email
+
+
+def _generate_password(length=8):
+    """
+    パスワード用の文字列を生成する
+
+    :param length: パスワードの長さ
+    """
+    text = string.ascii_letters + string.digits
+    password = ''.join(random.sample(text, length))
+    return password
+
+
 @respond_to('^gadmin\s+user\s+list')
 def gadmin_user_list(message):
     """
@@ -89,6 +116,111 @@ def gadmin_user_list(message):
     message.send(msg)
 
 
+def _gadmin_user_insert(service, message, email, fname, lname):
+    """
+    指定したユーザーを追加する
+
+    :param service: Google API との接続
+    :param email: メールアドレス
+    :param fname: ユーザーのfirst name(insert時に使用)
+    :param fname: ユーザーのlast name(insert時に使用)
+    """
+    # パスワードを生成する
+    password = _generate_password()
+    body = {
+        'primaryEmail': email,
+        'password': password,
+        'name': {
+            'givenName': fname.title(),
+            'familyName': lname.title(),
+        },
+    }
+    try:
+        service.users().insert(body=body).execute()
+        message.send('ユーザー `{}` を追加しました'.format(email))
+        # TODO: password をユーザーにDMで伝える
+    except HttpError as e:
+        message.send('ユーザーの追加に失敗しました\n`{}`'.format(e))
+
+
+def _gadmin_user_delete(service, message, email):
+    """
+    指定したユーザーを削除する
+
+    :param service: Google API との接続
+    :param email: メールアドレス
+    """
+    try:
+        # 停止中のユーザーのみ削除対象とする
+        result = service.users().get(userKey=email).execute()
+        if not result['suspended']:
+            message.send('ユーザーはアクティブなため削除できません\n'
+                         '`$gadmin user suspend {}` でユーザーを停止してから削除してください'.format(email))
+        else:
+            service.users().delete(userKey=email).execute()
+            message.send('ユーザー `{}` を削除しました'.format(email))
+    except HttpError as e:
+        message.send('ユーザーの削除に失敗しました\n`{}`'.format(e))
+
+
+def _gadmin_user_update(service, message, email, suspended):
+    """
+    ユーザーの情報を更新する
+
+    :param service: Google API との接続
+    :param email: メールアドレス
+    :param suspended: ユーザーの状態、True or False
+    """
+    body = {
+        'suspended': suspended,
+    }
+    try:
+        service.users().update(userKey=email, body=body).execute()
+        if suspended:
+            message.send('ユーザー `{}` を停止しました'.format(email))
+        else:
+            message.send('ユーザー `{}` を再開しました'.format(email))
+    except HttpError as e:
+        message.send('ユーザー情報の更新に失敗しました\n`{}`'.format(e))
+
+
+@respond_to('^gadmin\s+user\s+(insert)\s+(\S+)\s+(\S+)\s+(\S+)')
+@respond_to('^gadmin\s+user\s+(delete|suspend|resume|reset)\s+(\S+)')
+def gadmin_user_insert_delete(message, command, email, fname=None, lname=None):
+    """
+    指定したユーザーを追加/削除する
+
+    - `$gadmin user insert user firstname lastname`: ユーザーを追加する
+    - `$gadmin user delete user`: ユーザーを削除する(停止中のみ削除可)
+    - `$gadmin user reset user`: ユーザーのパスワードをリセットする
+    - `$gadmin user suspend user`: ユーザーを停止する(停止中にする)
+    - `$gadmin user resume user`: ユーザーを再開する(アクティブにする)
+
+    :param command: コマンド(insert または delete)
+    :param email: メールアドレス
+    :param fname: ユーザーのfirst name(insert時に使用)
+    :param fname: ユーザーのlast name(insert時に使用)
+    """
+    # コマンドを実行したユーザーのIDを取得
+    user = message.body['user']
+    if not _is_admin(user):
+        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
+
+    service = _get_service()
+    email = _get_default_domain_email(email)
+
+    if command == 'insert':
+        _gadmin_user_insert(service, message, email, fname, lname)
+    elif command == 'delete':
+        _gadmin_user_delete(service, message, email)
+    elif command == 'suspend':
+        # ユーザーを停止して停止中にする
+        _gadmin_user_update(service, message, email, suspended=True)
+    elif command == 'resume':
+        # ユーザーを再開してアクティブにする
+        _gadmin_user_update(service, message, email, suspended=False)
+
+
 @respond_to('^gadmin\s+alias\s+list\s+(.*)')
 def gadmin_alias_list(message, email):
     """
@@ -98,9 +230,7 @@ def gadmin_alias_list(message, email):
     """
 
     service = _get_service()
-    email = _remove_email_link(email)
-    if '@' not in email:
-        email += '@' + DOMAIN
+    email = _get_default_domain_email(email)
     try:
         result = service.users().aliases().list(userKey=email).execute()
         msg = ''
@@ -157,17 +287,13 @@ def gadmin_alias_insert_delete(message, command, email, alias):
     - `$gadmin alias insert (email) (alias)`
     - `$gadmin alias delete (email) (alias)`
 
-    :param command: コマンド
+    :param command: コマンド(insert または delete)
     :param email: メールアドレス
     :param alias: エイリアスのメールアドレス
     """
     service = _get_service()
-    email = _remove_email_link(email)
-    if '@' not in email:
-        email += '@' + DOMAIN
-    alias = _remove_email_link(alias)
-    if '@' not in alias:
-        alias += '@' + DOMAIN
+    email = _get_default_domain_email(email)
+    alias = _get_default_domain_email(alias)
 
     if command == 'insert':
         _gadmin_alias_insert(service, message, email, alias)
@@ -259,9 +385,7 @@ def gadmin_group_insert_delete(message, command, group, name=None):
         message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
 
     # グループ、メンバー情報の前処理
-    group = _remove_email_link(group)
-    if '@' not in group:
-        group += '@' + DOMAIN
+    group = _get_default_domain_email(group)
     service = _get_service()
     if command == 'insert':
         _gadmin_group_insert(message, service, group, name)
@@ -277,9 +401,7 @@ def gadmin_member_list(message, group):
     :param key: グループのメールアドレス(@の前の部分)
     """
     service = _get_service()
-    group = _remove_email_link(group)
-    if '@' not in group:
-        group += '@' + DOMAIN
+    group = _get_default_domain_email(group)
     try:
         members_list = service.members().list(groupKey=group).execute()
     except HttpError:
@@ -357,9 +479,7 @@ def gadmin_member_insert_delete(message, command, group, email):
         email = _remove_email_link(email)
         if '@' in email:
             emails.append(email)
-    group = _remove_email_link(group)
-    if '@' not in group:
-        group += '@' + DOMAIN
+    group = _get_default_domain_email(group)
     service = _get_service()
 
     # 対象となるメールアドレスがある場合のみ処理する
