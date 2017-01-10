@@ -11,19 +11,30 @@ DOMAIN = 'pycon.jp'
 # https://developers.google.com/resources/api-libraries/documentation/admin/directory_v1/python/latest/index.html
 
 HELP = '''
-- `$gadmin user list`: ユーザーの一覧を返す
 
-- `$gadmin alias list (email)`: ユーザーのエイリアスの一覧を返す
-- `$gadmin alias insert (email) (alias)`: ユーザーにエイリアスを追加する
-- `$gadmin alias delete (email) (alias)`: ユーザーからエイリアスを削除する
+ユーザー管理
+
+- `$gadmin user list`: ユーザーの一覧を返す
+- `$gadmin user insert user firstname lastname`: ユーザーを追加する
+- `$gadmin user delete user`: ユーザーを削除する
+
+メールのエイリアス管理
+
+- `$gadmin alias list user`: ユーザーのエイリアスの一覧を返す
+- `$gadmin alias insert user alias`: ユーザーにエイリアスを追加する
+- `$gadmin alias delete user alias`: ユーザーからエイリアスを削除する
+
+グループ管理
 
 - `$gadmin group list`: グループの一覧を返す
-- `$gadmin group insert (group) (name)`: 指定したグループを追加する
-- `$gadmin group delete (group)`: 指定したグループを削除する
+- `$gadmin group insert group group-name`: 指定したグループを追加する
+- `$gadmin group delete group`: 指定したグループを削除する
 
-- `$gadmin member list (group)`: 指定したグループのメンバー一覧を返す
-- `$gadmin member insert (group) (email...)`: 指定したグループにメンバーを追加する
-- `$gadmin member delete (group) (email...)`: 指定したグループからメンバーを削除する
+グループのメンバー管理
+
+- `$gadmin member list group`: 指定したグループのメンバー一覧を返す
+- `$gadmin member insert group email1 [email2...]`: 指定したグループにメンバーを追加する
+- `$gadmin member delete group email1 [email2...]`: 指定したグループからメンバーを削除する
 '''
 
 
