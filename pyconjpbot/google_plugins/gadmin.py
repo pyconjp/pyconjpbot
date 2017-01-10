@@ -96,6 +96,24 @@ def _generate_password(length=8):
     return password
 
 
+def _send_password_on_dm(message, email, password):
+    """
+    ユーザーのパスワード文字列を DM でコマンドを実行したユーザーに送信する
+
+    :param email: ユーザーのメールアドレス
+    :param password: 生成されたパスワード文字列
+    """
+    # ユーザーとのDMのチャンネルIDを取得
+    user = message._body['user']
+    slack = Slacker(settings.API_TOKEN)
+    result = slack.im.open(user)
+    dm_channel = result.body['channel']['id']
+
+    msg = 'ユーザー `{}` のパスワードは `{}` です'.format(email, password)
+    # DMチャンネルにメッセージを送信する
+    message._client.rtm_send_message(dm_channel, msg)
+
+
 @respond_to('^gadmin\s+user\s+list')
 def gadmin_user_list(message):
     """
@@ -138,7 +156,8 @@ def _gadmin_user_insert(service, message, email, fname, lname):
     try:
         service.users().insert(body=body).execute()
         message.send('ユーザー `{}` を追加しました'.format(email))
-        # TODO: password をユーザーにDMで伝える
+        # password をユーザーにDMで伝える
+        _send_password_on_dm(message, email, password)
     except HttpError as e:
         message.send('ユーザーの追加に失敗しました\n`{}`'.format(e))
 
@@ -199,7 +218,8 @@ def _gadmin_user_password_reset(service, message, email):
     try:
         service.users().update(userKey=email, body=body).execute()
         message.send('ユーザー `{}` のパスワードをリセットしました'.format(email))
-        # TODO: password をユーザーにDMで伝える
+        # password を実行ユーザーにDMで伝える
+        _send_password_on_dm(message, email, password)
     except HttpError as e:
         message.send('ユーザーパスワードのリセットに失敗しました\n`{}`'.format(e))
 
