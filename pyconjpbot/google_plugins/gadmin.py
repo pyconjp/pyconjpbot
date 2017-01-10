@@ -184,6 +184,26 @@ def _gadmin_user_update(service, message, email, suspended):
         message.send('ユーザー情報の更新に失敗しました\n`{}`'.format(e))
 
 
+def _gadmin_user_password_reset(service, message, email):
+    """
+    ユーザーのパスワードをリセットする
+
+    :param service: Google API との接続
+    :param email: メールアドレス
+    """
+    # パスワードを生成する
+    password = _generate_password()
+    body = {
+        'password': password,
+    }
+    try:
+        service.users().update(userKey=email, body=body).execute()
+        message.send('ユーザー `{}` のパスワードをリセットしました'.format(email))
+        # TODO: password をユーザーにDMで伝える
+    except HttpError as e:
+        message.send('ユーザーパスワードのリセットに失敗しました\n`{}`'.format(e))
+
+
 @respond_to('^gadmin\s+user\s+(insert)\s+(\S+)\s+(\S+)\s+(\S+)')
 @respond_to('^gadmin\s+user\s+(delete|suspend|resume|reset)\s+(\S+)')
 def gadmin_user_insert_delete(message, command, email, fname=None, lname=None):
@@ -219,6 +239,9 @@ def gadmin_user_insert_delete(message, command, email, fname=None, lname=None):
     elif command == 'resume':
         # ユーザーを再開してアクティブにする
         _gadmin_user_update(service, message, email, suspended=False)
+    elif command == 'reset':
+        # ユーザーのパスワードをリセットする
+        _gadmin_user_password_reset(service, message, email)
 
 
 @respond_to('^gadmin\s+alias\s+list\s+(.*)')
