@@ -1,6 +1,5 @@
 slackbot_settings.py
-client_secrets.json
-city_code.json
+*.json
 *.dat
 *.db
 

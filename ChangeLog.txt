@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-01-11
+--------------------------
+- [ISSHA-397] add gadmin(google directory admin) command
+
 Release Notes - 2016-12-10
 --------------------------
 - [ISSHA-398] update 3rd party packages
