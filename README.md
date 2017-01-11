@@ -25,6 +25,37 @@
 
 - [google.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/google_plugins/google.py)
 
+### gadmin plugin
+
+ユーザー管理
+
+- `$gadmin user list`: ユーザーの一覧を返す
+- `$gadmin user insert (ユーザー) (名前) (名字)`: ユーザーを追加する
+- `$gadmin user delete  (ユーザー)`: ユーザーを削除する(停止中のみ削除可)
+- `$gadmin user reset  (ユーザー)`: ユーザーのパスワードをリセットする
+- `$gadmin user suspend  (ユーザー)`: ユーザーを停止する(停止中にする)
+- `$gadmin user resume  (ユーザー)`: ユーザーを再開する(アクティブにする)
+
+メールのエイリアス管理
+
+- `$gadmin alias list (ユーザ)`: ユーザーのエイリアスの一覧を返す
+- `$gadmin alias insert (ユーザ) (エイリアス)`: ユーザーにエイリアスを追加する
+- `$gadmin alias delete (ユーザ) (エイリアス)`: ユーザーからエイリアスを削除する
+
+グループ管理
+
+- `$gadmin group list`: グループの一覧を返す
+- `$gadmin group insert (グループ) (グループ名)`: 指定したグループを追加する
+- `$gadmin group delete (グループ)`: 指定したグループを削除する
+
+グループのメンバー管理
+
+- `$gadmin member list (グループ)`: 指定したグループのメンバー一覧を返す
+- `$gadmin member insert (グループ) (メール1) [(メール2...)]`: 指定したグループにメンバーを追加する
+- `$gadmin member delete (グループ) (メール1) [(メール2...)]`: 指定したグループからメンバーを削除する
+
+- [gadmin.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/google_plugins/gadmin.py)
+
 ### term plugin
 
 - `$term (用語)`: 用語コマンドを作成する
