@@ -18,29 +18,29 @@ HELP = '''
 ユーザー管理
 
 - `$gadmin user list`: ユーザーの一覧を返す
-- `$gadmin user insert user firstname lastname`: ユーザーを追加する
-- `$gadmin user delete user`: ユーザーを削除する(停止中のみ削除可)
-- `$gadmin user reset user`: ユーザーのパスワードをリセットする
-- `$gadmin user suspend user`: ユーザーを停止する(停止中にする)
-- `$gadmin user resume user`: ユーザーを再開する(アクティブにする)
+- `$gadmin user insert (ユーザー) (名前) (名字)`: ユーザーを追加する
+- `$gadmin user delete  (ユーザー)`: ユーザーを削除する(停止中のみ削除可)
+- `$gadmin user reset  (ユーザー)`: ユーザーのパスワードをリセットする
+- `$gadmin user suspend  (ユーザー)`: ユーザーを停止する(停止中にする)
+- `$gadmin user resume  (ユーザー)`: ユーザーを再開する(アクティブにする)
 
 メールのエイリアス管理
 
-- `$gadmin alias list user`: ユーザーのエイリアスの一覧を返す
-- `$gadmin alias insert user alias`: ユーザーにエイリアスを追加する
-- `$gadmin alias delete user alias`: ユーザーからエイリアスを削除する
+- `$gadmin alias list (ユーザ)`: ユーザーのエイリアスの一覧を返す
+- `$gadmin alias insert (ユーザ) (エイリアス)`: ユーザーにエイリアスを追加する
+- `$gadmin alias delete (ユーザ) (エイリアス)`: ユーザーからエイリアスを削除する
 
 グループ管理
 
 - `$gadmin group list`: グループの一覧を返す
-- `$gadmin group insert group group-name`: 指定したグループを追加する
-- `$gadmin group delete group`: 指定したグループを削除する
+- `$gadmin group insert (グループ) (グループ名)`: 指定したグループを追加する
+- `$gadmin group delete (グループ)`: 指定したグループを削除する
 
 グループのメンバー管理
 
-- `$gadmin member list group`: 指定したグループのメンバー一覧を返す
-- `$gadmin member insert group email1 [email2...]`: 指定したグループにメンバーを追加する
-- `$gadmin member delete group email1 [email2...]`: 指定したグループからメンバーを削除する
+- `$gadmin member list (グループ)`: 指定したグループのメンバー一覧を返す
+- `$gadmin member insert (グループ) (メール1) [(メール2...)]`: 指定したグループにメンバーを追加する
+- `$gadmin member delete (グループ) (メール1) [(メール2...)]`: 指定したグループからメンバーを削除する
 '''
 
 
