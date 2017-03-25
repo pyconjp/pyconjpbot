@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from dateutil import parser
 from jira import JIRA, JIRAError
 from slackbot import settings
@@ -20,9 +22,76 @@ COMPONENT = 'Python Boot Camp'
 ISSUE_TYPE_TASK = 3     # タスク
 ISSUE_TYPE_SUBTASK = 5  # サブタスク
 
+# コアスタッフの JIRA username
+REPORTER = 'takanory'
+CORE_STAFFS = ('makoto-kimura', 'takanory', 'ryu22e')
+
 HELP = """
 `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)` : pycamp のイベント用issueを作成する
 """
+
+TEMPLATE = {
+    'assignee_type': 'reporter',  # reporter/local_staff/lecturer
+    'delta': +30,  # 開催日から30日後
+    'summary': 'Python Boot Camp in {area}を開催',
+    'description': '''h2. 目的
+
+* Python Boot Camp in {area}を開催するのに必要なタスクとか情報をまとめる親タスク
+
+h2. 内容
+
+* 日時: {target_date:%Y-%m-%d(%a)}
+* 会場: 
+* 現地スタッフ: [~{local_staff}]
+* 講師: [~{reporter}]
+* TA: 
+* イベントconnpass: https://pyconjp.connpass.com/event/XXXXX/
+* 懇親会connpass: https://pyconjp.connpass.com/event/XXXXX/
+'''
+}
+
+
+def create_issue(template, params, parent=None):
+    """
+    テンプレートにパラメーターを適用して、JIRA issueを作成する
+
+    :params template:
+    :params params:
+    :params parent: 親issueのID(ISSHA-XXX)
+    """
+
+    # 担当者情報を作成
+    assignee_type = template.get('assignee_type', 'reporter')
+    assignee = params[assignee_type]
+    # 期限の日付を作成
+    delta = timedelta(days=template['delta'])
+    duedate = params['target_date'] + delta
+    
+    issue_dict = {
+        'project': {'key': PROJECT},
+        'components': [{'name': COMPONENT}],
+        'summary': template['summary'].format(**params),
+        'description': template['description'].format(**params),
+        'assignee': {'name': assignee},  # 担当者
+        'reporter': {'name': REPORTER},  # 報告者
+        'duedate': '{:%Y-%m-%d}'.format(duedate),  # 期限
+    }
+
+    if parent:
+        # 親issueのサブタスクとして作成
+        issue_dict['parent'] = {'key': parent}
+        issue_dict['issuetype'] = {'id': ISSUE_TYPE_SUBTASK}
+    else:
+        issue_dict['issuetype'] = {'id': ISSUE_TYPE_TASK}
+
+    # issue を作成する
+    issue = jira.create_issue(fields=issue_dict)
+    # JIRA bot を watcherからはずす
+    jira.remove_watcher(issue, settings.JIRA_USER)
+    # watcerを追加
+    for watcher in CORE_STAFFS:
+        jira.add_watcher(issue, watcher)
+    return issue
 
 
 @respond_to('^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)')
@@ -50,20 +119,17 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         message.send('`$pycamp` エラー:', e.text)
         return
 
-    issue_dict = {
-        'project': {'key': PROJECT},
-        'components': [{'name': COMPONENT}],
-        'issuetype': {'id': ISSUE_TYPE_TASK},
-        'summary': 'テストのチケットです',
-        'description': 'h2.目的\n\n説明文に\n改行を入れる',
-        'reporter': {'name': local_staff},
-        'assignee': {'name': lecturer},
-        'duedate': '{:%Y-%m-%d}'.format(target_date),
-        }
+    # issue を作成するための情報
+    params = {
+        'reporter': REPORTER,
+        'local_staff': local_staff,
+        'lecturer': lecturer,
+        'target_date': target_date,
+        'area': area,
+    }
     try:
-        issue = jira.create_issue(fields=issue_dict)
-        # watcherからはずす
-        jira.remove_watcher(issue, settings.JIRA_USER)
+        # テンプレートとパラメーターから JIRA issue を作成する
+        issue = create_issue(TEMPLATE, params)
         message.send(issue.permalink())
     except JIRAError as e:
         import pdb
