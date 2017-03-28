@@ -30,6 +30,7 @@ HELP = """
 `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)` : pycamp のイベント用issueを作成する
 """
 
+# 作成するチケットのテンプレート
 TEMPLATE = {
     'assignee_type': 'reporter',  # reporter/local_staff/lecturer
     'delta': +30,  # 開催日から30日後
@@ -43,13 +44,12 @@ h2. 内容
 * 日時: {target_date:%Y-%m-%d(%a)}
 * 会場: 
 * 現地スタッフ: [~{local_staff}]
-* 講師: [~{reporter}]
+* 講師: [~{lecturer}]
 * TA: 
 * イベントconnpass: https://pyconjp.connpass.com/event/XXXXX/
 * 懇親会connpass: https://pyconjp.connpass.com/event/XXXXX/
 '''
 }
-
 
 def create_issue(template, params, parent=None):
     """
@@ -66,7 +66,7 @@ def create_issue(template, params, parent=None):
     # 期限の日付を作成
     delta = timedelta(days=template['delta'])
     duedate = params['target_date'] + delta
-    
+
     issue_dict = {
         'project': {'key': PROJECT},
         'components': [{'name': COMPONENT}],
@@ -86,9 +86,9 @@ def create_issue(template, params, parent=None):
 
     # issue を作成する
     issue = jira.create_issue(fields=issue_dict)
-    # JIRA bot を watcherからはずす
+    # JIRA bot を watcher からはずす
     jira.remove_watcher(issue, settings.JIRA_USER)
-    # watcerを追加
+    # コアスタッフを watcher に追加
     for watcher in CORE_STAFFS:
         jira.add_watcher(issue, watcher)
     return issue
