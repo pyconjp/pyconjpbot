@@ -16,6 +16,7 @@ RESERVED = (
     'google', 'image', 'map', 'gadmin',
     'github',
     'suddendeath',
+    'pycamp',
 )
 
 # コマンド一覧を初期化
