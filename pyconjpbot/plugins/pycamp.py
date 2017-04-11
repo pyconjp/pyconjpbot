@@ -51,7 +51,107 @@ h2. 内容
 '''
 }
 
-def create_issue(template, params, parent=None):
+# サブタスクのテンプレート
+SUBTASK_TEMPLATE = {
+    '1.事前準備': [
+        {
+            'assignee_type': 'reporter',  # reporter/local_staff/lecturer
+            'delta': -30,  # 開催一ヶ月前
+            'summary': 'connpassイベント公開(現地スタッフ)',
+            'description': '''h2. 目的
+
+* 参加者を募るために、イベント本体、懇親会のconnpassイベントを作成して公開する
+* イベント開催の一ヶ月前くらいには公開したい
+
+h2. 内容
+
+* connpassイベントを過去イベントからコピーしてベースを作成
+** 事前アンケートも過去イベントからコピーする
+* ロゴ設定
+* 会場設定
+* 説明文の修正(場所、講師など)
+'''
+        },
+        {
+            'assignee_type': 'lecturer',  # reporter/local_staff/lecturer
+            'delta': -30,  # 開催一ヶ月前
+            'summary': 'ホテル、移動の手配(講師)',
+            'description': '''h2. 目的
+
+* 現地往復の交通手段を事前に予約する
+* ホテルの予約をする
+
+h2. 内容
+
+* 予約した内容と金額の記載をする
+* 支払いは、Python Boot Camp 終了後に別チケットで行います
+'''
+        },
+        {
+            'assignee_type': 'reporter',  # reporter/local_staff/lecturer
+            'delta': -21,  # 開催3週間前
+            'summary': '事前打ち合わせ(主: コアスタッフ)',
+            'description': '''h2. 目的
+
+* 事前打ち合わせする
+
+h2. 内容
+
+* 日程調整
+* 議事録準備
+'''
+        },
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': -5,  # 開催直前
+            'summary': '参加者への事前連絡(現地スタッフ)',
+            'description': '''h2. 目的
+
+h2. 内容
+
+'''
+        },
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': -2,  # 開催直前
+            'summary': 'お茶、お菓子購入(現地スタッフ)',
+            'description': '''h2. 目的
+
+h2. 内容
+
+'''
+        },
+    ],
+    '2.広報': [
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': -14,  # 開催2週間前
+            'summary': '事前ブログ執筆(現地スタッフ)',
+            'description': '''h2. 目的
+
+h2. 内容
+
+'''
+        },
+        {
+            'assignee_type': 'reporter',  # reporter/local_staff/lecturer
+            'delta': -14,  # 開催2週間前
+            'summary': 'メディアスポンサー経由での告知(コアスタッフ)',
+            'description': '''h2. 目的
+
+h2. 内容
+
+'''
+        },
+    ],
+    '3.イベント当日': [
+    ],
+    '4.事後処理': [
+    ],
+}
+
+
+def create_issue(template, params, parent=None, area=None):
     """
     テンプレートにパラメーターを適用して、JIRA issueを作成する
 
@@ -64,14 +164,14 @@ def create_issue(template, params, parent=None):
     assignee_type = template.get('assignee_type', 'reporter')
     assignee = params[assignee_type]
     # 期限の日付を作成
-    delta = timedelta(days=template['delta'])
+    delta = timedelta(days=template.get('delta', -7))
     duedate = params['target_date'] + delta
 
     issue_dict = {
         'project': {'key': PROJECT},
         'components': [{'name': COMPONENT}],
-        'summary': template['summary'].format(**params),
-        'description': template['description'].format(**params),
+        'summary': template.get('summary', '').format(**params),
+        'description': template.get('description', '').format(**params),
         'assignee': {'name': assignee},  # 担当者
         'reporter': {'name': REPORTER},  # 報告者
         'duedate': '{:%Y-%m-%d}'.format(duedate),  # 期限
@@ -81,6 +181,10 @@ def create_issue(template, params, parent=None):
         # 親issueのサブタスクとして作成
         issue_dict['parent'] = {'key': parent}
         issue_dict['issuetype'] = {'id': ISSUE_TYPE_SUBTASK}
+
+        # サブタスクはタイトルの先頭に "#pycamp 地域: " とつける
+        summary = '#pycamp {area}: ' + template.get('summary', '')
+        issue_dict['summary'] = summary.format(**params)
     else:
         issue_dict['issuetype'] = {'id': ISSUE_TYPE_TASK}
 
@@ -116,7 +220,7 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         jira.user(local_staff)
         jira.user(lecturer)
     except JIRAError as e:
-        message.send('`$pycamp` エラー:', e.text)
+        message.send('`$pycamp` エラー: `{}`'.format(e.text))
         return
 
     # issue を作成するための情報
@@ -129,8 +233,25 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
     }
     try:
         # テンプレートとパラメーターから JIRA issue を作成する
+        import pdb
+        pdb.set_trace()
         issue = create_issue(TEMPLATE, params)
-        message.send(issue.permalink())
+        desc = issue.fields.description
+
+        # サブタスクを作成する
+        for category in sorted(SUBTASK_TEMPLATE.keys()):
+            # カテゴリーを description に追加
+            desc += '\r\n\r\nh3. {}\r\n\r\n'.format(category)
+            for subtask in SUBTASK_TEMPLATE[category]:
+                sub_issue = create_issue(subtask, params, issue.key, area)
+                _, summary = sub_issue.fields.summary.split(': ', 1)
+                # サブタスクへのリンクを親タスクのdescriptionに追加
+                desc += '* {} {}\r\n'.format(sub_issue.key, summary)
+
+        # descriptionを更新する
+        issue.update(description=desc)
+
+        message.send('チケットを作成しました: {}'.format(issue.permalink()))
     except JIRAError as e:
         import pdb
         pdb.set_trace()
