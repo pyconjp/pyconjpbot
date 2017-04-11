@@ -9,6 +9,12 @@
 
 コマンドの一覧と簡単な説明
 
+### pycamp plugin
+
+- `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)` : pycamp のイベント用issueを作成する
+
+- [pycamp.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/pycamp.py)
+
 ### github plugin
 
 - `$gihub repos`: pyconjp organization のリポジトリ一覧を返す
