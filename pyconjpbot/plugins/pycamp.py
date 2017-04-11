@@ -93,12 +93,15 @@ h2. 内容
             'summary': '事前打ち合わせ(主: コアスタッフ)',
             'description': '''h2. 目的
 
-* 事前打ち合わせする
+* 現地スタッフ、コアスタッフ、講師のやること認識合わせのために事前打ち合わせを実施する
+* Slack の Call を使う想定
 
 h2. 内容
 
 * 日程調整
-* 議事録準備
+* Google Driveに議事録を準備
+* JIRAのチケットをベースにして確認を進める
+* TODOがあった場合は、JIRAのチケットを作成する
 '''
         },
         {
@@ -107,7 +110,16 @@ h2. 内容
             'summary': '参加者への事前連絡(現地スタッフ)',
             'description': '''h2. 目的
 
+* 参加者が当日スムーズにイベントに参加できるように、重要事項をを事前に連絡する
+
 h2. 内容
+
+* 以下をconnpassメッセージで参加者に伝える
+* 事前準備(python3、エディタインストール)をすること
+* 懇親会の案内
+* pyconjp-fellow.slack.com への誘導
+* 会場へのアクセス
+* 参考: 過去文面は ISSHA-470 とかを参考にしてください
 
 '''
         },
@@ -117,7 +129,14 @@ h2. 内容
             'summary': 'お茶、お菓子購入(現地スタッフ)',
             'description': '''h2. 目的
 
+* イベント当日、講師や参加者が飲み食べするためのお茶とお菓子を購入して会場に持っていく
+
 h2. 内容
+
+* お菓子は小分けしやすいスナック菓子など
+* お茶はペットボトル+紙コップでOK
+* お金はあとで精算するので領収書をもらってください
+* 3時くらいに休憩を取って、お菓子を配って和気あいあいとしましょう
 
 '''
         },
@@ -129,8 +148,30 @@ h2. 内容
             'summary': '事前ブログ執筆(現地スタッフ)',
             'description': '''h2. 目的
 
+* イベントを広く知ってもらうために PyCon JP のブログに記事を書く
+
 h2. 内容
 
+* メールアドレスを [~ryu22e] に伝えて、ブログの書き込み権限をもらってください
+* その後ブログの記事を書いて、公開してください
+* 必要なら事前に内容を Slack でレビューしてください
+
+h2. 記事作成の参考情報
+
+* 以下のような内容を入れる。フランクな文体で書いてもOK
+** 開催地をイメージできるような写真
+** Python Boot Campについて簡単な説明
+** connpassのURL（イベント本体・懇親会）
+** 講師のプロフィール紹介
+** 「懇親会も参加するのがお勧めです！」みたいな文
+* 記事の設定は以下のようにする
+** ラベルは「pycamp, pyconjp, tutorial」
+** パーマリンクは「pycamp-in-地域名.html」（地域名に今回の開催地名がローマ字で入る）
+* 過去の記事
+** 札幌: http://pyconjp.blogspot.jp/2016/10/pycamp-in-sapporo.html
+** 栃木小山: http://pyconjp.blogspot.jp/2017/01/pycamp-in-tochigioyama.html
+** 広島: http://pyconjp.blogspot.jp/2017/02/python-boot-camp-in.html
+** 大阪: http://pyconjp.blogspot.jp/2017/03/pycamp-in-osaka.html
 '''
         },
         {
@@ -139,14 +180,184 @@ h2. 内容
             'summary': 'メディアスポンサー経由での告知(コアスタッフ)',
             'description': '''h2. 目的
 
+* イベントの認知度を上げるために、メディアスポンサーに告知してもらう
+
 h2. 内容
+
+
+* 各メディアスポンサーのサイトにイベントの情報が掲載されたり、記事が載ったりする
+* エンジニアtypeについては終了後のインタビューとかできないか打診する
+
+'''
+        },
+        {
+            'assignee_type': 'reporter',  # reporter/local_staff/lecturer
+            'delta': -14,  # 開催2週間前
+            'summary': 'Twitter定期通知(コアスタッフ)',
+            'description': '''h2. 目的
+
+* イベントを知ってもらうためにTwitterの定期通知を入れる
+
+h2. 内容
+
+
+* うざくならない程度のTwitterの定期通知にする
+** https://docs.google.com/spreadsheets/d/1lpa9p_dCyTckREf09-oA2C6ZAMACCrgD9W3HQSKeoSI/edit#gid=0
+* 満席に鳴った場合は定期通知を止めることをお忘れなく
+
+'''
+        },
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': -14,  # 開催2週間前
+            'summary': '現地メディア経由での告知(現地スタッフ)',
+            'description': '''h2. 目的
+
+* いろいろな人に知ってもらうために、PyCon JP 以外の現地のチャネルを使って広報する
+
+h2. 内容
+
+
+* 以下のような候補があると思います
+* 地方紙
+* 現地コミュニティ
+* 近県のコミュニティ
+* 現地の大学、高専など
 
 '''
         },
     ],
     '3.イベント当日': [
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': -1,  # 開催前日
+            'summary': 'ランチミーティング(主: 現地スタッフ)',
+            'description': '''h2. 目的
+
+* 講師、TA、現地スタッフが事前に顔合わせをするためのランチミーティングを実施する
+* イベント当日の11:30くらいから開始
+* 顔合わせをすることよにって、仲良くなって、お互いに助け合ってよりよいイベントにする
+
+h2. 内容
+
+* 店を決めて、集合時間、場所などを関係者(講師、TAなど)に周知
+* おいしく楽しくランチを食べる
+'''
+        },
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': -1,  # 開催前日
+            'summary': '参加者アンケート実施(現地スタッフ)',
+            'description': '''h2. 目的
+
+* 参加者の満足度を確認するため、今後よりよいイベントとするためにアンケートを実施
+
+h2. 内容
+
+* https://docs.google.com/forms/d/1x125tHum4MVmiUbcxQdCmOqFMirNZPICF-9QsVNJ2eg/edit をコピーしてアンケート作成
+* イベントの終了直前に、参加者にアンケートのURLを告知して回答してもらう
+** connpassのメッセージ機能を使うとよさそう
+* 振り返りミーティングでアンケートの結果を確認する
+'''
+        },
     ],
     '4.事後処理': [
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': 14,  # 開催2週間後
+            'summary': '精算処理(現地スタッフ)',
+            'description': '''h2. 目的
+
+* 現地スタッフが使用した経費を精算する
+
+h2. 内容
+
+* 経費の内訳(お茶菓子等)、金額について記載する
+* 領収書の電子データでこのチケットに添付する
+** スキャナーない人はCamScannerアプリおすすめ
+* 振込先の口座情報を記載する
+* これらの情報が揃ったら [~ryu22e] にチケットをまわしてください
+
+h3. 経費の内訳
+
+* (ここに経費の内訳と金額、合計金額を書く)
+
+h3. 振込先口座
+
+* (ここに振込先口座の情報を書く)
+
+'''
+        },
+        {
+            'assignee_type': 'lecturer',  # reporter/local_staff/lecturer
+            'delta': 14,  # 開催2週間後
+            'summary': '精算処理(講師)',
+            'description': '''h2. 目的
+
+* 講師が使用した経費を精算する
+* 講師謝礼とまとめて振り込む
+
+h2. 内容
+
+* 旅費、宿泊費の領収書を電子データでこのチケットに添付する
+* 合計金額を記載する
+* 振込先の口座情報を記載する
+* 謝礼の源泉徴収をおわすれなく(会計担当)
+
+'''
+        },
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': 14,  # 開催2週間後
+            'summary': '事後ブログ(現地スタッフ)',
+            'description': '''h2. 目的
+
+* Python Boot Camp の開催報告として事後ブログをPyCon JPブログに書く
+* 他の地域の人が「自分のところでも開催しようかな」と思えるような内容にする
+
+
+h2. 内容
+
+* 写真入りで雰囲気を伝える
+* やってみてどうだったかの感想を書く
+* 現地スタッフ申し込みフォームへのリンクを追加する
+** https://www.pycon.jp/support/bootcamp.html
+** https://docs.google.com/forms/d/e/1FAIpQLSedZskvqmwH_cvwOZecI10PA3KX5d-Ui-74aZro_cvCcTZLMw/viewform
+'''
+        },
+        {
+            'assignee_type': 'local_staff',  # reporter/local_staff/lecturer
+            'delta': 21,  # 開催3週間後
+            'summary': '振り返りミーティング(主: 現地スタッフ)',
+            'description': '''h2. 目的
+
+* Python Boot Camp をよりよいものにするために、振り返りミーティングを実施し、今後の改善につなげる
+
+h2. 内容
+
+* 日程調整(主: 現地スタッフ、講師、TA、コアスタッフ)
+* 議事録を準備
+* ミーティングを実施
+* 振り返りミーティングで出た内容でkeep/problem/tryすることをまとめる(コアスタッフ)
+
+'''
+        },
+        {
+            'assignee_type': 'reporter',  # reporter/local_staff/lecturer
+            'delta': 28,  # 開催4週間後
+            'summary': '経費まとめ(コアスタッフ)',
+            'description': '''h2. 目的
+
+* イベントの最後に実際にかかった経費とかをシートにまとめる
+
+h2. 内容
+
+* connpass、精算チケットの内容を元に、下記のシートを埋める
+* https://docs.google.com/spreadsheets/d/1Fcgck7fMl6JpqeEVS7j542LE39ibRmCi3UxzfWhcLuc/edit#gid=1024129981
+
+
+'''
+        },
     ],
 }
 
@@ -233,8 +444,6 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
     }
     try:
         # テンプレートとパラメーターから JIRA issue を作成する
-        import pdb
-        pdb.set_trace()
         issue = create_issue(TEMPLATE, params)
         desc = issue.fields.description
 
