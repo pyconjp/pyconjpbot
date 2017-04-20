@@ -203,7 +203,7 @@ h2. 内容
 
 * うざくならない程度のTwitterの定期通知にする
 ** https://docs.google.com/spreadsheets/d/1lpa9p_dCyTckREf09-oA2C6ZAMACCrgD9W3HQSKeoSI/edit#gid=0
-* 満席に鳴った場合は定期通知を止めることをお忘れなく
+* 満席になった場合は定期通知を止めることをお忘れなく
 
 '''
         },
