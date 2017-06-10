@@ -95,10 +95,10 @@
 
 - `名前++`: 指定された名前に +1 カウントする(感謝を伝えるインクリメント)
 - `名前--`: 指定された名前に -1 カウントする
-- `$pluplus search (キーワード)`: 名前にキーワードを含む一覧を返す
-- `$pluplus delete (名前)`: カウントを削除する(カウント10未満のみ)
-- `$pluplus rename (変更前) (変更後)`: カウントする名前を変更する
-- `$pluplus merge (統合元) (統合先)`: 2つの名前のカウントを統合先の名前にまとめる
+- `$plusplus search (キーワード)`: 名前にキーワードを含む一覧を返す
+- `$plusplus delete (名前)`: カウントを削除する(カウント10未満のみ)
+- `$plusplus rename (変更前) (変更後)`: カウントする名前を変更する
+- `$plusplus merge (統合元) (統合先)`: 2つの名前のカウントを統合先の名前にまとめる
 
 - [plusplus.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/plusplus.py)
 
