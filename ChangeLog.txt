@@ -3,6 +3,7 @@ Unreleased
 
 Release Notes - 2017-06-15
 --------------------------
+- [ISSHA-645] update component info for jira command
 - [ISSHA-643] update 3rd party packages
 - [ISSHA-644] update folder info for google drive command
 

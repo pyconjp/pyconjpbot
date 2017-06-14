@@ -24,8 +24,8 @@ COMPONENT = {
     '事務局': '1.事務局',
     '会場': '2.会場',
     'プログラム': '3.プログラム',
-    'メディア': '4.メディア',
-    '環境': '5.環境',
+    'システム': '4.システム',
+    'デザイン': '5.デザイン・グッズ',
     'その他': '9.その他',
 }
 
@@ -253,7 +253,7 @@ def jira_help(message):
     """
     jiraコマンドのヘルプを返す
     """
-    message.send('''- `SAR-123`: 指定されたチケットの詳細情報を返す
+    message.send('''- `TRI-123`: 指定されたチケットの詳細情報を返す
 - `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
 - `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
 - `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す
