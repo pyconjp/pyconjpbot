@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-06-14
+--------------------------
+- [ISSHA-641] update issue template for pycamp command
+
 Release Notes - 2017-04-11
 --------------------------
 - [ISSHA-497] add pycamp command to create issues
