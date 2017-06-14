@@ -17,16 +17,20 @@ ROOT_FOLDER_ID = '0BzmtypRXAd8zZDZhOWJkNWQtMDNjOC00NjQ1LWI0YzYtZDU3NzY1NTY5NDM3'
 # 検索対象のフォルダのパス
 FOLDER = OrderedDict([
     ('2017', 'PyCon JP/2017/'),
+    ('全体', 'PyCon JP/2017/0.全体/'),
+    ('事務局', 'PyCon JP/2017/1.事務局/'),
+    ('会場', 'PyCon JP/2017/2.会場/'),
+    ('プログラム', 'PyCon JP/2017/3.プログラム/'),
+    ('システム', 'PyCon JP/2017/4.システム/'),
+    ('デザイン', 'PyCon JP/2017/5.デザイン/'),
+    ('翻訳', 'PyCon JP/2017/6.Translation/'),
     ('2016', 'PyCon JP/2016/'),
-    ('事務局', 'PyCon JP/2016/1.事務局/'),
-    ('会場', 'PyCon JP/2016/2.会場/'),
-    ('プログラム', 'PyCon JP/2016/3.プログラム/'),
-    ('メディア', 'PyCon JP/2016/4.メディア/'),
     ('2015', 'PyCon JP/2015/'),
     ('2014', 'PyCon JP/2014/'),
     ('2013', 'PyCon JP/2013/'),
     ('2012', 'PyCon JP/2012/'),
     ('一社', 'PyCon JP/一般社団法人/'),
+    ('pycamp', 'PyCon JP/一般社団法人/Python Boot Camp'),
 ])
 
 # ファイルの種類と MIME_TYPE の辞書
@@ -55,7 +59,7 @@ $drive [-n] [-l LIMIT] [-f FOLDER] [-t TYPE] keywords...`
   -l LIMIT, --limit LIMIT
                         結果の最大件数を指定する(default: 10)
   -f FOLDER, --folder FOLDER
-                        検索対象のフォルダーを指定する(default: 2016)
+                        検索対象のフォルダーを指定する(default: 2017)
   -t TYPE, --type TYPE  検索対象のファイル種別を指定する
 ```
 """
@@ -64,8 +68,8 @@ parser.add_argument('-n', '--name', default=False, action='store_true',
                     help='ファイル名のみを検索対象にする(未指定時は全文検索)')
 parser.add_argument('-l', '--limit', default=10, type=int,
                     help='結果の最大件数を指定する(default: 10)')
-parser.add_argument('-f', '--folder', default='2016', type=str,
-                    help='検索対象のフォルダーを指定する(default: 2016)')
+parser.add_argument('-f', '--folder', default='2017', type=str,
+                    help='検索対象のフォルダーを指定する(default: 2017)')
 parser.add_argument('-t', '--type', type=str,
                     help='検索対象のファイル種別を指定する')
 parser.add_argument('keywords', nargs='+',
@@ -121,7 +125,7 @@ def drive_search(message, keywords):
     -l LIMIT, --limit LIMIT
                           結果の最大件数を指定する(default: 10)
     -f FOLDER, --folder FOLDER
-                          検索対象のフォルダーを指定する(default: 2016)
+                          検索対象のフォルダーを指定する(default: 2017)
     -t TYPE, --type TYPE  検索対象のファイル種別を指定する
     """
 

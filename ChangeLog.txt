@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-06-15
+--------------------------
+- [ISSHA-644] update folder info for google drive command
+
 Release Notes - 2017-06-14
 --------------------------
 - [ISSHA-641] update issue template for pycamp command
