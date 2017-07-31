@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-07-31
+--------------------------
+- [ISSHA-612] add pycamp manual links
+
 Release Notes - 2017-06-15
 --------------------------
 - [ISSHA-645] update component info for jira command
