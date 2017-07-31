@@ -48,6 +48,9 @@ h2. 内容
 * TA: 
 * イベントconnpass: https://pyconjp.connpass.com/event/XXXXX/
 * 懇親会connpass: https://pyconjp.connpass.com/event/XXXXX/
+
+JIRAの使い方については以下マニュアルを参照してください。
+http://bootcamp-text.readthedocs.io/organize/1_manual.html#id28
 '''
 }
 
@@ -71,6 +74,9 @@ h2. 内容
 * 会場設定
 * 説明文の修正(場所、講師など)
 * 公開のタイミングは平日の昼間が狙い目（多くの人に見てもらえる）
+
+以下、イベント公開に関するマニュアルも参照してください。
+http://bootcamp-text.readthedocs.io/organize/1_manual.html#id8
 '''
         },
         {
@@ -106,6 +112,9 @@ h2. 内容
 * TODOがあった場合は、JIRAのチケットを作成する
 ** JIRAのチケットを作成する際には、親チケットに対してサブタスクとしてぶら下げて下さい
 ** 参考URL http://manual.pycon.jp/staff/tool-tips.html#create-issue
+
+以下、事前打ち合わせに関するマニュアルも参照してください。
+http://bootcamp-text.readthedocs.io/organize/1_manual.html#id10
 '''
         },
         {
