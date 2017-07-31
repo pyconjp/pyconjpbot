@@ -161,6 +161,11 @@ h2. 内容
 * メールアドレスを [~ryu22e] に伝えて、ブログの書き込み権限をもらってください
 * その後ブログの記事を書いて、公開してください
 * このblogの公開のタイミングも平日の昼間が狙い目
+** 公開前に、ラベル・パーマリンクの設定を忘れずに
+* 現地スタッフ申し込みフォームへのリンクを追加する
+** https://www.pycon.jp/support/bootcamp.html
+** https://docs.google.com/forms/d/e/1FAIpQLSedZskvqmwH_cvwOZecI10PA3KX5d-Ui-74aZro_cvCcTZLMw/viewform
+** その他、マニュアルを参照して注意事項等を確認して下さい。 http://manual.pycon.jp/media/blog.html#id8
 * 必要なら事前に内容を Slack でレビューしてください
 
 h2. 記事作成の参考情報
@@ -264,7 +269,7 @@ h2. 内容
 * https://docs.google.com/forms/d/1x125tHum4MVmiUbcxQdCmOqFMirNZPICF-9QsVNJ2eg/edit をコピーしてアンケート作成
 * イベントの終了直前に、参加者にアンケートのURLを告知して回答してもらう
 ** connpassのメッセージ機能を使うとよさそう
-** 事前ミーティングでお知らせ済みのgoogle Driveに共有してね。程度でOK
+** 事前ミーティングでお知らせ済みのgoogle Driveに共有してください
 * 振り返りミーティングでアンケートの結果を確認する
 '''
         },
@@ -337,6 +342,7 @@ h2. 内容
 * 現地スタッフ申し込みフォームへのリンクを追加する
 ** https://www.pycon.jp/support/bootcamp.html
 ** https://docs.google.com/forms/d/e/1FAIpQLSedZskvqmwH_cvwOZecI10PA3KX5d-Ui-74aZro_cvCcTZLMw/viewform
+** その他、マニュアルを参照して注意事項等を確認して下さい。 http://manual.pycon.jp/media/blog.html#id8
 '''
         },
         {
@@ -351,7 +357,7 @@ h2. 内容
 
 * 調整さんで日程調整(主: 現地スタッフ、講師、TA、コアスタッフ)
 * connpassでイベントを作成→参加忘れを防ぐため
-** 管理者に @takanory を入れる。
+** 管理者に @takanori を入れる。（PyCon JP スタッフグループに追加します）
 * 議事録を準備
 * ミーティングを実施
 * 振り返りミーティングで出た内容でkeep/problem/tryすることをまとめる(コアスタッフ)
