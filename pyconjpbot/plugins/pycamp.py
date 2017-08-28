@@ -368,6 +368,8 @@ h2. 内容
 * connpassでイベントを作成→参加忘れを防ぐため
 ** 管理者に @takanori を入れる。（PyCon JP スタッフグループに追加します）
 * 議事録を準備
+** https://docs.google.com/document/d/1HyGt-PUj2m48_-mlZt97Qp3peisLEMFWq5gCPN860aQ/edit をコピーして作成する。
+*** 「TODO」と書いている項目はミーティング開催前に予め記入すること（参加者全員で書く項目はSlackで記入を依頼する）。
 * ミーティングを実施
 * 振り返りミーティングで出た内容でkeep/problem/tryすることをまとめる(コアスタッフ)
 
