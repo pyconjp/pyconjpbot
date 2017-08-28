@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-08-28
+--------------------------
+- [ISSHA-734] update issue template for pycamp command
+
 Release Notes - 2017-07-31
 --------------------------
 - [ISSHA-612] add pycamp manual links
