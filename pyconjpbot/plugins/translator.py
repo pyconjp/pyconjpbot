@@ -1,11 +1,30 @@
+import xml.etree.ElementTree as ET
+
 from slackbot import settings
 from slackbot.bot import respond_to
 
-from microsofttranslator import Translator, ArgumentOutOfRangeException
+import requests
 from langdetect import detect
 
-# Connect to Microsoft Translator
-translator = Translator(settings.TRANSLATOR_ID, settings.TRANSLATOR_SECRET)
+
+def get_access_token(key):
+    """
+    Cognitive ServiceでAPI認証を行い、トークンを取得する
+
+    参考: http://beachside.hatenablog.com/entry/2017/01/27/123000
+
+    :params key: APIキー
+    """
+    headers = {
+        'Ocp-Apim-Subscription-Key': key
+    }
+    issue_token_url = 'https://api.cognitive.microsoft.com/sts/v1.0/issueToken'
+    r = requests.post(issue_token_url, headers=headers)
+    return r.text
+
+
+# トークンを取得する
+token = get_access_token(settings.TRANSLATOR_API_KEY)
 
 
 @respond_to('^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)')
@@ -24,10 +43,28 @@ def translate(message, cmd, option, text):
         # 漢字が多いと日本語なのに ko と判定される
         # 日本語の場合は英語に翻訳する
         lang = 'en'
-    try:
-        message.send(translator.translate(text, lang))
-    except ArgumentOutOfRangeException:
-        message.send('`{}` は無効な言語です'.format(lang))
+
+    headers = {
+        'Authorization': 'Bearer ' + token
+    }
+    query = {
+        'to': lang,
+        'text': text,
+    }
+    url = 'https://api.microsofttranslator.com/V2/Http.svc/Translate'
+    r = requests.get(url, headers=headers, params=query)
+
+    if r.status_code == 400:
+        # エラーが発生したので内容を表示する
+        error_message = r.text
+        if "Message: 'to' must be a valid language" in error_message:
+            message.send('`{}` は無効な言語です'.format(lang))
+        else:
+            message.send('エラーが発生しました\n```\n{}\n```'.format(r.text))
+        return
+
+    tree = ET.fromstring(r.text)
+    message.send(tree.text)
 
 
 @respond_to('^(translate|翻訳)\s+(list|リスト)')
@@ -35,9 +72,10 @@ def translate_list(message, cmd, option):
     """
     言語のリストを返す
     """
-    languages = translator.get_languages()
-    reply = ' '.join(['`{}`'.format(x) for x in languages])
-    message.send('使用できる言語: {}'.format(reply))
+    #languages = translator.get_languages()
+    #reply = ' '.join(['`{}`'.format(x) for x in languages])
+    #message.send('使用できる言語: {}'.format(reply))
+    pass
 
 
 @respond_to('^(translate|翻訳)\s+help')
