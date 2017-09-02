@@ -10,7 +10,6 @@ httplib2==0.10.3
 idna==2.5
 jira==1.0.10
 langdetect==1.0.7
-microsofttranslator==0.8
 mpmath==0.19
 oauth2client==4.1.1
 oauthlib==2.0.2
