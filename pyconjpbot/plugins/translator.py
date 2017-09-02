@@ -67,7 +67,8 @@ def translate_list(message, cmd, option):
     r = requests.get(url, headers=headers)
     # 言語の一覧を取得
     tree = ET.fromstring(r.text)
-    reply = ' '.join(('`{}`'.format(child.text) for child in tree))
+    langs = sorted(child.text for child in tree)
+    reply = ' '.join(('`{}`'.format(l) for l in langs))
     message.send('使用できる言語: {}'.format(reply))
 
 
