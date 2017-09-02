@@ -3,6 +3,7 @@ Unreleased
 
 Release Notes - 2017-09-02
 --------------------------
+- [ISSHA-745] use API_KEY every translate command
 - [ISSHA-642] update translate command for Microsoft Translator API
 
 Release Notes - 2017-08-28

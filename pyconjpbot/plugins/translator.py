@@ -7,27 +7,8 @@ import requests
 from langdetect import detect
 
 
+# Microsoft Translator API の BASE URL
 API_BASE_URL = 'https://api.microsofttranslator.com/V2/Http.svc/'
-
-
-def get_access_token(key):
-    """
-    Cognitive ServiceでAPI認証を行い、トークンを取得する
-
-    参考: http://beachside.hatenablog.com/entry/2017/01/27/123000
-
-    :params key: APIキー
-    """
-    headers = {
-        'Ocp-Apim-Subscription-Key': key
-    }
-    issue_token_url = 'https://api.cognitive.microsoft.com/sts/v1.0/issueToken'
-    r = requests.post(issue_token_url, headers=headers)
-    return r.text
-
-
-# トークンを取得する
-bearer_token = 'Bearer ' + get_access_token(settings.TRANSLATOR_API_KEY)
 
 
 @respond_to('^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)')
@@ -49,12 +30,14 @@ def translate(message, cmd, option, text):
         # 日本語の場合は英語に翻訳する
         lang = 'en'
 
-    headers = {'Authorization': bearer_token}
+    url = API_BASE_URL + 'Translate'
+    headers = {
+        'Ocp-Apim-Subscription-Key': settings.TRANSLATOR_API_KEY,
+    }
     query = {
         'to': lang,
         'text': text,
     }
-    url = API_BASE_URL + 'Translate'
     r = requests.get(url, headers=headers, params=query)
 
     if r.status_code == 400:
@@ -77,12 +60,15 @@ def translate_list(message, cmd, option):
 
     http://docs.microsofttranslator.com/text-translate.html#!/default/post_GetLanguageNames
     """
-    headers = {'Authorization': bearer_token}
     url = API_BASE_URL + 'GetLanguagesForTranslate'
+    headers = {
+        'Ocp-Apim-Subscription-Key': settings.TRANSLATOR_API_KEY,
+    }
     r = requests.get(url, headers=headers)
     # 言語の一覧を取得
     tree = ET.fromstring(r.text)
-    reply = ' '.join(('`{}`'.format(child.text) for child in tree))
+    langs = sorted(child.text for child in tree)
+    reply = ' '.join(('`{}`'.format(l) for l in langs))
     message.send('使用できる言語: {}'.format(reply))
 
 
