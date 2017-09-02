@@ -7,6 +7,9 @@ import requests
 from langdetect import detect
 
 
+API_BASE_URL = 'https://api.microsofttranslator.com/V2/Http.svc/'
+
+
 def get_access_token(key):
     """
     Cognitive ServiceでAPI認証を行い、トークンを取得する
@@ -24,13 +27,15 @@ def get_access_token(key):
 
 
 # トークンを取得する
-token = get_access_token(settings.TRANSLATOR_API_KEY)
+bearer_token = 'Bearer ' + get_access_token(settings.TRANSLATOR_API_KEY)
 
 
 @respond_to('^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)')
 def translate(message, cmd, option, text):
     """
     指定した文字列を翻訳する
+
+    http://docs.microsofttranslator.com/text-translate.html#!/default/get_Translate
     """
     if text in ('help', 'list'):
         return
@@ -44,14 +49,12 @@ def translate(message, cmd, option, text):
         # 日本語の場合は英語に翻訳する
         lang = 'en'
 
-    headers = {
-        'Authorization': 'Bearer ' + token
-    }
+    headers = {'Authorization': bearer_token}
     query = {
         'to': lang,
         'text': text,
     }
-    url = 'https://api.microsofttranslator.com/V2/Http.svc/Translate'
+    url = API_BASE_URL + 'Translate'
     r = requests.get(url, headers=headers, params=query)
 
     if r.status_code == 400:
@@ -70,12 +73,17 @@ def translate(message, cmd, option, text):
 @respond_to('^(translate|翻訳)\s+(list|リスト)')
 def translate_list(message, cmd, option):
     """
-    言語のリストを返す
+    使用できる言語の一覧を返す
+
+    http://docs.microsofttranslator.com/text-translate.html#!/default/post_GetLanguageNames
     """
-    #languages = translator.get_languages()
-    #reply = ' '.join(['`{}`'.format(x) for x in languages])
-    #message.send('使用できる言語: {}'.format(reply))
-    pass
+    headers = {'Authorization': bearer_token}
+    url = API_BASE_URL + 'GetLanguagesForTranslate'
+    r = requests.get(url, headers=headers)
+    # 言語の一覧を取得
+    tree = ET.fromstring(r.text)
+    reply = ' '.join(('`{}`'.format(child.text) for child in tree))
+    message.send('使用できる言語: {}'.format(reply))
 
 
 @respond_to('^(translate|翻訳)\s+help')
