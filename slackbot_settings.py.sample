@@ -1,4 +1,4 @@
-## Settings for slackbot
+# Settings for slackbot
 
 # API Token for Bot integration
 # https://pyconjp.slack.com/services/B15KRL7CY
@@ -16,20 +16,19 @@ PLUGINS = [
 
 ALIASES = '$'
 
-## Settings for jira plugin
+# Settings for jira plugin
 JIRA_URL = 'https://pyconjp.atlassian.net/'
-JIRA_PROJECTS = ['ISSHA', 'SAR', 'TRI'] # JIRA Project Keys
-JIRA_DEFAULT_PROJECT = 'SAR'  # JIRA Default Project Key
+JIRA_PROJECTS = ['ISSHA', 'SAR', 'TRI']  # JIRA Project Keys
+JIRA_DEFAULT_PROJECT = 'TRI'   # JIRA Default Project Key
 
 # see https://docs.google.com/spreadsheets/d/1YiqErBDdp5QWfTlfDmxc6Vi696b_NGFJKzuyM-v6PDM/edit#gid=0
 JIRA_USER = '<JIRA Username>'
 JIRA_PASS = '<JIRA Password>'
 
-## Settings for translator plugin
-# https://www.microsoft.com/en-us/translator/getstarted.aspx
-TRANSLATOR_ID = '<Your Client ID>'
-TRANSLATOR_SECRET = '<Your Client Secret>'
+# Settings for translator plugin
+# https://www.microsoft.com/ja-jp/translator/getstarted.aspx
+TRANSLATOR_API_KEY = '<Your Subscription Key>'
 
-## Settings for github plugin
+# Settings for github plugin
 GITHUB_TOKEN = '<Your Github Token>'
 GITHUB_ORGANIZATION = '<Your organization>'

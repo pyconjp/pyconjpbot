@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-09-02
+--------------------------
+- [ISSHA-642] update translate command for Microsoft Translator API
+
 Release Notes - 2017-08-28
 --------------------------
 - [ISSHA-734] update issue template for pycamp command
