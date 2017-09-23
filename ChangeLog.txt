@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-09-23
+--------------------------
+- [ISSHA-769] add google spreadsheet template support to pycamp command
+
 Release Notes - 2017-09-02
 --------------------------
 - [ISSHA-745] use API_KEY every translate command
