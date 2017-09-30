@@ -1,5 +1,3 @@
-import json
-
 from github import Github
 from slackbot import settings
 from slackbot.bot import respond_to
