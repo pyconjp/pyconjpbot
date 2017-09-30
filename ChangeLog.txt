@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-09-30
+--------------------------
+- [ISSHA-842] add Slack thread support
+
 Release Notes - 2017-09-23
 --------------------------
 - [ISSHA-769] add google spreadsheet template support to pycamp command

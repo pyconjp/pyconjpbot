@@ -1,6 +1,5 @@
 import calendar
 from datetime import date
-import json
 import random
 
 from slackbot.bot import respond_to
@@ -8,13 +7,15 @@ from slackbot import settings
 import slacker
 import git
 
+from ..botmessage import botsend, botreply, botwebapi
+
 
 @respond_to('^help$')
 def help(message):
     """
     helpページのURLを返す
     """
-    message.send('ヘルプはこちら→ https://github.com/pyconjp/pyconjpbot#commands')
+    botsend(message, 'ヘルプはこちら→ https://github.com/pyconjp/pyconjpbot#commands')
 
 
 @respond_to('^shuffle\s+(.*)')
@@ -24,10 +25,10 @@ def shuffle(message, words):
     """
     words = words.split()
     if len(words) == 1:
-        message.send('キーワードを複数指定してください\n`$shuffle word1 word2...`')
+        botsend(message, 'キーワードを複数指定してください\n`$shuffle word1 word2...`')
     else:
         random.shuffle(words)
-        message.send(' '.join(words))
+        botsend(message, ' '.join(words))
 
 
 @respond_to('^choice\s+(.*)')
@@ -37,9 +38,9 @@ def choice(message, words):
     """
     words = words.split()
     if len(words) == 1:
-        message.send('キーワードを複数指定してください\n`$choice word1 word2...`')
+        botsend(message, 'キーワードを複数指定してください\n`$choice word1 word2...`')
     else:
-        message.send(random.choice(words))
+        botsend(message, random.choice(words))
 
 
 @respond_to('^ping$')
@@ -47,7 +48,7 @@ def ping(message):
     """
     pingに対してpongで応答する
     """
-    message.reply('pong')
+    botreply(message, 'pong')
 
 
 @respond_to('^version$')
@@ -57,12 +58,13 @@ def version(message):
     """
     obj = git.Repo('').head.object
     url = "https://github.com/pyconjp/pyconjpbot/commit/{}".format(obj.hexsha)
-    text = "<{}|{}> {} - {}({})".format(url, obj.hexsha[:6], obj.summary,
-                                       obj.committer.name, obj.committed_datetime)
+    text = "<{}|{}> {} - {}({})".format(
+        url, obj.hexsha[:6], obj.summary,
+        obj.committer.name, obj.committed_datetime)
     attachments = [{
         'pretext': text,
     }]
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 @respond_to('^random$')
@@ -78,7 +80,7 @@ def random_command(message, subcommand=None):
     """
 
     if subcommand == 'help':
-        message.send('''- `$random`: チャンネルにいるメンバーからランダムに一人を選ぶ
+        botsend(message, '''- `$random`: チャンネルにいるメンバーからランダムに一人を選ぶ
 - `$random active`: チャンネルにいるactiveなメンバーからランダムに一人を選ぶ
 ''')
         return
@@ -106,7 +108,7 @@ def random_command(message, subcommand=None):
 
     user_info = webapi.users.info(member_id)
     name = user_info.body['user']['name']
-    message.send('{} さん、君に決めた！'.format(name))
+    botsend(message, '{} さん、君に決めた！'.format(name))
 
 
 @respond_to('^cal$')
@@ -119,10 +121,10 @@ def cal_command(message, month=None, year=None):
     today = date.today()
     month = int(month) if month else today.month
     year = int(year) if year else today.year
-        
+
     cal = calendar.TextCalendar(firstweekday=calendar.SUNDAY)
     try:
-        message.send('```{}```'.format(cal.formatmonth(year, month)))
+        botsend(message, '```{}```'.format(cal.formatmonth(year, month)))
     except IndexError:
         # 数字が範囲外の場合は無視する
         pass
@@ -133,7 +135,7 @@ def cal_help(message):
     """
     cal コマンドのヘルプを返す
     """
-    message.send('''- `$cal`: 今月のカレンダーを返す
+    botsend(message, '''- `$cal`: 今月のカレンダーを返す
 - `$cal 9`: 今年の指定された月のカレンダーを返す
 - `$cal 9 2016`: 指定された年月のカレンダーを返す
 ''')

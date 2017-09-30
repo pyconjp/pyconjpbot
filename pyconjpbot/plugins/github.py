@@ -1,8 +1,8 @@
-import json
-
 from github import Github
 from slackbot import settings
 from slackbot.bot import respond_to
+
+from ..botmessage import botsend, botwebapi
 
 github = Github(settings.GITHUB_TOKEN)
 org = github.get_organization(settings.GITHUB_ORGANIZATION)
@@ -24,7 +24,7 @@ def github_repos(message):
         'text': text,
         'mrkdwn_in': ['text'],
     }]
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 @respond_to('^github\s+search\s+(.*)')
@@ -48,11 +48,11 @@ def github_search(message, keywords):
             'text': text,
             'mrkdwn_in': ['pretext', 'text'],
         }]
-        message.send_webapi('', json.dumps(attachments))
+        botwebapi(message, attachments)
 
     # 結果が一つもない場合
     else:
-        message.send('`{}` にマッチするissueはありません'.format(keywords))
+        botsend(message, '`{}` にマッチするissueはありません'.format(keywords))
 
 
 @respond_to('^github\s+code\s+(.*)')
@@ -76,11 +76,11 @@ def github_code(message, keywords):
             'text': text,
             'mrkdwn_in': ['pretext', 'text'],
         }]
-        message.send_webapi('', json.dumps(attachments))
+        botwebapi(message, attachments)
 
     # 結果が一つもない場合
     else:
-        message.send('`{}` にマッチするコードはありません'.format(keywords))
+        botsend(message, '`{}` にマッチするコードはありません'.format(keywords))
 
 
 @respond_to('^github\s+help$')
@@ -88,7 +88,7 @@ def github_help(message):
     """
     githubコマンドのヘルプを返す
     """
-    message.send('''- `$gihub repos`: pyconjp organization のリポジトリ一覧を返す
+    botsend(message, '''- `$gihub repos`: pyconjp organization のリポジトリ一覧を返す
 - `$github search keywords`: 指定されたキーワードにマッチするissueを返す
 - `$github code keywords`: 指定されたキーワードにマッチするコードを返す
 ''')

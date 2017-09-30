@@ -1,10 +1,11 @@
 import argparse
-import json
 from urllib.parse import quote
 
 from jira import JIRA, JIRAError
 from slackbot import settings
 from slackbot.bot import respond_to, listen_to
+
+from ..botmessage import botsend, botwebapi
 
 # Clean JIRA Url to not have trailing / if exists
 CLEAN_JIRA_URL = settings.JIRA_URL
@@ -77,7 +78,7 @@ def jira_listener(message, pre, project, number):
     try:
         issue = jira.issue(issue_id)
     except JIRAError:
-        message.send('%s は存在しません' % issue_id)
+        botsend(message, '%s は存在しません' % issue_id)
         return
 
     # Create variables to display to user
@@ -104,14 +105,14 @@ def jira_listener(message, pre, project, number):
             },
         ],
     }]
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 def _drive_help(message, cmd1, cmd2):
     """
     jira 検索コマンドのヘルプを返す
     """
-    message.send(HELP.format(cmd1, cmd2, DEFAULT_PROJECT))
+    botsend(message, HELP.format(cmd1, cmd2, DEFAULT_PROJECT))
 
 
 def _build_jql(args, jql_base=''):
@@ -146,13 +147,13 @@ def jira_search(message, keywords):
     try:
         args, argv = parser.parse_known_args(keywords.split())
     except SystemExit:
-        message.send('引数の形式が正しくありません')
+        botsend(message, '引数の形式が正しくありません')
         _drive_help(message, 'search', '検索')
         return
 
     # 引数から query を生成
     jql = _build_jql(args, 'status in (Open, "In Progress", Reopened) AND ')
-    
+
     title = '「{}」の検索結果(オープンのみ)'.format(keywords)
     _send_jira_search_responce(message, jql, title)
 
@@ -167,7 +168,7 @@ def jira_allsearch(message, keywords):
     try:
         args, argv = parser.parse_known_args(keywords.split())
     except SystemExit:
-        message.send('引数の形式が正しくありません')
+        botsend(message, '引数の形式が正しくありません')
         _drive_help(message, 'search', '検索')
         return
 
@@ -201,7 +202,7 @@ def _send_jira_search_responce(message, query, title):
         issues = jira.search_issues(query)
     except JIRAError as err:
         # なんらかのエラーが発生
-        message.send('JIRAError: `{}`'.format(err.text))
+        botsend(message, 'JIRAError: `{}`'.format(err.text))
         return
 
     if issues:
@@ -219,7 +220,7 @@ def _send_jira_search_responce(message, query, title):
         'pretext': pretext,
         'text': text,
     }]
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 @respond_to('^jira\s+filters?')
@@ -245,7 +246,7 @@ def jira_filter(message):
         'pretext': pretext,
         'text': ' / '.join(flist),
     }]
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 @respond_to('^jira\s+help$')
@@ -253,7 +254,7 @@ def jira_help(message):
     """
     jiraコマンドのヘルプを返す
     """
-    message.send('''- `TRI-123`: 指定されたチケットの詳細情報を返す
+    botsend(message, '''- `TRI-123`: 指定されたチケットの詳細情報を返す
 - `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
 - `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
 - `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す

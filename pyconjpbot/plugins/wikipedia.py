@@ -3,6 +3,8 @@ import json
 from slackbot.bot import respond_to
 import wikipedia
 
+from ..botmessage import botsend, botwebapi
+
 
 @respond_to('^wikipedia(\s+-\w+)?\s+(.*)')
 def wikipedia_page(message, option, query):
@@ -22,7 +24,7 @@ def wikipedia_page(message, option, query):
         # search with query
         results = wikipedia.search(query)
     except:
-        message.send('指定された言語 `{}` は存在しません'.format(lang))
+        botsend(message, '指定された言語 `{}` は存在しません'.format(lang))
         return
 
     # get first result
@@ -34,13 +36,13 @@ def wikipedia_page(message, option, query):
             'pretext': 'Wikipedia: <{}|{}>'.format(page.url, page.title),
             'text': page.summary,
         }]
-        message.send_webapi('', json.dumps(attachments))
+        botwebapi(message, attachments)
     else:
-        message.send('`{}` に該当するページはありません'.format(query))
+        botsend(message, '`{}` に該当するページはありません'.format(query))
 
 
 @respond_to('^wikipedia\s+help')
 def wikipedia_help(message):
-    message.send('''`$wikipedia keywords`: Wikipedia で指定されたページを返す
+    botsend(message, '''`$wikipedia keywords`: Wikipedia で指定されたページを返す
 `$wikipedia -en keywords`: Wikipedia で指定された言語(en等)のページを返す
 ''')

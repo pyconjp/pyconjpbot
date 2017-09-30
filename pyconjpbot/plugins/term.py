@@ -1,10 +1,10 @@
 import random
-import json
 from datetime import datetime
 
 from slackbot.bot import respond_to
 
 from .term_model import Term, Response
+from ..botmessage import botsend, botwebapi
 
 # すでに存在するコマンドは無視する
 RESERVED = (
@@ -37,19 +37,19 @@ def term_create(message, command):
     command = command.lower()
     # 予約語の場合は実行しない
     if command in RESERVED:
-        message.send('コマンド `${}` は予約語なので登録できません'.format(command))
+        botsend(message, 'コマンド `${}` は予約語なので登録できません'.format(command))
         return
 
     creator = message.body['user']
-    term, created = Term.create_or_get(command=command, creator=creator)
+    term, created = Term.get_or_create(command=command, creator=creator)
     if not created:
         # すでに登録してあるコマンドは登録しない
-        message.send('コマンド `${}` はすでに登録されています'.format(command))
+        botsend(message, 'コマンド `${}` はすでに登録されています'.format(command))
 
     else:
         msg = 'コマンド `${}` を作成しました。\n'.format(command)
         msg += '`${} add (レスポンス)` でレスポンスを追加できます'.format(command)
-        message.send(msg)
+        botsend(message, msg)
 
         # コマンド一覧の set に追加
         commands.add(command)
@@ -74,7 +74,7 @@ def term_drop(message, subcommand, command):
 
     # コマンド一覧の set から削除
     commands.remove(command)
-    message.send('コマンド `${}` を消去しました'.format(command))
+    botsend(message, 'コマンド `${}` を消去しました'.format(command))
 
 
 def _create_attachments_for_list(pretext, data, command=True):
@@ -92,7 +92,7 @@ def _create_attachments_for_list(pretext, data, command=True):
         'text': list_text,
         'mrkdwn_in': ['pretext', 'text'],
     }]
-    return json.dumps(attachments)
+    return attachments
 
 
 @respond_to('^term\s+search\s+([\w-]+)$')
@@ -106,7 +106,7 @@ def term_search(message, keyword):
         if keyword in command:
             data.append(command)
     attachments = _create_attachments_for_list(pretext, data)
-    message.send_webapi('', attachments)
+    botwebapi(message, attachments)
 
 
 @respond_to('^term\s+list$')
@@ -116,7 +116,7 @@ def term_list(message):
     """
     pretext = '用語コマンドの一覧です'
     attachments = _create_attachments_for_list(pretext, sorted(commands))
-    message.send_webapi('', attachments)
+    botwebapi(message, attachments)
 
 
 def _available_command(message, command):
@@ -128,7 +128,7 @@ def _available_command(message, command):
     if command in RESERVED:
         result = False
     elif command not in commands:
-        message.send('コマンド `${}` は登録されていません'.format(command))
+        botsend(message, 'コマンド `${}` は登録されていません'.format(command))
         result = False
 
     return result
@@ -142,7 +142,7 @@ def _send_markdown_text(message, text):
         'pretext': text,
         'mrkdwn_in': ['pretext'],
     }]
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 @respond_to('^([\w-]+)$')
@@ -157,7 +157,7 @@ def return_response(message, command):
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
         msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
-        message.send(msg)
+        botsend(message, msg)
     else:
         response = random.choice(response_set)
         _send_markdown_text(message, response.text)
@@ -261,7 +261,7 @@ def pop_response(message, command):
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
         msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
-        message.send(msg)
+        botsend(message, msg)
         return
         
     last_response = response_set.order_by(Response.created.desc())[0]
@@ -281,13 +281,13 @@ def search_responses(message, command, keyword):
     responses = Response.select().where(term == term, Response.text ** pat)
 
     if len(responses) == 0:
-        message.send('コマンド `${}` に `{}` を含む応答はありません'.format(command, keyword))
+        botsend(message, 'コマンド `${}` に `{}` を含む応答はありません'.format(command, keyword))
     else:
         pretext = 'コマンド `${}` の `{}` を含む応答は {} 件あります\n'.format(
             command, keyword, len(responses))
         data = [x.text for x in responses]
         attachments = _create_attachments_for_list(pretext, data, False)
-        message.send_webapi('', attachments)
+        botwebapi(message, attachments)
 
 
 def get_responses(message, command):
@@ -298,13 +298,13 @@ def get_responses(message, command):
     if len(response_set) == 0:
         msg = 'コマンド `${}` には応答が登録されていません\n'.format(command)
         msg += '`${} add (レスポンス)` で応答を登録してください'.format(command)
-        message.send(msg)
+        botsend(message, msg)
     else:
         pretext = 'コマンド `${}` の応答は {} 件あります\n'.format(
             command, len(response_set))
         data = [x.text for x in response_set]
         attachments = _create_attachments_for_list(pretext, data, False)
-        message.send_webapi('', attachments)
+        botwebapi(message, attachments)
 
 
 @respond_to('term\s+help')
@@ -312,7 +312,7 @@ def term_help(message):
     """
     term pluginのヘルプを返す
     """
-    message.send('''- `$term (用語)`: 用語コマンドを作成する
+    botsend(message, '''- `$term (用語)`: 用語コマンドを作成する
 - `$term create (用語)`: 用語コマンドを作成する
 - `$term drop (用語)`: 用語コマンドを消去する
 - `$term search (キーワード)`: キーワードを含む用語コマンドの一覧を返す

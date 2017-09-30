@@ -6,6 +6,8 @@ from random import choice
 
 from slackbot.bot import listen_to
 
+from ..botmessage import botreply
+
 
 @listen_to('おはよう|お早う')
 def morning(message):
@@ -14,7 +16,7 @@ def morning(message):
         'おはよー',
         'おはようございます',
     )
-    message.reply(choice(replies))
+    botreply(message, choice(replies))
 
 
 @listen_to('こんにち[はわ]')
@@ -24,7 +26,7 @@ def noon(message):
         'ちーっす',
         'こんにちは、元気ですかー?',
     )
-    message.reply(choice(replies))
+    botreply(message, choice(replies))
 
 
 @listen_to('いってきま|行ってきま')
@@ -35,7 +37,7 @@ def go(message):
         'いってらっしゃ～い',
         'いってら',
     )
-    message.reply(choice(replies))
+    botreply(message, choice(replies))
 
 
 @listen_to('眠た?い|ねむた?い|寝る|寝ます')
@@ -45,4 +47,4 @@ def night(message):
         'おやす',
         'おやすー',
     )
-    message.reply(choice(replies))
+    botreply(message, choice(replies))

@@ -3,6 +3,8 @@ import re
 from slackbot.bot import listen_to
 from sympy import sympify, SympifyError
 
+from ..botmessage import botsend
+
 # 単一の数字っぽい文字列を表すパターン
 NUM_PATTERN = re.compile('^\s*[-+]?[\d.,]+\s*$')
 
@@ -35,4 +37,4 @@ def calc(message, expression, dummy_):
             return
 
     # カンマをつけて出力する
-    message.send('{:,}'.format(answer))
+    botsend(message, '{:,}'.format(answer))

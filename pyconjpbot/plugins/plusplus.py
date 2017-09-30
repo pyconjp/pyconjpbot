@@ -1,4 +1,3 @@
-import json
 import random
 
 from slackbot.bot import respond_to, listen_to
@@ -6,6 +5,8 @@ from slackbot import settings
 import slacker
 
 from .plusplus_model import Plusplus
+from ..botmessage import botsend, botwebapi
+
 
 PLUS_MESSAGE = (
     'leveled up!',
@@ -53,7 +54,7 @@ def _update_count(message, target, plusplus):
         msg = random.choice(MINUS_MESSAGE)
     plus.save()
 
-    message.send('{} {} (通算: {})'.format(target, msg, plus.counter))
+    botsend(message, '{} {} (通算: {})'.format(target, msg, plus.counter))
 
 
 @listen_to(r'^<@(.+)>:?\s*(\++|-+)')
@@ -99,7 +100,7 @@ def plusplus_delete(message, subcommand, name):
         return
 
     if abs(plus.counter) > 10:
-        message.send('`{}` のカウントが多いので削除を取り消しました(count: {})'.format(name, plus.counter))
+        botsend(message, '`{}` のカウントが多いので削除を取り消しました(count: {})'.format(name, plus.counter))
         return
 
     plus.delete_instance()
@@ -114,7 +115,7 @@ def plusplus_rename(message, old, new):
     try:
         oldplus = Plusplus.get(name=old)
     except Plusplus.DoesNotExist:
-        message.send('`{}` という名前は登録されていません'.format(old))
+        botsend(message, '`{}` という名前は登録されていません'.format(old))
         return
 
     newplus, created = Plusplus.create_or_get(name=new, counter=oldplus.counter)
@@ -125,7 +126,7 @@ def plusplus_rename(message, old, new):
 
     # 入れ替える
     oldplus.delete_instance()
-    message.send('`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, oldplus.counter))
+    botsend(message, '`{}` から `{}` に名前を変更しました(count: {})'.format(old, new, oldplus.counter))
 
 
 @respond_to(r'^plusplus\s+merge\s+(\S+)\s+(\S+)')
@@ -136,13 +137,13 @@ def plusplus_merge(message, old, new):
     try:
         oldplus = Plusplus.get(name=old)
     except Plusplus.DoesNotExist:
-        message.send('`{}` という名前は登録されていません'.format(old))
+        botsend(message, '`{}` という名前は登録されていません'.format(old))
         return
 
     try:
         newplus = Plusplus.get(name=new)
     except Plusplus.DoesNotExist:
-        message.send('`{}` という名前は登録されていません'.format(new))
+        botsend(message, '`{}` という名前は登録されていません'.format(new))
         return
 
     oldcount = oldplus.counter
@@ -153,7 +154,7 @@ def plusplus_merge(message, old, new):
     newplus.save()
     oldplus.delete_instance()
 
-    message.send('`{}` を `{}` に統合しました(count: {} + {} = {})'.format(old, new, oldcount, newcount, newplus.counter))
+    botsend(message, '`{}` を `{}` に統合しました(count: {} + {} = {})'.format(old, new, oldcount, newcount, newplus.counter))
 
 
 @respond_to(r'^plusplus\s+search\s+(\S+)')
@@ -165,7 +166,7 @@ def plusplus_search(message, keyword):
     pluses = Plusplus.select().where(Plusplus.name ** pattern)
 
     if len(pluses) == 0:
-        message.send('`{}` を含む名前はありません'.format(keyword))
+        botsend(message, '`{}` を含む名前はありません'.format(keyword))
     else:
         pretext = '`{}` を含む名前とカウントの一覧です\n'.format(keyword)
         text = ''
@@ -176,7 +177,7 @@ def plusplus_search(message, keyword):
             'text': text,
             'mrkdwn_in': ['pretext', 'text'],
         }]
-        message.send_webapi('', json.dumps(attachments))
+        botwebapi(message, attachments)
 
 
 @respond_to(r'^plusplus\s+help+')
@@ -184,7 +185,7 @@ def plusplus_help(message):
     """
     ヘルプメッセージを返す
     """
-    message.send('''- `名前++`: 指定された名前に +1 カウントする
+    botsend(message, '''- `名前++`: 指定された名前に +1 カウントする
 - `名前--`: 指定された名前に -1 カウントする
 - `$pluplus search (キーワード)`: 名前にキーワードを含む一覧を返す
 - `$pluplus delete (名前)`: カウントを削除する(カウント10未満のみ)
