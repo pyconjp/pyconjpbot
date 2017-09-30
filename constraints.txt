@@ -1,0 +1,14 @@
+slacker
+slackbot
+sympy
+PyGithub
+jira
+GitPython
+peewee
+python-dateutil
+requests
+langdetect
+beautifulsoup4
+wikipedia
+google-api-python-client
+oauth2client
