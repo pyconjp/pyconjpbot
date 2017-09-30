@@ -9,11 +9,11 @@ def botsend(message, text):
     :param text: 送信するテキストメッセージ
     """
     if 'thread_ts' in message.body:
-        # 親メッセージの場合
-        message.send(text, thread_ts=None)
-    else:
         # スレッド内のメッセージの場合
         message.send(text, thread_ts=message.thread_ts)
+    else:
+        # 親メッセージの場合
+        message.send(text, thread_ts=None)
 
 
 def botreply(message, text):
@@ -24,11 +24,11 @@ def botreply(message, text):
     :param text: 送信するテキストメッセージ
     """
     if 'thread_ts' in message.body:
-        # 親メッセージの場合
-        message.reply(text)
-    else:
         # スレッド内のメッセージの場合
         message.reply(text, in_thread=True)
+    else:
+        # 親メッセージの場合
+        message.reply(text)
 
 
 def botwebapi(message, attachments):
@@ -43,8 +43,8 @@ def botwebapi(message, attachments):
         attachments = json.dumps(attachments)
 
     if 'thread_ts' in message.body:
-        # 親メッセージの場合
-        message.send_webapi('', attachments)
-    else:
         # スレッド内のメッセージの場合
         message.send_webapi('', attachments, thread_ts=message.thread_ts)
+    else:
+        # 親メッセージの場合
+        message.send_webapi('', attachments)
