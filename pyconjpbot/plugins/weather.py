@@ -7,6 +7,8 @@ from slackbot.bot import respond_to
 import requests
 from bs4 import BeautifulSoup
 
+from ..botmessage import botsend, botwebapi
+
 WEATHER_URL = 'http://weather.livedoor.com/forecast/webservice/json/v1?city={}'
 CODE_URL = 'http://weather.livedoor.com/forecast/rss/primary_area.xml'
 
@@ -89,7 +91,7 @@ def weather(message, command, place='東京'):
     code = city_dict.get(place)
 
     if code is None:
-        message.send('指定された地域は存在しません')
+        botsend(message, '指定された地域は存在しません')
         return
 
     r = requests.get(WEATHER_URL.format(code))
@@ -107,18 +109,18 @@ def weather(message, command, place='東京'):
         'text': text,
     }]
 
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 @respond_to('^(weather|天気)\s+list')
 def weather_list(message, command):
     reply = ' '.join(['`{}`'.format(x) for x in city_dict])
-    message.send('指定可能な地域: {}'.format(reply))
+    botsend(message, '指定可能な地域: {}'.format(reply))
 
 
 @respond_to('^(weather|天気)\s+help')
 def weather_help(message, command):
-    message.send('''`$weather` `$天気`: 東京の天気予報を返す
+    botsend(message, '''`$weather` `$天気`: 東京の天気予報を返す
 `$weather 釧路` `$天気 釧路`: 指定した地域の天気予報を返す
 `$weather list` `$天気 list`: 指定可能な地域の一覧を返す
 ''')

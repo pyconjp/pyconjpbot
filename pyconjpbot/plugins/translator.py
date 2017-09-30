@@ -6,6 +6,7 @@ from slackbot.bot import respond_to
 import requests
 from langdetect import detect
 
+from ..botmessage import botsend
 
 # Microsoft Translator API の BASE URL
 API_BASE_URL = 'https://api.microsofttranslator.com/V2/Http.svc/'
@@ -44,13 +45,13 @@ def translate(message, cmd, option, text):
         # エラーが発生したので内容を表示する
         error_message = r.text
         if "Message: 'to' must be a valid language" in error_message:
-            message.send('`{}` は無効な言語です'.format(lang))
+            botsend(message, '`{}` は無効な言語です'.format(lang))
         else:
-            message.send('エラーが発生しました\n```\n{}\n```'.format(r.text))
+            botsend(message, 'エラーが発生しました\n```\n{}\n```'.format(r.text))
         return
 
     tree = ET.fromstring(r.text)
-    message.send(tree.text)
+    botsend(message, tree.text)
 
 
 @respond_to('^(translate|翻訳)\s+(list|リスト)')
@@ -69,12 +70,12 @@ def translate_list(message, cmd, option):
     tree = ET.fromstring(r.text)
     langs = sorted(child.text for child in tree)
     reply = ' '.join(('`{}`'.format(l) for l in langs))
-    message.send('使用できる言語: {}'.format(reply))
+    botsend(message, '使用できる言語: {}'.format(reply))
 
 
 @respond_to('^(translate|翻訳)\s+help')
 def translate_help(message, cmd):
-    message.send('''`$translate python`, `$翻訳 python`: 指定した文字列を日本語に翻訳
+    botsend(message, '''`$translate python`, `$翻訳 python`: 指定した文字列を日本語に翻訳
 `$translate へび`, `$翻訳 蛇`: 指定した文字列を英語に翻訳
 `$translate -ru へび` `$翻訳 -ru へび`: 指定した言語(ru等)に翻訳
 `$translate list` `$翻訳 リスト`: 使用できる言語の一覧を返す
