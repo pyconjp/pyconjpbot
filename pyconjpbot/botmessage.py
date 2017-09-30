@@ -1,13 +1,14 @@
 import json
 
+
 def botsend(message, text):
     """
-    スレッドの親かどうかで応答先を切り替える message.send() の変わりの関数
+    スレッドの親かどうかで応答先を切り替える message.send() の代わりの関数
 
     :param messsage: slackbotのmessageオブジェクト
     :param text: 送信するテキストメッセージ
     """
-    if message.thread_ts == message.body['ts']:
+    if 'thread_ts' in message.body:
         # 親メッセージの場合
         message.send(text, thread_ts=None)
     else:
@@ -15,9 +16,24 @@ def botsend(message, text):
         message.send(text, thread_ts=message.thread_ts)
 
 
+def botreply(message, text):
+    """
+    スレッドの親かどうかで応答先を切り替える message.reply() の代わりの関数
+
+    :param messsage: slackbotのmessageオブジェクト
+    :param text: 送信するテキストメッセージ
+    """
+    if 'thread_ts' in message.body:
+        # 親メッセージの場合
+        message.reply(text)
+    else:
+        # スレッド内のメッセージの場合
+        message.reply(text, in_thread=True)
+
+
 def botwebapi(message, attachments):
     """
-    スレッドの親かどうかで応答先を切り替える message.send_webapi() の変わりの関数
+    スレッドの親かどうかで応答先を切り替える message.send_webapi() の代わりの関数
 
     :param messsage: slackbotのmessageオブジェクト
     :param attachments: 送信するAttachments(JSON)
@@ -26,7 +42,7 @@ def botwebapi(message, attachments):
     if not isinstance(attachments, str):
         attachments = json.dumps(attachments)
 
-    if message.thread_ts == message.body['ts']:
+    if 'thread_ts' in message.body:
         # 親メッセージの場合
         message.send_webapi('', attachments)
     else:
