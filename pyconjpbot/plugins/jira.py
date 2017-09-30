@@ -1,5 +1,6 @@
 import argparse
 from urllib.parse import quote
+import re
 
 from jira import JIRA, JIRAError
 from slackbot import settings
@@ -60,28 +61,25 @@ parser.add_argument('keywords', nargs='*', type=str,
                     help='検索対象のキーワードを指定する')
 
 
-@listen_to(r'(^|[^/])\b([A-Za-z]+)-([0-9]+)\b')
-def jira_listener(message, pre, project, number):
+def create_attachments(issue_id):
     """
-    JIRAのissue idっぽいものを取得したら、そのissueの情報を返す
-    """
-    # botメッセージの場合は無視する
-    if message.body.get('subtype', '') == 'bot_message':
-        return
+    JIRAのissue_idからそのissueに関連する情報をまとめた Slack のメッセージ用の
+    attachments を生成して返す
 
-    # Only attempt to find tickets in projects defined in slackbot_settings
+    :param issue_id: JIRAのissue番号
+    """
+    project, _ = issue_id.split('-')
+    # 存在しないプロジェクトの場合はNoneを返す
     if project not in settings.JIRA_PROJECTS:
-        return
+        return None
 
-    # Parse ticket and search JIRA
-    issue_id = '{}-{}'.format(project, number)
     try:
+        # JIRAからissue情報を取得
         issue = jira.issue(issue_id)
     except JIRAError:
-        botsend(message, '%s は存在しません' % issue_id)
-        return
+        # 存在しない場合はNoneを返す
+        return None
 
-    # Create variables to display to user
     summary = issue.fields.summary
     assignee = '未割り当て'
     if issue.fields.assignee:
@@ -105,7 +103,26 @@ def jira_listener(message, pre, project, number):
             },
         ],
     }]
-    botwebapi(message, attachments)
+    return attachments
+
+
+@listen_to(r'[A-Za-z]{3,5}-[\d]+')
+def jira_listener(message):
+    """
+    JIRAのissue idっぽいものを取得したら、そのissueの情報を返す
+    """
+    # botメッセージの場合は無視する
+    if message.body.get('subtype', '') == 'bot_message':
+        return
+
+    text = message.body['text'].upper()
+    # JIRAのissue idっぽい文字列を取得
+    for issue_id in re.findall(r'[A-Z]{3,5}-[\d]+', text):
+        # issue_id から issue 情報の attachments を取得
+        attachments = create_attachments(issue_id)
+        if attachments:
+            # issue 情報を送信する
+            botwebapi(message, attachments)
 
 
 def _drive_help(message, cmd1, cmd2):
