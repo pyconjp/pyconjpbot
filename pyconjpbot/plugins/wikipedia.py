@@ -1,5 +1,3 @@
-import json
-
 from slackbot.bot import respond_to
 import wikipedia
 
