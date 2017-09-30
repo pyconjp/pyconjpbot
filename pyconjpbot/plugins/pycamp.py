@@ -6,6 +6,7 @@ from slackbot import settings
 from slackbot.bot import respond_to
 
 from ..google_plugins.google_api import get_service
+from ..botmessage import botsend
 
 # Clean JIRA Url to not have trailing / if exists
 CLEAN_JIRA_URL = settings.JIRA_URL
@@ -148,7 +149,7 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
     try:
         target_date = parser.parse(date_str)
     except ValueError:
-        message.send('Python Boot Campの開催日に正しい日付を指定してください')
+        botsend(message, 'Python Boot Campの開催日に正しい日付を指定してください')
         return
 
     # 指定されたユーザーの存在チェック
@@ -156,7 +157,7 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         jira.user(local_staff)
         jira.user(lecturer)
     except JIRAError as e:
-        message.send('`$pycamp` エラー: `{}`'.format(e.text))
+        botsend(message, '`$pycamp` エラー: `{}`'.format(e.text))
         return
 
     # Google Sheets API でシートから情報を抜き出す
@@ -192,11 +193,11 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         # descriptionを更新する
         issue.update(description=desc)
 
-        message.send('チケットを作成しました: {}'.format(issue.permalink()))
+        botsend(message, 'チケットを作成しました: {}'.format(issue.permalink()))
     except JIRAError as e:
         import pdb
         pdb.set_trace()
-        message.send('`$pycamp` エラー:', e.text)
+        botsend(message, '`$pycamp` エラー:', e.text)
 
 
 @respond_to('^pycamp\s+help')
@@ -204,4 +205,4 @@ def pycamp_help(message):
     """
     ヘルプメッセージを返す
     """
-    message.send(HELP)
+    botsend(message, HELP)

@@ -3,6 +3,8 @@ import re
 
 from slackbot.bot import respond_to
 
+from ..botmessage import botsend
+
 
 def _message_length(message):
     """
@@ -36,11 +38,11 @@ def suddendeath(message, words='突然の死'):
     footer = '￣' + 'Y^' * (length // 2) + 'Y￣'
     middle = "＞　" + words + "　＜"
 
-    message.send("\n".join([header, middle, footer]))
+    botsend(message, "\n".join([header, middle, footer]))
 
 
 @respond_to('^suddendeath\s+help')
 def suddendeath_help(message):
-    message.send('''- `$suddendeath`: 突然の死のメッセージを返す
+    botsend(message, '''- `$suddendeath`: 突然の死のメッセージを返す
 - `$suddendeath words`: words を使って突然の死のメッセージを返す
 ''')
