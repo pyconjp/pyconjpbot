@@ -1,5 +1,8 @@
 Unreleased
 ----------
+
+Release Notes - 2017-09-30
+--------------------------
 - [ISSHA-842] add Slack thread support
 
 Release Notes - 2017-09-23
