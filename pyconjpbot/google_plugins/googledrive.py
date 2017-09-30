@@ -1,11 +1,11 @@
 import argparse
-import json
 from collections import OrderedDict
 
 from slackbot.bot import respond_to
 
 from .folder_model import Folder
 from .google_api import get_service
+from ..botmessage import botsend, botwebapi
 
 # Google Drive API の Scope
 SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly'
@@ -136,19 +136,19 @@ def drive_search(message, keywords):
     try:
         args, argv = parser.parse_known_args(keywords.split())
     except SystemExit:
-        message.send('引数の形式が正しくありません')
+        botsend(message, '引数の形式が正しくありません')
         _drive_help(message)
         return
 
     if args.folder and args.folder not in FOLDER:
         folders = ', '.join(["`" + x + "`" for x in FOLDER])
-        message.send('フォルダーの指定が正しくありません。以下のフォルダーが指定可能です。\n' + folders)
+        botsend(message, 'フォルダーの指定が正しくありません。以下のフォルダーが指定可能です。\n' + folders)
         _drive_help(message)
         return
         
     if args.type and args.type not in MIME_TYPE:
         mime_types = ', '.join(["`" + x + "`" for x in MIME_TYPE])
-        message.send('ファイル種別の指定が正しくありません。以下のファイルが指定可能です。\n' + mime_types)
+        botsend(message, 'ファイル種別の指定が正しくありません。以下のファイルが指定可能です。\n' + mime_types)
         _drive_help(message)
         return
 
@@ -162,7 +162,7 @@ def drive_search(message, keywords):
 
     items = results.get('files', [])
     if not items:
-        message.send('パラメーター: `{}` にマッチするファイルはありません'.format(keywords))
+        botsend(message, 'パラメーター: `{}` にマッチするファイルはありません'.format(keywords))
         return
 
     pretext = 'パラメーター: `{}` の検索結果'.format(keywords)
@@ -177,7 +177,7 @@ def drive_search(message, keywords):
         'text': text,
         'mrkdwn_in': ["pretext"],
     }]
-    message.send_webapi('', json.dumps(attachments))
+    botwebapi(message, attachments)
 
 
 def _drive_db_update():
@@ -195,9 +195,9 @@ def drive_db_update(message):
     """
     フォルダーのパスとidを入れたデータベースを更新する
     """
-    message.send('データベースを更新します')
+    botsend(message, 'データベースを更新します')
     _drive_db_update()
-    message.send('データベースを更新を完了しました')
+    botsend(message, 'データベースを更新を完了しました')
 
 
 @respond_to('drive db refresh')
@@ -205,13 +205,13 @@ def drive_db_refresh(message):
     """
     フォルダーのパスとidを入れたデータベースを最初から作成し直す
     """
-    message.send('データベースを再構築します')
+    botsend(message, 'データベースを再構築します')
 
     # テーブルを削除する
     Folder.drop_table()
     _drive_db_update()
 
-    message.send('データベースを再構築を完了しました')
+    botsend(message, 'データベースを再構築を完了しました')
 
 
 def _drive_walk(service, path, folder_id):
@@ -241,4 +241,4 @@ def drive_help(message):
 
 
 def _drive_help(message):
-    message.send(HELP)
+    botsend(message, HELP)
