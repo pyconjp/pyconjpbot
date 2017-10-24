@@ -1,12 +1,14 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from dateutil import parser
 from jira import JIRA, JIRAError
 from slackbot import settings
 from slackbot.bot import respond_to
+import requests
+from bs4 import BeautifulSoup
 
 from ..google_plugins.google_api import get_service
-from ..botmessage import botsend
+from ..botmessage import botsend, botwebapi
 
 # Clean JIRA Url to not have trailing / if exists
 CLEAN_JIRA_URL = settings.JIRA_URL
@@ -40,7 +42,8 @@ ASSIGNEE_TYPE = {
 SHEET_ID = '1LEtpNewhAFSf_vtkhTsWi6JGs2p-7XHZE8yOshagz0I'
 
 HELP = """
-`$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)` : pycamp のイベント用issueを作成する
+`$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
+`$pycamp summary`: 開催予定のpycampイベントの情報を返す
 """
 
 
@@ -198,6 +201,53 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         import pdb
         pdb.set_trace()
         botsend(message, '`$pycamp` エラー:', e.text)
+
+
+def generate_pycamp_summary(events):
+    """
+    イベント情報一覧からレスポンス用のattachementsを生成する
+    """
+    text = ''
+    for event in reversed(events):
+        text += '<{url}|{title}> {started_at:%Y年%m月%d日}\n'.format(**event)
+    attachements = [{
+        'pretext': 'Python Boot Campイベント情報一覧',
+        'text': text,
+    }]
+    return attachements
+
+
+@respond_to('^pycamp\s+summary')
+def pycamp_summary(message):
+    """
+    開催予定のpycampイベントの情報を返す
+    """
+    params = {
+        'series_id': 137,
+        'keyword': 'Python Boot Camp',
+        'order': 2,  # 開催日時順
+        'count': 20,  # 20件
+    }
+    r = requests.get('https://connpass.com/api/v1/event/', params=params)
+    now = datetime.now()
+    events = []
+    for event in r.json()['events']:
+        dt = parser.parse(event['started_at']).replace(tzinfo=None)
+        # 過去のイベントは対象外にする
+        if dt < now:
+            break
+
+        # イベント情報を追加
+        events.append({
+            'title': event['title'],  # タイトル
+            'started_at': dt,  # 開催日時
+            'url': event['event_url'],  # イベントURL
+            'address': event['address'],  # 開催場所
+            'place': event['place'],  # 開催会場
+        })
+
+    attachements = generate_pycamp_summary(events)
+    botwebapi(message, attachements)
 
 
 @respond_to('^pycamp\s+help')
