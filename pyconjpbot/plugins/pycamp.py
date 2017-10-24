@@ -41,6 +41,9 @@ ASSIGNEE_TYPE = {
 # https://docs.google.com/spreadsheets/d/1LEtpNewhAFSf_vtkhTsWi6JGs2p-7XHZE8yOshagz0I/edit#gid=1772747731
 SHEET_ID = '1LEtpNewhAFSf_vtkhTsWi6JGs2p-7XHZE8yOshagz0I'
 
+# 参加者枠の短い名前
+SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ')
+
 HELP = """
 `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの情報を返す
@@ -203,13 +206,53 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         botsend(message, '`$pycamp` エラー:', e.text)
 
 
+def get_participants(url):
+    """
+    イベント情報のWebページから参加者情報を取得する
+
+    :url text: イベントページのURL
+    :return: 参加者情報の一覧(辞書の配列)
+    """
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    td = soup.find('td', class_='participation')
+    participants = []
+    for ptype in td.select('div.ptype'):
+        # 参加の種別を取得
+        ptype_name = ptype.find('p', class_='ptype_name').text
+
+        # 参加者枠の講師は無視する
+        if ptype_name == '講師':
+            continue
+        # 参加者枠の名前を短くする
+        for short_ptype_name in SHORT_PTYPE_NAMES:
+            if short_ptype_name in ptype_name:
+                ptype_name = short_ptype_name
+                break
+
+        # 人数を取得
+        p = ptype.find('p', class_='participants')
+        amount = p.find('span', class_='amount').text
+        participants.append({
+            'ptype': ptype_name,
+            'amount': amount,
+        })
+    import time
+    time.sleep(1)
+    return participants
+
+
 def generate_pycamp_summary(events):
     """
     イベント情報一覧からレスポンス用のattachementsを生成する
     """
     text = ''
     for event in reversed(events):
-        text += '<{url}|{title}> {started_at:%Y年%m月%d日}\n'.format(**event)
+        text += '<{url}|{title}> ({started_at:%Y年%m月%d日})\n'.format(**event)
+        for pinfo in event['participants']:
+            text += '{ptype}: {amount}、'.format(**pinfo)
+        text = text[:-1]
+        text += '\n'
     attachements = [{
         'pretext': 'Python Boot Campイベント情報一覧',
         'text': text,
@@ -232,19 +275,25 @@ def pycamp_summary(message):
     now = datetime.now()
     events = []
     for event in r.json()['events']:
-        dt = parser.parse(event['started_at']).replace(tzinfo=None)
+        # 懇親会は無視する
+        if '懇親会' in event['title']:
+            continue
+
         # 過去のイベントは対象外にする
+        dt = parser.parse(event['started_at']).replace(tzinfo=None)
         if dt < now:
             break
 
         # イベント情報を追加
-        events.append({
+        event_info = {
             'title': event['title'],  # タイトル
             'started_at': dt,  # 開催日時
             'url': event['event_url'],  # イベントURL
             'address': event['address'],  # 開催場所
             'place': event['place'],  # 開催会場
-        })
+        }
+        event_info['participants'] = get_participants(event['event_url'])
+        events.append(event_info)
 
     attachements = generate_pycamp_summary(events)
     botwebapi(message, attachements)
