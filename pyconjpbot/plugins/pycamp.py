@@ -1,12 +1,14 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from dateutil import parser
 from jira import JIRA, JIRAError
 from slackbot import settings
 from slackbot.bot import respond_to
+import requests
+from bs4 import BeautifulSoup
 
 from ..google_plugins.google_api import get_service
-from ..botmessage import botsend
+from ..botmessage import botsend, botwebapi
 
 # Clean JIRA Url to not have trailing / if exists
 CLEAN_JIRA_URL = settings.JIRA_URL
@@ -39,8 +41,12 @@ ASSIGNEE_TYPE = {
 # https://docs.google.com/spreadsheets/d/1LEtpNewhAFSf_vtkhTsWi6JGs2p-7XHZE8yOshagz0I/edit#gid=1772747731
 SHEET_ID = '1LEtpNewhAFSf_vtkhTsWi6JGs2p-7XHZE8yOshagz0I'
 
+# 参加者枠の短い名前
+SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ')
+
 HELP = """
-`$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)` : pycamp のイベント用issueを作成する
+`$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
+`$pycamp summary`: 開催予定のpycampイベントの概要を返す
 """
 
 
@@ -198,6 +204,102 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         import pdb
         pdb.set_trace()
         botsend(message, '`$pycamp` エラー:', e.text)
+
+
+def get_participants(url):
+    """
+    イベント情報のWebページから参加者情報を取得する
+
+    :url text: イベントページのURL
+    :return: 参加者情報の一覧(辞書の配列)
+    """
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    td = soup.find('td', class_='participation')
+    participants = []
+    for ptype in td.select('div.ptype'):
+        # 参加の種別を取得
+        ptype_name = ptype.find('p', class_='ptype_name').text
+
+        # 参加者枠の講師は無視する
+        if ptype_name == '講師':
+            continue
+        # 参加者枠の名前を短くする
+        for short_ptype_name in SHORT_PTYPE_NAMES:
+            if short_ptype_name in ptype_name:
+                ptype_name = short_ptype_name
+                break
+
+        # 人数を取得
+        p = ptype.find('p', class_='participants')
+        amount = p.find('span', class_='amount').text
+        participants.append({
+            'ptype': ptype_name,
+            'amount': amount,
+        })
+    import time
+    time.sleep(1)
+    return participants
+
+
+def generate_pycamp_summary(events):
+    """
+    イベント情報一覧からレスポンス用のattachementsを生成する
+    """
+    attachements = []
+    # 新しい方が上にあるので、逆順で処理する
+    for event in reversed(events):
+        # イベント名、URL、日付
+        title = '<{url}|{title}> ({started_at:%Y年%m月%d日})\n'.format(**event)
+        ptypes = []
+        for pinfo in event['participants']:
+            ptypes.append('*{ptype}*: {amount}'.format(**pinfo))
+        msg = {
+            'pretext': title,
+            'text': '、 '.join(ptypes),  # 参加者数の文字列を生成
+            'mrkdwn_in': ['pretext', 'text'],
+        }
+        attachements.append(msg)
+    return attachements
+
+
+@respond_to('^pycamp\s+summary')
+def pycamp_summary(message):
+    """
+    開催予定のpycampイベントの情報を返す
+    """
+    params = {
+        'series_id': 137,
+        'keyword': 'Python Boot Camp',
+        'order': 2,  # 開催日時順
+        'count': 20,  # 20件
+    }
+    r = requests.get('https://connpass.com/api/v1/event/', params=params)
+    now = datetime.now()
+    events = []
+    for event in r.json()['events']:
+        # 懇親会は無視する
+        if '懇親会' in event['title']:
+            continue
+
+        # 過去のイベントは対象外にする
+        dt = parser.parse(event['started_at']).replace(tzinfo=None)
+        if dt < now:
+            break
+
+        # イベント情報を追加
+        event_info = {
+            'title': event['title'],  # タイトル
+            'started_at': dt,  # 開催日時
+            'url': event['event_url'],  # イベントURL
+            'address': event['address'],  # 開催場所
+            'place': event['place'],  # 開催会場
+        }
+        event_info['participants'] = get_participants(event['event_url'])
+        events.append(event_info)
+
+    attachements = generate_pycamp_summary(events)
+    botwebapi(message, attachements)
 
 
 @respond_to('^pycamp\s+help')
