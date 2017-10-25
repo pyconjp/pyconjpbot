@@ -2,7 +2,7 @@ from urllib.parse import quote_plus
 
 from slackbot.bot import respond_to
 
-from ..botmeesage import botsend
+from ..botmessage import botsend
 
 # マニュアルのURL
 URL = 'http://manual.pycon.jp/'
