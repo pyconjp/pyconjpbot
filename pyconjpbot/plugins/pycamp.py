@@ -46,7 +46,7 @@ SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ')
 
 HELP = """
 `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
-`$pycamp summary`: 開催予定のpycampイベントの情報を返す
+`$pycamp summary`: 開催予定のpycampイベントの概要を返す
 """
 
 
@@ -246,17 +246,20 @@ def generate_pycamp_summary(events):
     """
     イベント情報一覧からレスポンス用のattachementsを生成する
     """
-    text = ''
+    attachements = []
+    # 新しい方が上にあるので、逆順で処理する
     for event in reversed(events):
-        text += '<{url}|{title}> ({started_at:%Y年%m月%d日})\n'.format(**event)
+        # イベント名、URL、日付
+        title = '<{url}|{title}> ({started_at:%Y年%m月%d日})\n'.format(**event)
+        ptypes = []
         for pinfo in event['participants']:
-            text += '{ptype}: {amount}、'.format(**pinfo)
-        text = text[:-1]
-        text += '\n'
-    attachements = [{
-        'pretext': 'Python Boot Campイベント情報一覧',
-        'text': text,
-    }]
+            ptypes.append('*{ptype}*: {amount}'.format(**pinfo))
+        msg = {
+            'pretext': title,
+            'text': '、 '.join(ptypes),  # 参加者数の文字列を生成
+            'mrkdwn_in': ['pretext', 'text'],
+        }
+        attachements.append(msg)
     return attachements
 
 
