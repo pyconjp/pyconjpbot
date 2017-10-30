@@ -42,11 +42,13 @@ ASSIGNEE_TYPE = {
 SHEET_ID = '1LEtpNewhAFSf_vtkhTsWi6JGs2p-7XHZE8yOshagz0I'
 
 # 参加者枠の短い名前
-SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ')
+SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ',
+                     '本イベント参加者', '懇親会のみ')
 
 HELP = """
 `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの概要を返す
+`$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
 """
 
 
@@ -263,8 +265,9 @@ def generate_pycamp_summary(events):
     return attachements
 
 
-@respond_to('^pycamp\s+summary')
-def pycamp_summary(message):
+@respond_to('^pycamp\s+summary$')
+@respond_to('^pycamp\s+summary\s+(-party)')
+def pycamp_summary(message, party=None):
     """
     開催予定のpycampイベントの情報を返す
     """
@@ -278,8 +281,11 @@ def pycamp_summary(message):
     now = datetime.now()
     events = []
     for event in r.json()['events']:
-        # 懇親会は無視する
-        if '懇親会' in event['title']:
+        if party and '懇親会' not in event['title']:
+            # 懇親会のみを対象にする
+            continue
+        elif not party and '懇親会' in event['title']:
+            # 懇親会は無視する
             continue
 
         # 過去のイベントは対象外にする
