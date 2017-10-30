@@ -12,6 +12,8 @@
 ### pycamp plugin
 
 - `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)` : pycamp のイベント用issueを作成する
+- `$pycamp summary`: 開催予定のpycampイベントの概要を返す
+- `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
 
 - [pycamp.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/pycamp.py)
 
