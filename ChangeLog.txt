@@ -1,6 +1,9 @@
 Unreleased
 ----------
-- [ISSHA-944] fix date bug for pycamp create
+
+Release Notes - 2017-11-09
+--------------------------
+- [ISSHA-944] fix target date bug for pycamp create command
 
 Release Notes - 2017-10-30
 --------------------------
