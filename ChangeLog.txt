@@ -1,9 +1,10 @@
 Unreleased
 ----------
+- [ISSHA-944] fix date bug for pycamp create
 
 Release Notes - 2017-10-30
 --------------------------
-- [ISSHA-912] add -party option to pycamy summary command
+- [ISSHA-912] add -party option to pycamp summary command
 
 Release Notes - 2017-10-25
 --------------------------
