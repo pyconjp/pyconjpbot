@@ -160,6 +160,10 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         botsend(message, 'Python Boot Campの開催日に正しい日付を指定してください')
         return
 
+    # 開催日(target_date)が過去の場合は1年後にする
+    if datetime.now() > target_date:
+        target_date = target_date.replace(year=target_date.year + 1)
+
     # 指定されたユーザーの存在チェック
     try:
         jira.user(local_staff)
