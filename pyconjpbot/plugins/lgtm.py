@@ -62,7 +62,7 @@ def lgtm_create(message, url):
 
 
 @respond_to('^lgtm\s+help')
-def lgtm_help(message, url):
+def lgtm_help(message):
     """
     ヘルプメッセージを返す
     """
