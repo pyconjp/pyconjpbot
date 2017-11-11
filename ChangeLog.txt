@@ -1,5 +1,6 @@
 Unreleased
 ----------
+- [ISSHA-947] add lgtm command
 
 Release Notes - 2017-11-09
 --------------------------
