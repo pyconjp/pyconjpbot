@@ -6,31 +6,26 @@ from slackbot.bot import respond_to
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-from ..botmessage import botsend, botwebapi
+from ..botmessage import botsend
 
 HELP = """
+`$lgtm create URL`: 指定したURLの画像をもとにLGTM画像を生成する
 """
+
+font = ImageFont.truetype('Helvetica', 100, encoding="utf-8")
 
 
 def generate_lgtm_image(im):
     """
     LGTM画像を生成して返す
-    参考: https://github.com/beproud/pyconjp2016-tutorial/blob/master/codes/3/lgtm.py
+
+    :params im: PillowのImageオブジェクト
     """
-    im = im.rotate(90)
+    draw_im = ImageDraw.Draw(im)
+    width, height = im.size
+    draw_im.text((width * 0.5 - 100, height * 0.7), "LGTM", font=font,
+                 fill="#FFF")
     return im
-
-
-def upload_image(message, im, basename):
-    """
-    :im: PillowのImage
-    :basename: ファイルのbasename
-    """
-    # 一時ファイルに保存して送信する
-    with NamedTemporaryFile(suffix='.png') as fp:
-        im.save(fp, format='png')
-        fname = '{}-lgtm.png'.format(basename)
-        message.channel.upload_file(fname=fname, fpath=fp.name)
 
 
 @respond_to('^lgtm\s+create\s+(\S+)')
@@ -58,5 +53,17 @@ def lgtm_create(message, url):
 
     # LGTM画像を生成する
     im = generate_lgtm_image(im)
-    # 画像を送信する
-    upload_image(message, im, basename)
+
+    # 一時ファイルに画像を保存してアップロードする
+    with NamedTemporaryFile(suffix='.png') as fp:
+        im.save(fp, format='png')
+        fname = '{}-lgtm.png'.format(basename)
+        message.channel.upload_file(fname=fname, fpath=fp.name)
+
+
+@respond_to('^lgtm\s+help')
+def lgtm_help(message, url):
+    """
+    ヘルプメッセージを返す
+    """
+    botsend(message, HELP)
