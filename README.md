@@ -9,6 +9,13 @@
 
 コマンドの一覧と簡単な説明
 
+### lgtm plugin
+
+- `$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する(英語のみ)
+
+
+- [lgtm.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/lgtm.py)
+
 ### pycamp plugin
 
 - `$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)` : pycamp のイベント用issueを作成する

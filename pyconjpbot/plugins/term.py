@@ -17,6 +17,7 @@ RESERVED = (
     'github',
     'suddendeath',
     'pycamp',
+    'lgtm',
 )
 
 # コマンド一覧を初期化

@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2017-12-02
+--------------------------
+- [ISSHA-947] add lgtm command for lgtm image generator
+
 Release Notes - 2017-11-09
 --------------------------
 - [ISSHA-944] fix target date bug for pycamp create command
