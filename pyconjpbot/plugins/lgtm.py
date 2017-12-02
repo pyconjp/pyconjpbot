@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 from io import BytesIO
 from tempfile import NamedTemporaryFile
+import sys
 
 from slackbot.bot import respond_to
 import requests
@@ -73,7 +74,10 @@ def generate_lgtm_image(im, text):
     # フォント生成
     # Arial, Arial Black, Comic Sans MS, Courier New, Georgia, Impact
     # Times New Roman, Trebuchet MS, Verdana
-    font_name = 'Arial Black'
+    if sys.platform == 'linuts':
+        font_name = 'ipagp.ttf'
+    elif sys.platform == 'darwin':
+        font_name = 'Arial Black'
     font_size = get_font_size(min(width, height), font_name, text)
     font = ImageFont.truetype(font_name, font_size, encoding="utf-8")
 
