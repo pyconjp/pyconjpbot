@@ -11,6 +11,8 @@
 
 ### lgtm plugin
 
+- `$lgtm create URL`: 指定したURLの画像をもとにLGTM画像を生成する
+
 - [lgtm.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/lgtm.py)
 
 ### pycamp plugin
