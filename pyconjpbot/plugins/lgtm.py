@@ -74,7 +74,7 @@ def generate_lgtm_image(im, text):
     # フォント生成
     # Arial, Arial Black, Comic Sans MS, Courier New, Georgia, Impact
     # Times New Roman, Trebuchet MS, Verdana
-    if sys.platform == 'linuts':
+    if sys.platform == 'linux':
         font_name = 'ipagp.ttf'
     elif sys.platform == 'darwin':
         font_name = 'Arial Black'
