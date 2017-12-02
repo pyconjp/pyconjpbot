@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 from ..botmessage import botsend
 
 HELP = """
-`$lgtm create URL`: 指定したURLの画像をもとにLGTM画像を生成する
+`$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する(英語のみ)
 """
 
 # 文字の色と影の色
@@ -59,7 +59,7 @@ def get_text_xy(width, height, font, text):
     return x_center, y_center
 
 
-def generate_lgtm_image(im):
+def generate_lgtm_image(im, text):
     """
     LGTM画像を生成して返す
 
@@ -73,7 +73,6 @@ def generate_lgtm_image(im):
     # フォント生成
     # Arial, Arial Black, Comic Sans MS, Courier New, Georgia, Impact
     # Times New Roman, Trebuchet MS, Verdana
-    text = 'LGTM'
     font_name = 'Arial Black'
     font_size = get_font_size(min(width, height), font_name, text)
     font = ImageFont.truetype(font_name, font_size, encoding="utf-8")
@@ -93,8 +92,9 @@ def generate_lgtm_image(im):
     return im
 
 
-@respond_to('^lgtm\s+create\s+(\S+)')
-def lgtm_create(message, url):
+@respond_to('^lgtm\s+create\s+(\S+)$')
+@respond_to('^lgtm\s+create\s+(\S+)\s+(.+)')
+def lgtm_create(message, url, text='LGTM'):
     try:
         url = url.replace('<', '').replace('>', '')
         r = requests.get(url)
@@ -117,7 +117,7 @@ def lgtm_create(message, url):
     basename = urlparse(url).path.split('/')[-1].split('.')[0]
 
     # LGTM画像を生成する
-    im = generate_lgtm_image(im)
+    im = generate_lgtm_image(im, text)
 
     # 一時ファイルに画像を保存してアップロードする
     with NamedTemporaryFile(suffix='.png') as fp:
