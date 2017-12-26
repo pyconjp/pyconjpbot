@@ -18,8 +18,8 @@ ALIASES = '$'
 
 # Settings for jira plugin
 JIRA_URL = 'https://pyconjp.atlassian.net/'
-JIRA_PROJECTS = ['ISSHA', 'SAR', 'TRI']  # JIRA Project Keys
-JIRA_DEFAULT_PROJECT = 'TRI'   # JIRA Default Project Key
+JIRA_PROJECTS = ['ISSHA', 'SAR', 'TRI', 'INU']  # JIRA Project Keys
+JIRA_DEFAULT_PROJECT = 'INU'   # JIRA Default Project Key
 
 # see https://docs.google.com/spreadsheets/d/1YiqErBDdp5QWfTlfDmxc6Vi696b_NGFJKzuyM-v6PDM/edit#gid=0
 JIRA_USER = '<JIRA Username>'
