@@ -166,14 +166,14 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
     if core_staff not in CORE_STAFFS:
         msg = 'コアスタッフの JIRA ID に正しい値を指定してください\n'
         msg += '有効なID: '
-        msg += ', '.join(("'{}'".format(jid) for jid in CORE_STAFFS))
+        msg += ', '.join(('`{}`'.format(jid) for jid in CORE_STAFFS))
         botsend(message, msg)
         return
 
     if lecturer not in LECTURERS:
         msg = '講師の JIRA ID に正しい値を指定してください\n'
         msg += '有効なID: '
-        msg += ', '.join(("'{}'".format(jid) for jid in LECTURERS))
+        msg += ', '.join(('`{}`'.format(jid) for jid in LECTURERS))
         botsend(message, msg)
         return
 
