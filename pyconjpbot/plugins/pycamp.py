@@ -27,9 +27,10 @@ COMPONENT = 'Python Boot Camp'
 ISSUE_TYPE_TASK = 3     # タスク
 ISSUE_TYPE_SUBTASK = 5  # サブタスク
 
-# コアスタッフの JIRA username
+# コアスタッフ、講師の JIRA username
 REPORTER = 'takanory'
-CORE_STAFFS = ('makoto-kimura', 'takanory', 'ryu22e')
+CORE_STAFFS = ('makoto-kimura', 'takanory', 'ryu22e', 'kobatomo')
+LECTURERS = ('takanory', 'terada', 'shimizukawa')
 
 ASSIGNEE_TYPE = {
     '作成者': 'reporter',
@@ -46,7 +47,7 @@ SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ',
                      '本イベント参加者', '懇親会のみ')
 
 HELP = """
-`$pycamp create (地域) (開催日) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
+`$pycamp create (地域) (開催日) (コアスタッフJIRA) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの概要を返す
 `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
 """
@@ -143,14 +144,16 @@ def get_subtask_template(service):
     return subtask_template
 
 
-@respond_to('^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)')
-def pycamp_create(message, area, date_str, local_staff, lecturer):
+@respond_to('^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)')
+def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
     """
     Python Boot Camp の issue をまとめて作成する
 
     :params area: 地域名(札幌、大阪など)
     :params date_str: 開催日の日付文字列
-    :params jira_id: 現地スタッフの JIRA ID
+    :params core_staff: 担当コアスタッフの JIRA ID
+    :params local_staff: 現地スタッフの JIRA ID
+    :params lecturer: 講師の JIRA ID
     """
 
     # 日付が正しいかチェック
@@ -160,12 +163,27 @@ def pycamp_create(message, area, date_str, local_staff, lecturer):
         botsend(message, 'Python Boot Campの開催日に正しい日付を指定してください')
         return
 
+    if core_staff not in CORE_STAFFS:
+        msg = 'コアスタッフの JIRA ID に正しい値を指定してください\n'
+        msg += '有効なID: '
+        msg += ', '.join(("'{}'".format(jid) for jid in CORE_STAFFS))
+        botsend(message, msg)
+        return
+
+    if lecturer not in LECTURERS:
+        msg = '講師の JIRA ID に正しい値を指定してください\n'
+        msg += '有効なID: '
+        msg += ', '.join(("'{}'".format(jid) for jid in LECTURERS))
+        botsend(message, msg)
+        return
+
     # 開催日(target_date)が過去の場合は1年後にする
     if datetime.now() > target_date:
         target_date = target_date.replace(year=target_date.year + 1)
 
     # 指定されたユーザーの存在チェック
     try:
+        jira.user(core_staff)
         jira.user(local_staff)
         jira.user(lecturer)
     except JIRAError as e:
