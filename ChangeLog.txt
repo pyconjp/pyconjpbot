@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2018-03-10
+--------------------------
+- [ISSHA-1027] add core_staff parameter to pycamp create command
+
 Release Notes - 2017-12-02
 --------------------------
 - [ISSHA-947] add lgtm command for lgtm image generator
