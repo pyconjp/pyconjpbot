@@ -28,7 +28,6 @@ ISSUE_TYPE_TASK = 3     # タスク
 ISSUE_TYPE_SUBTASK = 5  # サブタスク
 
 # コアスタッフ、講師の JIRA username
-REPORTER = 'takanory'
 CORE_STAFFS = ('makoto-kimura', 'takanory', 'ryu22e', 'kobatomo')
 LECTURERS = ('takanory', 'terada', 'shimizukawa')
 
