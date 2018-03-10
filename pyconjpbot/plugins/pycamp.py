@@ -33,7 +33,7 @@ CORE_STAFFS = ('makoto-kimura', 'takanory', 'ryu22e', 'kobatomo')
 LECTURERS = ('takanory', 'terada', 'shimizukawa')
 
 ASSIGNEE_TYPE = {
-    '作成者': 'reporter',
+    'コアスタッフ': 'core_staff',
     '現地スタッフ': 'local_staff',
     '講師': 'lecturer',
     }
@@ -64,7 +64,7 @@ def create_issue(template, params, parent=None, area=None):
     """
 
     # 担当者情報を作成
-    assignee_type = template.get('assignee_type', 'reporter')
+    assignee_type = template.get('assignee_type', 'core_staff')
     assignee = params[assignee_type]
     # 期限の日付を作成
     delta = timedelta(days=template.get('delta', -7))
@@ -76,7 +76,7 @@ def create_issue(template, params, parent=None, area=None):
         'summary': template.get('summary', '').format(**params),
         'description': template.get('description', '').format(**params),
         'assignee': {'name': assignee},  # 担当者
-        'reporter': {'name': REPORTER},  # 報告者
+        'reporter': {'name': params['core_staff']},  # 報告者はコアスタッフ
         'duedate': '{:%Y-%m-%d}'.format(duedate),  # 期限
     }
 
@@ -199,7 +199,7 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
 
     # issue を作成するための情報
     params = {
-        'reporter': REPORTER,
+        'core_staff': core_staff,
         'local_staff': local_staff,
         'lecturer': lecturer,
         'target_date': target_date,
