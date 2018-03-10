@@ -15,8 +15,10 @@ IMAGES = (
         ('pycamp_logo_horizontal.png', (2827, 1080)),
 )
 
-@respond_to('^pycamp-logo\s+(\S+)')
+@respond_to('^pycamp\s+logo\s+(\S+)')
 def pycamp_logo(message, title):
+    botsend(message, 'Python Boot Camp ロゴ作成中... :hammer:')
+
     for name, size in IMAGES:
         logo_image = Image.open(os.path.join('templates', name))
         logo_image = logo_image.convert('RGBA')
@@ -32,10 +34,8 @@ def pycamp_logo(message, title):
 
         logo_image.paste(background, (0, height - TEXT_HEIGHT))
 
-        if not os.path.exists('./build'):
-            os.makedirs('./build')
         with create_tmp_file() as tmpf:
             logo_image.save(tmpf, 'png')
             message.channel.upload_file(name, tmpf)
 
-    botsend(message, 'Generated!')
+    botsend(message, '作成完了 :thumbsup:')
