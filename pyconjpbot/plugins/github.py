@@ -88,7 +88,7 @@ def github_help(message):
     """
     githubコマンドのヘルプを返す
     """
-    botsend(message, '''- `$gihub repos`: pyconjp organization のリポジトリ一覧を返す
+    botsend(message, '''- `$github repos`: pyconjp organization のリポジトリ一覧を返す
 - `$github search keywords`: 指定されたキーワードにマッチするissueを返す
 - `$github code keywords`: 指定されたキーワードにマッチするコードを返す
 ''')
