@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2018-06-02
+--------------------------
+- [ISSHA-1272] update libraries
+
 Release Notes - 2018-05-12
 --------------------------
 - [ISSHA-1218] add kor.miyamoto to CORE_STAFFS
