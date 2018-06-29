@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2018-06-29
+--------------------------
+- [ISSHA-1286] add verification of event title to pycamp summary command
+
 Release Notes - 2018-06-02
 --------------------------
 - [ISSHA-1272] update libraries
