@@ -315,6 +315,10 @@ def pycamp_summary(message, party=None):
         if dt < now:
             break
 
+        # タイトルに 'Python Boot Camp' が入っていないイベントは飛ばす
+        if 'Python Boot Camp' not in event['title']:
+            continue
+       
         # イベント情報を追加
         event_info = {
             'title': event['title'],  # タイトル
