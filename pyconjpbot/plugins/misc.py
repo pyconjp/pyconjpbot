@@ -139,3 +139,27 @@ def cal_help(message):
 - `$cal 9`: 今年の指定された月のカレンダーを返す
 - `$cal 9 2016`: 指定された年月のカレンダーを返す
 ''')
+
+@respond_to('^members$')
+def members_command(message, subcommand=None):
+    """
+    チャンネルにいるメンバーの一覧を返す
+
+    - https://github.com/os/slacker
+    - https://api.slack.com/methods/channels.info
+    - https://api.slack.com/methods/users.getPresence
+    - https://api.slack.com/methods/users.info
+    """
+
+    # チャンネルのメンバー一覧を取得
+    channel = message.body['channel']
+    webapi = slacker.Slacker(settings.API_TOKEN)
+    cinfo = webapi.channels.info(channel)
+    members = cinfo.body['channel']['members']
+
+    name = ""
+    for member_id in members:
+        user_info = webapi.users.info(member_id)
+        name = name + " "+ user_info.body['user']['name']
+
+    botsend(message, 'このチャンネルのメンバーの一覧は {} です。'.format(name))
