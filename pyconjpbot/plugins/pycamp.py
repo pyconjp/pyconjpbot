@@ -30,7 +30,7 @@ ISSUE_TYPE_SUBTASK = 5  # サブタスク
 # コアスタッフ、講師の JIRA username
 CORE_STAFFS = ('makoto-kimura', 'takanory', 'ryu22e', 'kobatomo',
                'kor.miyamoto')
-LECTURERS = ('takanory', 'terada', 'shimizukawa')
+LECTURERS = ('takanory', 'terada', 'shimizukawa', 'arai')
 
 ASSIGNEE_TYPE = {
     'コアスタッフ': 'core_staff',
