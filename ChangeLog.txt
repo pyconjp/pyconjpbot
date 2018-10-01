@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2018-10-01
+--------------------------
+- [ISSHA-738] add arai to pycamp lecturer
+
 Release Notes - 2018-06-29
 --------------------------
 - [ISSHA-1286] add verification of event title to pycamp summary command
