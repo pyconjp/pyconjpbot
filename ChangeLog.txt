@@ -1,5 +1,8 @@
 Unreleased
 ----------
+
+Release Notes - 2018-10-13
+--------------------------
 - [ISSHA-1416] add pycmp count-staff command
 
 Release Notes - 2018-10-01

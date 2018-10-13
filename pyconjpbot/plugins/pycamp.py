@@ -53,7 +53,7 @@ HELP = """
 `$pycamp create (地域) (開催日) (コアスタッフJIRA) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの概要を返す
 `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
-`$pycamp count-staff`: pycampにスタッフやTAに2回以上参加した人を数える
+`$pycamp count-staff`: pycampにスタッフやTAに2回以上参加した人を調べる
 """
 
 
@@ -401,7 +401,7 @@ def get_staff_info(pycamp_dict):
     """
     # 中止されたイベントの一覧
     CANCELS = ['https://pyconjp.connpass.com/event/96844/']
-    
+
     staff_name_dict = {}  # スタッフのURLと名前の辞書
     staff_attend_dict = {}  # スタッフが参加したイベント情報の辞書
     for connpass_info in pycamp_dict.values():
@@ -426,7 +426,7 @@ def get_staff_info(pycamp_dict):
 @respond_to('^pycamp\s+count-staff$')
 def pycamp_count_staff(message):
     """
-    pycampにスタッフやTAに2回以上参加した人を数える
+    pycampにスタッフやTAに2回以上参加した人を調べる
     """
     # データを保存するJSONファイル
     jsonfile = Path(__file__).parent / 'pycamp-staff.json'
@@ -464,7 +464,7 @@ def pycamp_count_staff(message):
         json.dump(pycamp_dict, f, ensure_ascii=False, indent=2)
     botsend(message, 'pycampスタッフのデータを更新しました')
 
-    # スタッフの名前を参加したイベント情報を取得する
+    # スタッフの名前と参加したイベント情報を取得する
     staff_name_dict, staff_attend_dict = get_staff_info(pycamp_dict)
 
     # 2回以上参加しているスタッフ、TAの一覧メッセージを作成する
