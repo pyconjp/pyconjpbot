@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+import time
 
 from dateutil import parser
 from jira import JIRA, JIRAError
@@ -50,6 +51,7 @@ HELP = """
 `$pycamp create (地域) (開催日) (コアスタッフJIRA) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの概要を返す
 `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
+`$pycamp count-staff`: pycampにスタッフやTAに2回以上参加した人を数える
 """
 
 
@@ -332,6 +334,82 @@ def pycamp_summary(message, party=None):
 
     attachements = generate_pycamp_summary(events)
     botwebapi(message, attachements)
+
+
+def get_connpass_info(connpass_url):
+    """
+    connpassのページからタイトル、状態、TA、スタッフの一覧を取得して返す
+
+    戻り値は以下の形式
+    result = {
+        'url': 'https://pyconjp.connpass.com/event/103539/',
+        'title': 'Python Boot Camp in 岡山 ',
+        'ended_at': '2018-09-29T17:00:00',
+        'status': '開催済',
+        'staffs': [
+            ('https://connpass.com/user/rsuyama/', 'rhoboro'),
+            ('https://connpass.com/user/24motz/', '24motz'),
+            ('https://connpass.com/user/qt_luigi/', 'Ryuji Iwata'),
+            :
+        ]
+    }
+    """
+    result = {'url': 'connpass_url'}
+    # イベントIDを取り出す
+    event_id = connpass_url.split('/')[4]
+
+    # connpass APIを使用してタイトルと終了日を取得する
+    # https://connpass.com/about/api/
+    url = 'https://connpass.com/api/v1/event/?event_id={}'.format(event_id)
+    r = requests.get(url)
+    data = r.json()
+    result['title'] = data['events'][0]['title']
+    ended_at = data['events'][0]['ended_at'].replace('+09:00', '')
+    result['ended_at'] = ended_at
+    ended_datetime = parser.parse(ended_at)
+    now = datetime.now()
+    # 終了したかを確認する
+    if now > ended_datetime:
+        result['status'] = '開催済'
+    else:
+        result['status'] = '開催中'
+    time.sleep(1)
+
+    # 参加者とTAの一覧を取得する
+    staffs = []
+    r = requests.get(connpass_url + 'participation')
+    soup = BeautifulSoup(r.text, 'html.parser')
+    # TAとスタッフの情報を取得する
+    for div in soup.select('div.participation_table_area'):
+        ptype = div.find('span', class_='label_ptype_name').text
+        if 'TA' in ptype or '現地スタッフ' in ptype:
+            for user in div.select('p.display_name'):
+                # TAとスタッフのURLと名前を取得する
+                url = user.a['href']
+                name = user.a.text
+                staffs.append((url, name))
+    result['staffs'] = staffs
+    return result
+
+
+@respond_to('^pycamp\s+count-staff$')
+def pycamp_count_staff(message):
+    """
+    pycampにスタッフやTAに2回以上参加した人を数える
+    """
+    BASE_URL = 'https://www.pycon.jp/support/bootcamp.html'
+    r = requests.get(BASE_URL)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    id9 = soup.select_one('#id9')
+    for atag in id9.select('a.external')[10:]:
+        link = atag['href']
+        if 'connpass' not in link:  # connpassのリンク以外は対象外
+            continue
+        if '中止' in atag.text:  # 中止イベントは対象外
+            continue
+        result = get_connpass_info(link)
+        print(result)
+        time.sleep(1)
 
 
 @respond_to('^pycamp\s+help')
