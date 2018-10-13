@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
 import time
+from pathlib import Path
+import json
 
 from dateutil import parser
 from jira import JIRA, JIRAError
@@ -347,14 +349,13 @@ def get_connpass_info(connpass_url):
         'ended_at': '2018-09-29T17:00:00',
         'status': '開催済',
         'staffs': [
-            ('https://connpass.com/user/rsuyama/', 'rhoboro'),
-            ('https://connpass.com/user/24motz/', '24motz'),
-            ('https://connpass.com/user/qt_luigi/', 'Ryuji Iwata'),
-            :
+            {'url', 'https://connpass.com/user/rsuyama/', 'name': 'rhoboro'},
+            {'url': 'https://connpass.com/user/24motz/', 'name': '24motz'},
+```            :
         ]
     }
     """
-    result = {'url': 'connpass_url'}
+    result = {'url': connpass_url}
     # イベントIDを取り出す
     event_id = connpass_url.split('/')[4]
 
@@ -385,31 +386,96 @@ def get_connpass_info(connpass_url):
         if 'TA' in ptype or '現地スタッフ' in ptype:
             for user in div.select('p.display_name'):
                 # TAとスタッフのURLと名前を取得する
-                url = user.a['href']
-                name = user.a.text
-                staffs.append((url, name))
+                staff_dict = {
+                    'url': user.a['href'],
+                    'name': user.a.text,
+                }
+                staffs.append(staff_dict)
     result['staffs'] = staffs
     return result
 
 
+def get_staff_info(pycamp_dict):
+    """
+    スタッフの参加したイベント情報をとまとめる
+    """
+    staff_name_dict = {}  # スタッフのURLと名前の辞書
+    staff_attend_dict = {}  # スタッフが参加したイベント情報の辞書
+    for connpass_info in pycamp_dict.values():
+        event = {
+            'title': connpass_info['title'],
+            'url': connpass_info['url'],
+        }
+        for staff in connpass_info['staffs']:
+            # スタッフの名前一覧を作成
+            staff_url = staff['url']
+            staff_name_dict[staff_url] = staff['name']
+            # スタッフの参加したイベント情報を追加
+            if staff_url in staff_attend_dict:
+                staff_attend_dict[staff_url].append(event)
+            else:
+                staff_attend_dict[staff_url] = [event]
+    return staff_name_dict, staff_attend_dict
+
+   
 @respond_to('^pycamp\s+count-staff$')
 def pycamp_count_staff(message):
     """
     pycampにスタッフやTAに2回以上参加した人を数える
     """
+    # データを保存するJSONファイル
+    jsonfile = Path(__file__).parent / 'pycamp-staff.json'
+
+    pycamp_dict = {}
+    # JSONファイルが存在すれば読み込む
+    if jsonfile.exists():
+        with open(jsonfile, 'r', encoding='utf-8') as f:
+            pycamp_dict = json.load(f)
+    print(pycamp_dict)
+
+    botsend(message, 'pycampスタッフのデータを更新します')
+
     BASE_URL = 'https://www.pycon.jp/support/bootcamp.html'
     r = requests.get(BASE_URL)
     soup = BeautifulSoup(r.content, 'html.parser')
     id9 = soup.select_one('#id9')
-    for atag in id9.select('a.external')[10:]:
+    for atag in id9.select('a.external'):
         link = atag['href']
         if 'connpass' not in link:  # connpassのリンク以外は対象外
             continue
         if '中止' in atag.text:  # 中止イベントは対象外
             continue
+        # pycamp_dictにデータがあって、開催済だったら処理を飛ばす
+        if link in pycamp_dict:
+            if pycamp_dict[link]['status'] == '開催済':
+                continue
+        # connpassイベントごとに情報して辞書に格納する
         result = get_connpass_info(link)
-        print(result)
+        pycamp_dict[link] = result
         time.sleep(1)
+
+    # JSONファイルに保存する
+    with open(jsonfile, 'w', encoding='utf-8') as f:
+        json.dump(pycamp_dict, f, ensure_ascii=False, indent=2)
+    botsend(message, 'pycampスタッフのデータを更新しました')
+
+    # スタッフの名前を参加したイベント情報を取得する
+    staff_name_dict, staff_attend_dict = get_staff_info(pycamp_dict)
+
+    # 2回以上参加しているスタッフ、TAの一覧メッセージを作成する
+    text = "pycampに2回以上参加しているスタッフ、TAの一覧です\n```\n"
+    for url, events in staff_attend_dict.items():
+        if len(events) == 1:
+            continue
+        name = staff_name_dict[url]
+        # イベントタイトルから地域名だけ抜き出す
+        areas = [event['title'].split()[-1] for event in events]
+        area_text = '、'.join(areas)
+            
+        text += '{}, {}, {}, {}\n'.format(url, name, len(events), area_text)
+    text += "```\n"
+
+    botsend(message, text)
 
 
 @respond_to('^pycamp\s+help')
