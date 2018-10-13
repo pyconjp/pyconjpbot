@@ -399,9 +399,14 @@ def get_staff_info(pycamp_dict):
     """
     スタッフの参加したイベント情報をとまとめる
     """
+    # 中止されたイベントの一覧
+    CANCELS = ['https://pyconjp.connpass.com/event/96844/']
+    
     staff_name_dict = {}  # スタッフのURLと名前の辞書
     staff_attend_dict = {}  # スタッフが参加したイベント情報の辞書
     for connpass_info in pycamp_dict.values():
+        if connpass_info['url'] in CANCELS:
+            continue
         event = {
             'title': connpass_info['title'],
             'url': connpass_info['url'],
