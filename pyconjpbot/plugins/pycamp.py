@@ -436,7 +436,6 @@ def pycamp_count_staff(message):
     if jsonfile.exists():
         with open(jsonfile, 'r', encoding='utf-8') as f:
             pycamp_dict = json.load(f)
-    print(pycamp_dict)
 
     botsend(message, 'pycampスタッフのデータを更新します')
 
