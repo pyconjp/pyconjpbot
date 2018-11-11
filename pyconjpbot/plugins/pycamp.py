@@ -1,12 +1,9 @@
-import os
-from io import StringIO
 from datetime import timedelta, datetime
 import time
 from pathlib import Path
 import json
 
 from dateutil import parser
-
 from jira import JIRA, JIRAError
 from slackbot import settings
 from slackbot.bot import respond_to
@@ -55,7 +52,7 @@ SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ',
                      '本イベント参加者', '懇親会のみ')
 
 # Settings for the logo generation.
-MAIN_COLOR = (90, 200, 233)
+BACKGROUND_COLOR = (90, 200, 233)
 TEXT_SIZE = 120
 TEXT_HEIGHT = 200
 FONT = 'RictyDiminished-Regular.ttf'
@@ -501,15 +498,18 @@ def pycamp_count_staff(message):
 def pycamp_logo(message, title):
     botsend(message, 'Python Boot Camp ロゴ作成中... :hammer:')
 
+    fontfile = Path(__file__) / 'pycamp' / FONT
+    font = ImageFont.truetype(fontfile, size=TEXT_SIZE)
+
     for name, size in IMAGES:
-        logo_image = Image.open(os.path.join('templates', name))
+        logo_image = Path(__file__) / 'pycamp' / name
+
         logo_image = logo_image.convert('RGBA')
         logo_image.thumbnail(size)
 
         width, height = size
 
-        background = Image.new('RGBA', (width, TEXT_HEIGHT), MAIN_COLOR)
-        font = ImageFont.truetype(os.path.join('fonts', FONT), size=TEXT_SIZE)
+        background = Image.new('RGBA', (width, TEXT_HEIGHT), BACKGROUND_COLOR)
         draw = ImageDraw.Draw(background)
         text_width, _ = draw.textsize(title, font=font)
         draw.text(((width - text_width) / 2, 0), title, font=font, fill=(0, 0, 0))
