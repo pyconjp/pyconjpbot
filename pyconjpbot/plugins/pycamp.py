@@ -488,7 +488,7 @@ def pycamp_count_staff(message):
         # イベントタイトルから地域名だけ抜き出す
         areas = [event['title'].split()[-1] for event in events]
         area_text = '、'.join(areas)
-            
+           
         text += '{}, {}, {}, {}\n'.format(url, name, len(events), area_text)
     text += "```\n"
 
@@ -498,11 +498,12 @@ def pycamp_count_staff(message):
 def pycamp_logo(message, title):
     botsend(message, 'Python Boot Camp ロゴ作成中... :hammer:')
 
-    fontfile = Path(__file__) / 'pycamp' / FONT
-    font = ImageFont.truetype(fontfile, size=TEXT_SIZE)
+    fontfile = Path(__file__).parent / 'pycamp' / FONT
+    font = ImageFont.truetype(str(fontfile), size=TEXT_SIZE)
 
     for name, size in IMAGES:
-        logo_image = Path(__file__) / 'pycamp' / name
+        logofile = Path(__file__).parent / 'pycamp' / name
+        logo_image = Image.open(logofile)
 
         logo_image = logo_image.convert('RGBA')
         logo_image.thumbnail(size)
