@@ -1,5 +1,6 @@
 Unreleased
 ----------
+- [ISSHA-0185] add pycamp logo command
 
 Release Notes - 2018-11-11
 --------------------------
