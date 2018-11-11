@@ -1,6 +1,9 @@
+asn1crypto==0.24.0
 beautifulsoup4==4.6.0
 certifi==2017.7.27.1
+cffi==1.11.5
 chardet==3.0.4
+cryptography==2.3.1
 defusedxml==0.5.0
 gitdb==0.6.4
 gitdb2==2.0.3
@@ -8,7 +11,7 @@ GitPython==2.1.10
 google-api-python-client==1.6.4
 httplib2==0.10.3
 idna==2.6
-jira==1.0.15
+jira==2.0.0
 langdetect==1.0.7
 mpmath==0.19
 oauth2client==4.1.2
@@ -19,6 +22,7 @@ peewee==3.5.0
 Pillow==4.3.0
 pyasn1==0.3.6
 pyasn1-modules==0.1.4
+pycparser==2.19
 PyGithub==1.39
 PyJWT==1.5.3
 python-dateutil==2.7.3
