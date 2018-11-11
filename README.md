@@ -22,6 +22,7 @@
 - `$pycamp summary`: 開催予定のpycampイベントの概要を返す
 - `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
 - `$pycamp count-staff`: pycampにスタッフやTAに2回以上参加した人を調べる
+- `$pycamp logo (地域)`: pycamp のイベント用ロゴを作成する
 
 - [pycamp.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/pycamp.py)
 
