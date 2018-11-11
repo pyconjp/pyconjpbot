@@ -4,6 +4,7 @@ Unreleased
 Release Notes - 2018-11-11
 --------------------------
 - [ISSHA-1454] fix JIRA error
+- [ISSHA-1421] upgrade requirements.txt
 
 Release Notes - 2018-10-13
 --------------------------
