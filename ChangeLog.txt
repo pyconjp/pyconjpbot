@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2018-11-11
+--------------------------
+- [ISSHA-1454] fix JIRA error
+
 Release Notes - 2018-10-13
 --------------------------
 - [ISSHA-1416] add pycmp count-staff command
