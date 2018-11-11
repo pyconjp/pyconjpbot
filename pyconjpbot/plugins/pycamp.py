@@ -68,11 +68,8 @@ HELP = """
 `$pycamp create (地域) (開催日) (コアスタッフJIRA) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの概要を返す
 `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
-<<<<<<< HEAD
 `$pycamp count-staff`: pycampにスタッフやTAに2回以上参加した人を調べる
-=======
 `$pycamp logo (地域)`: pycamp のイベント用ロゴを作成する
->>>>>>> 3ce978cfec7a75d7ac2c8bf6b9e23b6a7d74a4ba
 """
 
 
@@ -357,7 +354,6 @@ def pycamp_summary(message, party=None):
     botwebapi(message, attachements)
 
 
-<<<<<<< HEAD
 def get_connpass_info(connpass_url):
     """
     connpassのページからタイトル、状態、TA、スタッフの一覧を取得して返す
@@ -500,7 +496,7 @@ def pycamp_count_staff(message):
     text += "```\n"
 
     botsend(message, text)
-=======
+
 @respond_to('^pycamp\s+logo\s+(\S+)')
 def pycamp_logo(message, title):
     botsend(message, 'Python Boot Camp ロゴ作成中... :hammer:')
@@ -525,8 +521,6 @@ def pycamp_logo(message, title):
             message.channel.upload_file(name, tmpf)
 
     botsend(message, '作成完了 :thumbsup:')
->>>>>>> 3ce978cfec7a75d7ac2c8bf6b9e23b6a7d74a4ba
-
 
 @respond_to('^pycamp\s+help')
 def pycamp_help(message):
