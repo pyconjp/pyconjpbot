@@ -55,7 +55,7 @@ SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ',
 BACKGROUND_COLOR = (90, 200, 233)
 TEXT_SIZE = 120
 TEXT_HEIGHT = 200
-FONT = 'RictyDiminished-Regular.ttf'
+FONT = 'NotoSansCJKjp-Bold.otf'
 IMAGES = (
         ('pycamp_logo.png', (1080, 1080)),
         ('pycamp_logo_horizontal.png', (2827, 1080)),
@@ -521,7 +521,7 @@ def pycamp_logo(message, title):
             logo_image.save(tmpf, 'png')
             message.channel.upload_file(name, tmpf)
 
-    botsend(message, '作成完了 :thumbsup:')
+    botsend(message, 'ロゴ画像を作成しました')
 
 @respond_to('^pycamp\s+help')
 def pycamp_help(message):
