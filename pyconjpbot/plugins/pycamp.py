@@ -498,7 +498,7 @@ def pycamp_count_staff(message):
 def pycamp_logo(message, title):
     botsend(message, 'Python Boot Camp ロゴ作成中... :hammer:')
 
-    fontfile = Path(__file__).parent / 'pycamp' / FONT
+    fontfile = Path(__file__).parent / 'fonts' / FONT
     font = ImageFont.truetype(str(fontfile), size=TEXT_SIZE)
 
     for name, size in IMAGES:
