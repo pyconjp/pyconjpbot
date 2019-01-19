@@ -435,7 +435,7 @@ def get_staff_info(pycamp_dict):
                 staff_attend_dict[staff_url] = [event]
     return staff_name_dict, staff_attend_dict
 
-   
+
 @respond_to('^pycamp\s+count-staff$')
 def pycamp_count_staff(message):
     """
@@ -488,11 +488,11 @@ def pycamp_count_staff(message):
         # イベントタイトルから地域名だけ抜き出す
         areas = [event['title'].split()[-1] for event in events]
         area_text = '、'.join(areas)
-           
         text += '{}, {}, {}, {}\n'.format(url, name, len(events), area_text)
     text += "```\n"
 
     botsend(message, text)
+
 
 @respond_to('^pycamp\s+logo\s+(\S+)')
 def pycamp_logo(message, title):
@@ -523,11 +523,10 @@ def pycamp_logo(message, title):
 
     botsend(message, 'ロゴ画像を作成しました')
 
+
 @respond_to('^pycamp\s+help')
 def pycamp_help(message):
     """
     ヘルプメッセージを返す
     """
     botsend(message, HELP)
-
-
