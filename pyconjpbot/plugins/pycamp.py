@@ -7,8 +7,10 @@ from dateutil import parser
 from jira import JIRA, JIRAError
 from slackbot import settings
 from slackbot.bot import respond_to
+from slackbot.utils import create_tmp_file
 import requests
 from bs4 import BeautifulSoup
+from PIL import Image, ImageFont, ImageDraw
 
 from ..google_plugins.google_api import get_service
 from ..botmessage import botsend, botwebapi
@@ -49,11 +51,22 @@ SHEET_ID = '1LEtpNewhAFSf_vtkhTsWi6JGs2p-7XHZE8yOshagz0I'
 SHORT_PTYPE_NAMES = ('学生', 'TA', 'スタッフ',
                      '本イベント参加者', '懇親会のみ')
 
+# Settings for the logo generation.
+BACKGROUND_COLOR = (90, 200, 233)
+TEXT_SIZE = 120
+TEXT_HEIGHT = 200
+FONT = 'NotoSansCJKjp-Bold.otf'
+IMAGES = (
+        ('pycamp_logo.png', (1080, 1080)),
+        ('pycamp_logo_horizontal.png', (2827, 1080)),
+)
+
 HELP = """
 `$pycamp create (地域) (開催日) (コアスタッフJIRA) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの概要を返す
 `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
 `$pycamp count-staff`: pycampにスタッフやTAに2回以上参加した人を調べる
+`$pycamp logo (地域)`: pycamp のイベント用ロゴを作成する
 """
 
 
@@ -422,7 +435,7 @@ def get_staff_info(pycamp_dict):
                 staff_attend_dict[staff_url] = [event]
     return staff_name_dict, staff_attend_dict
 
-   
+
 @respond_to('^pycamp\s+count-staff$')
 def pycamp_count_staff(message):
     """
@@ -475,11 +488,40 @@ def pycamp_count_staff(message):
         # イベントタイトルから地域名だけ抜き出す
         areas = [event['title'].split()[-1] for event in events]
         area_text = '、'.join(areas)
-            
         text += '{}, {}, {}, {}\n'.format(url, name, len(events), area_text)
     text += "```\n"
 
     botsend(message, text)
+
+
+@respond_to('^pycamp\s+logo\s+(\S+)')
+def pycamp_logo(message, title):
+    botsend(message, 'Python Boot Camp ロゴ作成中... :hammer:')
+
+    fontfile = Path(__file__).parent / 'pycamp' / FONT
+    font = ImageFont.truetype(str(fontfile), size=TEXT_SIZE)
+
+    for name, size in IMAGES:
+        logofile = Path(__file__).parent / 'pycamp' / name
+        logo_image = Image.open(logofile)
+
+        logo_image = logo_image.convert('RGBA')
+        logo_image.thumbnail(size)
+
+        width, height = size
+
+        background = Image.new('RGBA', (width, TEXT_HEIGHT), BACKGROUND_COLOR)
+        draw = ImageDraw.Draw(background)
+        text_width, _ = draw.textsize(title, font=font)
+        draw.text(((width - text_width) / 2, 0), title, font=font, fill=(0, 0, 0))
+
+        logo_image.paste(background, (0, height - TEXT_HEIGHT))
+
+        with create_tmp_file() as tmpf:
+            logo_image.save(tmpf, 'png')
+            message.channel.upload_file(name, tmpf)
+
+    botsend(message, 'ロゴ画像を作成しました')
 
 
 @respond_to('^pycamp\s+help')
