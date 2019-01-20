@@ -157,9 +157,22 @@ def members_command(message, subcommand=None):
     cinfo = webapi.channels.info(channel)
     members = cinfo.body['channel']['members']
 
+
     name = ""
+    nameall = ""
     for member_id in members:
         user_info = webapi.users.info(member_id)
-        name = name + " "+ user_info.body['user']['name']
+        #name = user_info.body['user']['name']
+        #name = name + ": " + user_info.body['user']['profile']['display_name']
+        #botsend(message, name)
+        basename = user_info.body['user']['name']
+        display_name = user_info.body['user']['profile']['display_name']
+        if display_name != "":
+            basename = display_name
+        nameall = nameall + "\n" + basename
 
-    botsend(message, 'このチャンネルのメンバーの一覧は {} です。'.format(name))
+#    botsend(message, nameall)
+#        name = name + "\n" + format(user_info.body['user'][profile]['display_name'])+ ": " + format(user_info.body['user']['real_name'])
+#    botsend(message, name)
+    botsend(message, 'このチャンネルのメンバーの一覧は{}\nです。'.format(nameall))
+#    botsend(message, 'です。')
