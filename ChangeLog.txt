@@ -1,6 +1,9 @@
 Unreleased
 ----------
-- [ISSHA-967] update lgtm command
+
+Release Notes - 2019-01-20
+--------------------------
+- [ISSHA-967] update lgtm command for top and bottom text
 
 Release Notes - 2019-01-19
 --------------------------
