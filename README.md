@@ -11,8 +11,7 @@
 
 ### lgtm plugin
 
-- `$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する(英語のみ)
-
+- `$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する
 
 - [lgtm.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/lgtm.py)
 
