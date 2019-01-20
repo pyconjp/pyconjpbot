@@ -1,13 +1,15 @@
 from urllib.parse import urlparse
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-import sys
+from pathlib import Path
 
 from slackbot.bot import respond_to
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
 from ..botmessage import botsend
+
+FONT = 'NotoSansCJKjp-Bold.otf'
 
 HELP = """
 `$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する(英語のみ)
@@ -18,18 +20,18 @@ FILL = 'white'
 SHADOW = 'black'
 
 
-def get_font_size(size, font_name, text):
+def get_font_size(size, font_file, text):
     """
     指定したテキストを画像に配置する時にいい感じのフォントサイズを返す
 
     :params size: 画像の幅と高さの短い方
-    :params font_name: フォントの名前(Arial, Helvetica等)
+    :params font_file: フォントファイルのフルパス
     :params text: 描画する文字列(LGTM等)
     :return: フォントサイズ
     """
     # フォントのサイズを5ポイント刻みで大きくする
     for font_size in range(10, 200, 5):
-        font = ImageFont.truetype(font_name, font_size, encoding="utf-8")
+        font = ImageFont.truetype(font_file, font_size, encoding="utf-8")
         # テキストの描画サイズを取得
         width, height = font.getsize(text)
         # テキストの幅が、画像の短い方の半分のサイズを越えたら終了
@@ -40,7 +42,7 @@ def get_font_size(size, font_name, text):
 
 def get_text_xy(width, height, font, text):
     """
-    指定したテキストを配置する位置を位置を返す
+    指定したテキストを配置する位置を返す
 
     :params widht: 画像の幅
     :params height: 画像の高さ
@@ -72,14 +74,9 @@ def generate_lgtm_image(im, text):
     width, height = im.size
 
     # フォント生成
-    # Arial, Arial Black, Comic Sans MS, Courier New, Georgia, Impact
-    # Times New Roman, Trebuchet MS, Verdana
-    if sys.platform == 'linux':
-        font_name = 'ipagp.ttf'
-    elif sys.platform == 'darwin':
-        font_name = 'Arial Black'
-    font_size = get_font_size(min(width, height), font_name, text)
-    font = ImageFont.truetype(font_name, font_size, encoding="utf-8")
+    font_file = str(Path(__file__).parent / 'fonts' / FONT)
+    font_size = get_font_size(min(width, height), font_file, text)
+    font = ImageFont.truetype(font_file, font_size, encoding="utf-8")
 
     # テキストの描画位置の計算
     x, y = get_text_xy(width, height, font, text)
@@ -126,7 +123,7 @@ def lgtm_create(message, url, text='LGTM'):
     # 一時ファイルに画像を保存してアップロードする
     with NamedTemporaryFile(suffix='.png') as fp:
         im.save(fp, format='png')
-        fname = '{}-lgtm.png'.format(basename)
+        fname = '{}-{}.png'.format(basename, text.lower())
         message.channel.upload_file(fname=fname, fpath=fp.name)
 
 

@@ -1,6 +1,6 @@
 Unreleased
 ----------
-- 
+- [ISSHA-967] update lgtm command
 
 Release Notes - 2019-01-19
 --------------------------
