@@ -12,7 +12,7 @@ from ..botmessage import botsend
 FONT = 'NotoSansCJKjp-Bold.otf'
 
 HELP = """
-`$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する(英語のみ)
+`$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する
 """
 
 # 文字の色と影の色
@@ -48,18 +48,16 @@ def get_text_xy(width, height, font, text):
     :params height: 画像の高さ
     :params font: フォントオブジェクト
     :params text: 描画する文字列(LGTM等)
-    :return: X座標, Y座標
+    :return: X座標、Y座標(中央)、Y座標(上)、Y座標(下)
     """
     # テキストの幅と高さを取得
     text_width, text_height = font.getsize(text)
     # テキストの配置する位置を計算
     x_center = width / 2 - text_width / 2
-    # x_left = width / 20
-    # x_right = width - width / 20 - text_width
     y_center = height / 2 - text_height / 2
-    # y_top = height / 20
-    # y_bottom = height - height / 20 - text_height
-    return x_center, y_center
+    y_top = height / 5 - text_height / 2
+    y_bottom = height / 5 * 4 - text_height
+    return x_center, y_center, y_top, y_bottom
 
 
 def generate_lgtm_image(im, text):
@@ -67,7 +65,7 @@ def generate_lgtm_image(im, text):
     LGTM画像を生成して返す
 
     :params im: PillowのImageオブジェクト
-    :return: LGTM画像のImageオブジェクト
+    :return: LGTM画像のImageオブジェクトのリスト
     """
     # 画像が大きかったらリサイズする
     im.thumbnail((400, 400))
@@ -79,18 +77,23 @@ def generate_lgtm_image(im, text):
     font = ImageFont.truetype(font_file, font_size, encoding="utf-8")
 
     # テキストの描画位置の計算
-    x, y = get_text_xy(width, height, font, text)
+    x, y_center, y_top, y_bottom = get_text_xy(width, height, font, text)
 
-    draw_im = ImageDraw.Draw(im)
-    # 枠線を描画
-    draw_im.text((x-1, y-1), text, font=font, fill=SHADOW)
-    draw_im.text((x+1, y-1), text, font=font, fill=SHADOW)
-    draw_im.text((x-1, y+1), text, font=font, fill=SHADOW)
-    draw_im.text((x+1, y+1), text, font=font, fill=SHADOW)
-    # テキストを描画
-    draw_im.text((x, y), text, font=font, fill=FILL)
+    images = []
+    # 中央、上、下にテキストを描画する
+    for y in y_center, y_top, y_bottom:
+        copied_im = im.copy()
+        images.append(copied_im)
+        draw_im = ImageDraw.Draw(copied_im)
+        # 枠線を描画
+        draw_im.text((x-1, y-1), text, font=font, fill=SHADOW)
+        draw_im.text((x+1, y-1), text, font=font, fill=SHADOW)
+        draw_im.text((x-1, y+1), text, font=font, fill=SHADOW)
+        draw_im.text((x+1, y+1), text, font=font, fill=SHADOW)
+        # テキストを描画
+        draw_im.text((x, y), text, font=font, fill=FILL)
 
-    return im
+    return images
 
 
 @respond_to('^lgtm\s+create\s+(\S+)$')
@@ -118,13 +121,14 @@ def lgtm_create(message, url, text='LGTM'):
     basename = urlparse(url).path.split('/')[-1].split('.')[0]
 
     # LGTM画像を生成する
-    im = generate_lgtm_image(im, text)
+    images = generate_lgtm_image(im, text)
 
-    # 一時ファイルに画像を保存してアップロードする
-    with NamedTemporaryFile(suffix='.png') as fp:
-        im.save(fp, format='png')
-        fname = '{}-{}.png'.format(basename, text.lower())
-        message.channel.upload_file(fname=fname, fpath=fp.name)
+    for idx, im in enumerate(images):
+        # 一時ファイルに画像を保存してアップロードする
+        with NamedTemporaryFile(suffix='.png') as fp:
+            im.save(fp, format='png')
+            fname = '{}-{}{}.png'.format(basename, text.lower(), idx)
+            message.channel.upload_file(fname=fname, fpath=fp.name)
 
 
 @respond_to('^lgtm\s+help')
