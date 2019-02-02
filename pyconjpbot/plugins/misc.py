@@ -172,7 +172,7 @@ def members_command(message, subcommand=None):
         #name = user_info.body['user']['name']
         #name = name + ": " + user_info.body['user']['profile']['display_name']
         #botsend(message, name)
-        basename = user_info.body['user']['name']
+        basename = user_info.body['user']['profile']['real_name']
         display_name = user_info.body['user']['profile']['display_name']
         if display_name != "":
             basename = display_name
