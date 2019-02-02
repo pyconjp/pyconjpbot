@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2019-02-02
+--------------------------
+- [ISSHA-1329] add members command
+
 Release Notes - 2019-01-20
 --------------------------
 - [ISSHA-967] update lgtm command for top and bottom text
