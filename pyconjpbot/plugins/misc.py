@@ -9,7 +9,6 @@ import git
 
 from ..botmessage import botsend, botreply, botwebapi
 
-
 @respond_to('^help$')
 def help(message):
     """
@@ -139,67 +138,3 @@ def cal_help(message):
 - `$cal 9`: 今年の指定された月のカレンダーを返す
 - `$cal 9 2016`: 指定された年月のカレンダーを返す
 ''')
-
-
-@respond_to('^members$')
-@respond_to('^members\s+(all|bot|help)$')
-def members_command(message, subcommand=None):
-    """
-    チャンネル参加者のメンション名の一覧を返す
-
-    - https://github.com/os/slacker
-    - https://api.slack.com/methods/channels.info
-    - https://api.slack.com/methods/users.getPresence
-    - https://api.slack.com/methods/users.info
-    """
-
-    if subcommand == 'help':
-        botsend(message, '''- `$members`: チャンネルにいる通常の参加者のメンション名の一覧を返す
-- `$members all`:チャンネルにいる全ての参加者のメンション名の一覧を返す 
-- `$members bot`:チャンネルにいるbotの参加者メンション名の一覧を返す 
-''')
-        return
-
-    if subcommand == 'all':
-        desc = '全ての'
-    elif subcommand == 'bot':
-        desc = 'botの'
-    else:
-        desc = '通常の'
-
-    # チャンネルのメンバー一覧を取得
-    channel = message.body['channel']
-    webapi = slacker.Slacker(settings.API_TOKEN)
-    cinfo = webapi.channels.info(channel)
-    members = cinfo.body['channel']['members']
-
-    # 作業用リスト初期化
-    nameall = []
-
-    # メンバ一覧から順次処理
-    for member_id in members:
-        user_info = webapi.users.info(member_id)
-        # real_nameまたはdisplay_nameにメンション用文字列が入っている推測
-        basename = user_info.body['user']['profile']['real_name']
-        display_name = user_info.body['user']['profile']['display_name']
-
-        # display_nameが設定されていればそれが優先されている推測
-        if display_name != "":
-            basename = display_name
-
-        if subcommand == 'all':
-            nameall.append(basename)
-        elif subcommand == 'bot':
-            if user_info.body['user']['is_bot']:
-                nameall.append(basename)
-        else:
-            # サブコマンドでなにも指定されなければ通常(botでない)ユーザのみ
-            if not user_info.body['user']['is_bot']:
-                nameall.append(basename)
-
-        # 探しやすいように大小文字区別なしアルファベット順
-        nameall.sort(key=str.lower)
-
-    # 処理概要、一覧、Countを出力
-    botsend(message, 'このチャンネルの{0}参加者一覧は\n{1}\n{2}参加者です。'.format(
-        desc, '\n'.join(nameall), len(nameall)))
