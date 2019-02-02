@@ -159,6 +159,14 @@ def members_command(message, subcommand=None):
 - `$members bot`:チャンネルにいるbotのメンバーの一覧を返す 
 ''')
         return
+
+    if subcommand == 'all':
+        desc='全ての'
+    elif subcommand == 'bot':
+        desc='botの'
+    else :
+        desc='通常の'
+
     # チャンネルのメンバー一覧を取得
     channel = message.body['channel']
     webapi = slacker.Slacker(settings.API_TOKEN)
@@ -166,7 +174,7 @@ def members_command(message, subcommand=None):
     members = cinfo.body['channel']['members']
 
     name = ""
-    nameall = ""
+    nameall = []
     for member_id in members:
         user_info = webapi.users.info(member_id)
         #name = user_info.body['user']['name']
@@ -174,19 +182,22 @@ def members_command(message, subcommand=None):
         #botsend(message, name)
         basename = user_info.body['user']['profile']['real_name']
         display_name = user_info.body['user']['profile']['display_name']
+
         if display_name != "":
             basename = display_name
         if subcommand == 'all':
-            nameall = nameall + "\n" + basename
+            nameall.append(basename)
         elif subcommand == 'bot':
             if user_info.body['user']['is_bot']:
-                nameall = nameall + "\n" + basename
+                nameall.append(basename)
         else:
             if not user_info.body['user']['is_bot']:
-                nameall = nameall + "\n" + basename
+                nameall.append(basename)
+
+        nameall.sort(key=str.lower)
 
 #    botsend(message, nameall)
 #        name = name + "\n" + format(user_info.body['user'][profile]['display_name'])+ ": " + format(user_info.body['user']['real_name'])
 #    botsend(message, name)
-    botsend(message, 'このチャンネルのメンバーの一覧は{}\nです。'.format(nameall))
+    botsend(message, 'このチャンネルの{0}参加者一覧は\n{1}\n{2}参加者です。'.format(desc,'\n'.join(nameall),len(nameall)))
 #    botsend(message, 'です。')
