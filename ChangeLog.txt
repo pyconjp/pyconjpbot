@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2019-02-02
+--------------------------
+- [ISSHA-1329] add members command
+
 Release Notes - 2018-06-29
 --------------------------
 - [ISSHA-1286] add verification of event title to pycamp summary command
