@@ -197,8 +197,8 @@ def members_command(message, subcommand=None):
             if not user_info.body['user']['is_bot']:
                 nameall.append(basename)
 
-        # 探しやすいように大小文字区別なしアルファベット順
-        nameall.sort(key=str.lower)
+    # 探しやすいように大小文字区別なしアルファベット順
+    nameall.sort(key=str.lower)
 
     # 処理概要、一覧、Countを出力
     botsend(message, 'このチャンネルの{0}参加者一覧は\n{1}\n{2}参加者です。'.format(
