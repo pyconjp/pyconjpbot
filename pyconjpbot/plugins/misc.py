@@ -140,7 +140,9 @@ def cal_help(message):
 - `$cal 9 2016`: 指定された年月のカレンダーを返す
 ''')
 
+
 @respond_to('^members$')
+@respond_to('^members\s+(all|bot|help)$')
 def members_command(message, subcommand=None):
     """
     チャンネルにいるメンバーの一覧を返す
@@ -151,12 +153,17 @@ def members_command(message, subcommand=None):
     - https://api.slack.com/methods/users.info
     """
 
+    if subcommand == 'help':
+        botsend(message, '''- `$members`: チャンネルにいる通常のメンバーの一覧を返す
+- `$members all`:チャンネルにいる全てのメンバーの一覧を返す 
+- `$members bot`:チャンネルにいるbotのメンバーの一覧を返す 
+''')
+        return
     # チャンネルのメンバー一覧を取得
     channel = message.body['channel']
     webapi = slacker.Slacker(settings.API_TOKEN)
     cinfo = webapi.channels.info(channel)
     members = cinfo.body['channel']['members']
-
 
     name = ""
     nameall = ""
@@ -169,7 +176,14 @@ def members_command(message, subcommand=None):
         display_name = user_info.body['user']['profile']['display_name']
         if display_name != "":
             basename = display_name
-        nameall = nameall + "\n" + basename
+        if subcommand == 'all':
+            nameall = nameall + "\n" + basename
+        elif subcommand == 'bot':
+            if user_info.body['user']['is_bot']:
+                nameall = nameall + "\n" + basename
+        else:
+            if not user_info.body['user']['is_bot']:
+                nameall = nameall + "\n" + basename
 
 #    botsend(message, nameall)
 #        name = name + "\n" + format(user_info.body['user'][profile]['display_name'])+ ": " + format(user_info.body['user']['real_name'])
