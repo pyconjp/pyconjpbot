@@ -235,6 +235,9 @@ BOT: @takanory おはようございます
 - `$cal`: 今月のカレンダーを返す
 - `$cal 9`: 今年の指定された月のカレンダーを返す
 - `$cal 9 2016`: 指定された年月のカレンダーを返す
+- `$members`: チャンネルにいる通常の参加者のメンション名の一覧を返す
+- `$members bot`: チャンネルにいるbotの参加者のメンション名の一覧を返す
+- `$members all`: チャンネルにいる全ての参加者のメンション名の一覧を返す
 - [misc.py](https://github.com/pyconjp/pyconjpbot/blob/master/pyconjpbot/plugins/misc.py)
 
 ## How to build
