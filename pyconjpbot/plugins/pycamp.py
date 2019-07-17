@@ -245,8 +245,6 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
 
         botsend(message, 'チケットを作成しました: {}'.format(issue.permalink()))
     except JIRAError as e:
-        import pdb
-        pdb.set_trace()
         botsend(message, '`$pycamp` エラー:', e.text)
 
 
