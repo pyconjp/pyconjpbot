@@ -22,8 +22,10 @@ JIRA_PROJECTS = ['ISSHA', 'SAR', 'TRI', 'INU']  # JIRA Project Keys
 JIRA_DEFAULT_PROJECT = 'INU'   # JIRA Default Project Key
 
 # see https://docs.google.com/spreadsheets/d/1YiqErBDdp5QWfTlfDmxc6Vi696b_NGFJKzuyM-v6PDM/edit#gid=0
-JIRA_USER = '<JIRA Username>'
-JIRA_PASS = '<JIRA Password>'
+# https://id.atlassian.com/manage/api-tokens でトークンを生成
+JIRA_USERNAME = '<JIRA Username>'
+JIRA_USER = '<JIRA Email>'
+JIRA_PASS = '<JIRA API Token>'
 
 # Settings for translator plugin
 # https://www.microsoft.com/ja-jp/translator/getstarted.aspx

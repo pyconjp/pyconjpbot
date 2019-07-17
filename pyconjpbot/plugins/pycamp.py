@@ -111,10 +111,13 @@ def create_issue(template, params, parent=None, area=None):
     # issue を作成する
     issue = jira.create_issue(fields=issue_dict)
     # JIRA bot を watcher からはずす
-    jira.remove_watcher(issue, settings.JIRA_USER)
+    jira.remove_watcher(issue, settings.JIRA_USERNAME)
     # コアスタッフを watcher に追加
     for watcher in CORE_STAFFS:
         jira.add_watcher(issue, watcher)
+
+    import pdb
+    pdb.set_trace()
     return issue
 
 
