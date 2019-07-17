@@ -111,10 +111,11 @@ def create_issue(template, params, parent=None, area=None):
     # issue を作成する
     issue = jira.create_issue(fields=issue_dict)
     # JIRA bot を watcher からはずす
-    jira.remove_watcher(issue, settings.JIRA_USER)
+    jira.remove_watcher(issue, settings.JIRA_USERNAME)
     # コアスタッフを watcher に追加
     for watcher in CORE_STAFFS:
         jira.add_watcher(issue, watcher)
+
     return issue
 
 
@@ -242,8 +243,6 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
 
         botsend(message, 'チケットを作成しました: {}'.format(issue.permalink()))
     except JIRAError as e:
-        import pdb
-        pdb.set_trace()
         botsend(message, '`$pycamp` エラー:', e.text)
 
 
