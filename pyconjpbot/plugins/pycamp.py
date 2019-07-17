@@ -116,8 +116,6 @@ def create_issue(template, params, parent=None, area=None):
     for watcher in CORE_STAFFS:
         jira.add_watcher(issue, watcher)
 
-    import pdb
-    pdb.set_trace()
     return issue
 
 
