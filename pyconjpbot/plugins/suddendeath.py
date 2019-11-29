@@ -33,10 +33,11 @@ def suddendeath(message, words='突然の死'):
     # slack の絵文字っぽいパターンは全角文字と同じ長さとする
     words_for_length = re.sub(':[-+\w]+:', '蛇', words)
     length = _message_length(words_for_length)
+    soft_hyphen = b'\\u00AD'.decode('unicode-escape')
 
-    header = '＿' + '人' * (length // 2 + 2) + '＿'
-    footer = '￣' + 'Y^' * (length // 2) + 'Y￣'
-    middle = "＞　" + words + "　＜"
+    header = soft_hyphen + '＿' + '人' * (length // 2 + 2) + '＿'
+    footer = soft_hyphen + '￣' + 'Y^' * (length // 2) + 'Y￣'
+    middle = soft_hyphen + "＞　" + words + "　＜"
 
     botsend(message, "\n".join([header, middle, footer]))
 
