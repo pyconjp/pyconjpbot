@@ -103,8 +103,8 @@
 
 ### plusplus plugin
 
-- `名前++`: 指定された名前に +1 カウントする(感謝を伝えるインクリメント)
-- `名前--`: 指定された名前に -1 カウントする
+- `名前1 名前2++`: 指定された名前に +1 カウントする(感謝を伝えるインクリメント)
+- `名前1 名前2--`: 指定された名前に -1 カウントする
 - `$plusplus search (キーワード)`: 名前にキーワードを含む一覧を返す
 - `$plusplus delete (名前)`: カウントを削除する(カウント10未満のみ)
 - `$plusplus rename (変更前) (変更後)`: カウントする名前を変更する
@@ -245,7 +245,7 @@ BOT: @takanory おはようございます
 ```
 $ git clone git@github.com:pyconjp/pyconjpbot.git
 $ cd pyconjpbot
-$ python3.6 -m venv env
+$ python3.8 -m venv env
 $ . env/bin/activate
 (env) $ pip install -r requirements.txt
 (env) $ cp slackbot_settings.py.sample slackbot_settings.py

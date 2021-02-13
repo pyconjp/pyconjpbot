@@ -245,7 +245,8 @@ def gadmin_user_insert_delete(message, command, email, fname=None, lname=None):
     # コマンドを実行したユーザーのIDを取得
     user = message.body['user']
     if not _is_admin(user):
-        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
+        botsend(message, 'このコマンドの実行にはAdmin以上の権限が必要です')
+        return
 
     service = _get_service()
     email = _get_default_domain_email(email)
@@ -426,7 +427,8 @@ def gadmin_group_insert_delete(message, command, group, name=None):
     # コマンドを実行したユーザーのIDを取得
     user = message.body['user']
     if not _is_admin(user):
-        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
+        botsend(message, 'このコマンドの実行にはAdmin以上の権限が必要です')
+        return
 
     # グループ、メンバー情報の前処理
     group = _get_default_domain_email(group)
@@ -515,7 +517,8 @@ def gadmin_member_insert_delete(message, command, group, email):
     # コマンドを実行したユーザーのIDを取得
     user = message.body['user']
     if not _is_admin(user):
-        message.sent('このコマンドの実行にはAdmin以上の権限が必要です')
+        botsend(message, 'このコマンドの実行にはAdmin以上の権限が必要です')
+        return
 
     # グループ、メンバー情報の前処理
     emails = []

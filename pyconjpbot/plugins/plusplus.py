@@ -44,6 +44,9 @@ def _update_count(message, target, plusplus):
     指定ユーザーのカウンターを更新する
     """
     target = target.lower()
+    # 1文字の対象は無視する
+    if len(target) < 2:
+        return
     plus, created = Plusplus.get_or_create(name=target, defaults={'counter': 0})
 
     if plusplus == '++':
@@ -57,33 +60,26 @@ def _update_count(message, target, plusplus):
     botsend(message, '{} {} (通算: {})'.format(target, msg, plus.counter))
 
 
-@listen_to(r'^<@(.+)>:?\s*(\++|-+)')
-def mention_plusplus(message, user_id, plusplus):
+@listen_to(r'^(.*):?\s*(\+\+|--)')
+def multi_plusplus(message, targets, plusplus):
     """
-    mentionされたユーザーに対して ++ または -- する
-    """
-    if len(plusplus) != 2:
-        return
+    指定された複数の名前に対して ++ する
 
-    target = _get_user_name(user_id)
-    _update_count(message, target, plusplus)
-
-
-@listen_to(r'^(\w\S*[^\s:+-]):?\s*(\++|-+)')
-def plusplus(message, target, plusplus):
-    """
-    指定された名前に対して ++ または -- する
-
-    takanory++
-    takanory:++
-    takanory: ++
+    takanory terada++
+    takanory  terada  ++
+    takanory   terada: ++
     日本語++
-    takanory++ コメント
-    takanory ++
+    takanory  @terada++ コメント
     """
-    if len(plusplus) != 2:
-        return
-    _update_count(message, target, plusplus)
+    for target in targets.split():
+        # user_id(<@XXXXXX>)をユーザー名に変換する
+        if target.startswith('<@'):
+            user_id = target[2:-1]  # user_idを取り出す
+            target = _get_user_name(user_id)
+        # 先頭に @ があったら削除する
+        if target.startswith('@'):
+            target = target[1:]
+        _update_count(message, target, plusplus)
 
 
 @respond_to(r'^plusplus\s+(del|delete)\s+(\S+)')
@@ -185,10 +181,10 @@ def plusplus_help(message):
     """
     ヘルプメッセージを返す
     """
-    botsend(message, '''- `名前++`: 指定された名前に +1 カウントする
-- `名前--`: 指定された名前に -1 カウントする
-- `$pluplus search (キーワード)`: 名前にキーワードを含む一覧を返す
-- `$pluplus delete (名前)`: カウントを削除する(カウント10未満のみ)
-- `$pluplus rename (変更前) (変更後)`: カウントする名前を変更する
-- `$pluplus merge (統合元) (統合先)`: 2つの名前のカウントを統合先の名前にまとめる
+    botsend(message, '''- `名前1 名前2++`: 指定された名前に +1 カウントする
+- `名前1 名前2--`: 指定された名前に -1 カウントする
+- `$plusplus search (キーワード)`: 名前にキーワードを含む一覧を返す
+- `$plusplus delete (名前)`: カウントを削除する(カウント10未満のみ)
+- `$plusplus rename (変更前) (変更後)`: カウントする名前を変更する
+- `$plusplus merge (統合元) (統合先)`: 2つの名前のカウントを統合先の名前にまとめる
 ''')

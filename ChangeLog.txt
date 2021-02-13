@@ -1,9 +1,18 @@
 Unreleased
 ----------
 
-Release Notes - 2019-02-02
+Release Notes - 2021-02-13
 --------------------------
 - [ISSHA-1329] add members command
+
+Release Notes - 2021-02-13
+--------------------------
+- [ISSHA-2297] add multiple plusplus command
+- [ISSHA-2178] update library version
+
+Release Notes - 2019-07-17
+--------------------------
+- [ISSHA-1700] add JIRA_USERNAME for fix pycamp create command
 
 Release Notes - 2019-01-20
 --------------------------
