@@ -9,6 +9,7 @@ import git
 
 from ..botmessage import botsend, botreply, botwebapi
 
+
 @respond_to('^help$')
 def help(message):
     """
