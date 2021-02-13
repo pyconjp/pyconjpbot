@@ -242,7 +242,7 @@ BOT: @takanory おはようございます
 ```
 $ git clone git@github.com:pyconjp/pyconjpbot.git
 $ cd pyconjpbot
-$ python3.6 -m venv env
+$ python3.8 -m venv env
 $ . env/bin/activate
 (env) $ pip install -r requirements.txt
 (env) $ cp slackbot_settings.py.sample slackbot_settings.py
