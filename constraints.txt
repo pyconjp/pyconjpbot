@@ -5,6 +5,7 @@ PyGithub
 jira
 GitPython
 peewee
+Pillow
 python-dateutil
 requests
 langdetect
