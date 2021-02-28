@@ -9,12 +9,6 @@ from slackbot.bot import respond_to
 from ..botmessage import botsend, botwebapi
 
 
-AGENTS = ("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36",
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36",
-          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36",
-          )
-
-
 @respond_to(r'google\s+(.*)')
 def google(message, keywords):
     """
@@ -27,8 +21,7 @@ def google(message, keywords):
     # 検索を実行して結果を取得
     query = quote(keywords)
     url = f"https://google.com/search?q={query}"
-    headers = {'user-agent': choice(AGENTS)}
-    r = requests.get(url, headers=headers)
+    r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
 
     answer = soup.find("h3")
@@ -43,9 +36,8 @@ def google(message, keywords):
         href = href.split('&', 1)[0]
         botsend(message, f"{text} {unquote(href)}")
     except IndexError:
-        # in this case there is a first answer without a link, which is a
-        # google response! Let's grab it and display it to the user.
-        return ' '.join(answer[0].stripped_strings)
+        # URLが存在しない場合
+        botsend(message, f"{text}")
 
 
 def unescape(url):
@@ -64,18 +56,21 @@ def google_image(message, keywords):
     """
 
     query = quote(keywords)
-    searchurl = "https://www.google.com/search?tbm=isch&q={0}".format(query)
+    url = f"https://www.google.com/search?q={query}&source=lnms&tbm=isch"
 
     # this is an old iphone user agent. Seems to make google return good results.
-    useragent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Versio  n/4.0.5 Mobile/8A293 Safari/6531.22.7"
+    useragent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36"
 
-    result = requests.get(searchurl, headers={"User-agent": useragent}).text
-    images = list(map(unescape, re.findall(r"var u='(.*?)'", result)))
+    breakpoint()
+    r = requests.get(url, headers={"User-agent": useragent})
+    soup = BeautifulSoup(r.text, "html.parser")
+    images = soup.find_all('img')[1:]
 
     if images:
-        botsend(message, choice(images))
+        image = images[0]
+        botsend(message, image['src'])
     else:
-        botsend(message, "`{}` での検索結果はありませんでした".format(keywords))
+        botsend(message, f"`{keywords}` での検索結果はありませんでした")
 
 
 @respond_to(r'map\s+(.*)')
