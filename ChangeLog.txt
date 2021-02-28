@@ -3,6 +3,10 @@ Unreleased
 
 Release Notes - 2021-02-13
 --------------------------
+- [ISSHA-1329] add members command
+
+Release Notes - 2021-02-13
+--------------------------
 - [ISSHA-2297] add multiple plusplus command
 - [ISSHA-2178] update library version
 
