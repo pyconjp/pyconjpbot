@@ -13,7 +13,8 @@ def members_command(message, subcommand=None):
     チャンネル参加者のメンション名の一覧を返す
 
     - https://github.com/os/slacker
-    - https://api.slack.com/methods/channels.info
+    - https://api.slack.com/methods/conversations.members
+    - https://api.slack.com/methods/users.list
     - https://api.slack.com/methods/users.getPresence
     - https://api.slack.com/methods/users.info
     """
@@ -35,8 +36,8 @@ def members_command(message, subcommand=None):
     # チャンネルのメンバー一覧を取得
     channel = message.body['channel']
     webapi = slacker.Slacker(settings.API_TOKEN)
-    cinfo = webapi.channels.info(channel)
-    members = cinfo.body['channel']['members']
+    cinfo = webapi.conversations.members(channel)
+    members = cinfo.body['members']
 
     # 全メンバーを取得
     all_user_info = webapi.users.list()
