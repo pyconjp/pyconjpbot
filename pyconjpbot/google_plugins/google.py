@@ -9,29 +9,39 @@ from slackbot.bot import respond_to
 from ..botmessage import botsend, botwebapi
 
 
-@respond_to('google\s+(.*)')
+AGENTS = ("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36",
+          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36",
+          )
+
+
+@respond_to(r'google\s+(.*)')
 def google(message, keywords):
     """
     google で検索した結果を返す
-
-    https://github.com/llimllib/limbo/blob/master/limbo/plugins/google.py
     """
 
     if keywords == 'help':
         return
 
+    # 検索を実行して結果を取得
     query = quote(keywords)
-    url = "https://encrypted.google.com/search?q={0}".format(query)
-    soup = BeautifulSoup(requests.get(url).text, "html.parser")
+    url = f"https://google.com/search?q={query}"
+    headers = {'user-agent': choice(AGENTS)}
+    r = requests.get(url, headers=headers)
+    soup = BeautifulSoup(r.text, "html.parser")
 
-    answer = soup.findAll("h3", attrs={"class": "r"})
+    answer = soup.find("h3")
     if not answer:
-        botsend(message, "`{}` での検索結果はありませんでした".format(keywords))
+        botsend(message, f"`{keywords}` での検索結果はありませんでした")
 
     try:
-        _, url = answer[0].a['href'].split('=', 1)
-        url, _ = url.split('&', 1)
-        botsend(message, unquote(url))
+        # 検索結果からURLとテキストを取得して返す
+        text = answer.text
+        href = answer.parent['href']
+        href = href.replace('/url?q=', '')
+        href = href.split('&', 1)[0]
+        botsend(message, f"{text} {unquote(href)}")
     except IndexError:
         # in this case there is a first answer without a link, which is a
         # google response! Let's grab it and display it to the user.
@@ -45,7 +55,7 @@ def unescape(url):
     return url.replace(r"\x", "%")
 
 
-@respond_to('image\s+(.*)')
+@respond_to(r'image\s+(.*)')
 def google_image(message, keywords):
     """
     google で画像検索した結果を返す
@@ -68,7 +78,7 @@ def google_image(message, keywords):
         botsend(message, "`{}` での検索結果はありませんでした".format(keywords))
 
 
-@respond_to('map\s+(.*)')
+@respond_to(r'map\s+(.*)')
 def google_map(message, keywords):
     """
     google マップで検索した結果を返す
@@ -93,7 +103,7 @@ def google_map(message, keywords):
     botwebapi(message, attachments)
 
 
-@respond_to('google\s+help$')
+@respond_to(r'google\s+help$')
 def google_help(message):
     botsend(message, '''- `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
 - `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す
