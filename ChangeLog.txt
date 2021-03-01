@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2021-03-01
+--------------------------
+- [ISSHA-2296] fix search and image command, remove map command, remove weather comand
+
 Release Notes - 2021-02-13
 --------------------------
 - [ISSHA-2297] add multiple plusplus command
