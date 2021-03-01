@@ -1,12 +1,10 @@
-import re
 from urllib.request import quote, unquote
-from random import choice
 
 from bs4 import BeautifulSoup
 import requests
 from slackbot.bot import respond_to
 
-from ..botmessage import botsend, botwebapi
+from ..botmessage import botsend
 
 
 @respond_to(r'google\s+(.*)')
@@ -36,8 +34,9 @@ def google(message, keywords):
         href = href.split('&', 1)[0]
         botsend(message, f"{text} {unquote(href)}")
     except IndexError:
-        # URLが存在しない場合
-        botsend(message, f"{text}")
+        botsend(message, f"`{keywords}` での検索結果はありませんでした")
+    except KeyError:
+        botsend(message, f"`{keywords}` での検索結果はありませんでした")
 
 
 def unescape(url):
@@ -61,7 +60,6 @@ def google_image(message, keywords):
     # this is an old iphone user agent. Seems to make google return good results.
     useragent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36"
 
-    breakpoint()
     r = requests.get(url, headers={"User-agent": useragent})
     soup = BeautifulSoup(r.text, "html.parser")
     images = soup.find_all('img')[1:]
