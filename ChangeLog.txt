@@ -1,5 +1,6 @@
 Unreleased
 ----------
+- [ISSHA-2296] fix search and image command, remove map command
 
 Release Notes - 2021-02-13
 --------------------------
