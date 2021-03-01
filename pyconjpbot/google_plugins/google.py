@@ -73,33 +73,7 @@ def google_image(message, keywords):
         botsend(message, f"`{keywords}` での検索結果はありませんでした")
 
 
-@respond_to(r'map\s+(.*)')
-def google_map(message, keywords):
-    """
-    google マップで検索した結果を返す
-
-    https://github.com/llimllib/limbo/blob/master/limbo/plugins/map.py
-    """
-    query = quote(keywords)
-
-    # Slack seems to ignore the size param
-    #
-    # To get google to auto-reasonably-zoom its map, you have to use a marker
-    # instead of using a "center" parameter. I found that setting it to tiny
-    # and grey makes it the least visible.
-    url = "https://maps.googleapis.com/maps/api/staticmap?size=800x400&markers={0}&maptype={1}"
-    url = url.format(query, 'roadmap')
-
-    botsend(message, url)
-    attachments = [{
-        'pretext': '<http://maps.google.com/maps?q={}|大きい地図で見る>'.format(query),
-        'mrkdwn_in': ["pretext"],
-    }]
-    botwebapi(message, attachments)
-
-
 @respond_to(r'google\s+help$')
 def google_help(message):
     botsend(message, '''- `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
-- `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す
-- `$map keywords`: 指定したキーワードでgoogleマップの検索結果を返す''')
+- `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す''')
