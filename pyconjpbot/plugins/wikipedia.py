@@ -21,7 +21,7 @@ def wikipedia_page(message, option, query):
     try:
         # search with query
         results = wikipedia.search(query)
-    except:
+    except Exception:
         botsend(message, "指定された言語 `{}` は存在しません".format(lang))
         return
 

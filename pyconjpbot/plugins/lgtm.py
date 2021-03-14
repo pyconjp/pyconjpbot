@@ -102,7 +102,7 @@ def lgtm_create(message, url, text="LGTM"):
     try:
         url = url.replace("<", "").replace(">", "")
         r = requests.get(url)
-    except:
+    except Exception:
         botsend(message, "正しい画像URLを指定してください")
         return
 
