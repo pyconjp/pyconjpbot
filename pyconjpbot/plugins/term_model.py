@@ -1,7 +1,7 @@
 import os.path
 from datetime import datetime
 
-from peewee import *  # NOQA
+from peewee import CharField, DateTimeField, ForeignKeyField, Model, SqliteDatabase
 
 db = SqliteDatabase(os.path.join(os.path.dirname(__file__), "term.db"))
 

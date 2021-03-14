@@ -1,6 +1,6 @@
 import os.path
 
-from peewee import *  # NOQA
+from peewee import CharField, IntegerField, Model, SqliteDatabase
 
 db = SqliteDatabase(os.path.join(os.path.dirname(__file__), "plusplus.db"))
 

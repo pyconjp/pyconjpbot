@@ -1,6 +1,6 @@
 import os.path
 
-from peewee import *
+from peewee import CharField, Model, SqliteDatabase
 
 folder_db = SqliteDatabase(os.path.join(os.path.dirname(__file__), "folder.db"))
 
