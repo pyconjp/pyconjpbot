@@ -1,12 +1,11 @@
 import random
 
-from slackbot.bot import respond_to, listen_to
-from slackbot import settings
 import slacker
+from slackbot import settings
+from slackbot.bot import listen_to, respond_to
 
-from .plusplus_model import Plusplus
 from ..botmessage import botsend, botwebapi
-
+from .plusplus_model import Plusplus
 
 PLUS_MESSAGE = (
     'leveled up!',

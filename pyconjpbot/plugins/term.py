@@ -3,8 +3,8 @@ from datetime import datetime
 
 from slackbot.bot import respond_to
 
-from .term_model import Term, Response
 from ..botmessage import botsend, botwebapi
+from .term_model import Response, Term
 
 # すでに存在するコマンドは無視する
 RESERVED = (

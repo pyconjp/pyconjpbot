@@ -1,13 +1,13 @@
 import calendar
-from datetime import date
 import random
+from datetime import date
 
-from slackbot.bot import respond_to
-from slackbot import settings
-import slacker
 import git
+import slacker
+from slackbot import settings
+from slackbot.bot import respond_to
 
-from ..botmessage import botsend, botreply, botwebapi
+from ..botmessage import botreply, botsend, botwebapi
 
 
 @respond_to('^help$')

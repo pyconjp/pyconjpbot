@@ -1,10 +1,10 @@
 import argparse
-from urllib.parse import quote
 import re
+from urllib.parse import quote
 
 from jira import JIRA, JIRAError
 from slackbot import settings
-from slackbot.bot import respond_to, listen_to
+from slackbot.bot import listen_to, respond_to
 
 from ..botmessage import botsend, botwebapi
 

@@ -1,5 +1,5 @@
-from unicodedata import east_asian_width
 import re
+from unicodedata import east_asian_width
 
 from slackbot.bot import respond_to
 

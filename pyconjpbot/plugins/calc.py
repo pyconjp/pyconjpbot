@@ -1,7 +1,7 @@
 import re
 
 from slackbot.bot import listen_to
-from sympy import sympify, SympifyError
+from sympy import SympifyError, sympify
 
 from ..botmessage import botsend
 

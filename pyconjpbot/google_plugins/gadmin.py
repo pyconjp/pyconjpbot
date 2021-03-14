@@ -1,13 +1,13 @@
-import string
 import random
+import string
 
-from slackbot.bot import respond_to
-from slackbot import settings
-from slacker import Slacker
 from googleapiclient.errors import HttpError
+from slackbot import settings
+from slackbot.bot import respond_to
+from slacker import Slacker
 
-from .google_api import get_service
 from ..botmessage import botsend
+from .google_api import get_service
 
 DOMAIN = 'pycon.jp'
 

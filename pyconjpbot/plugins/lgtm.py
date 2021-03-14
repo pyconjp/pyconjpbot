@@ -1,11 +1,11 @@
-from urllib.parse import urlparse
 from io import BytesIO
-from tempfile import NamedTemporaryFile
 from pathlib import Path
+from tempfile import NamedTemporaryFile
+from urllib.parse import urlparse
 
-from slackbot.bot import respond_to
 import requests
 from PIL import Image, ImageDraw, ImageFont
+from slackbot.bot import respond_to
 
 from ..botmessage import botsend
 

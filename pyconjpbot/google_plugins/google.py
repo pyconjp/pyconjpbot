@@ -1,7 +1,7 @@
 from urllib.request import quote, unquote
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 from slackbot.bot import respond_to
 
 from ..botmessage import botsend

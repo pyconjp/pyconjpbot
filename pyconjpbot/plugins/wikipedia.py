@@ -1,5 +1,5 @@
-from slackbot.bot import respond_to
 import wikipedia
+from slackbot.bot import respond_to
 
 from ..botmessage import botsend, botwebapi
 

@@ -1,19 +1,19 @@
-from datetime import timedelta, datetime
-import time
-from pathlib import Path
 import json
+import time
+from datetime import datetime, timedelta
+from pathlib import Path
 
+import requests
+from bs4 import BeautifulSoup
 from dateutil import parser
 from jira import JIRA, JIRAError
+from PIL import Image, ImageDraw, ImageFont
 from slackbot import settings
 from slackbot.bot import respond_to
 from slackbot.utils import create_tmp_file
-import requests
-from bs4 import BeautifulSoup
-from PIL import Image, ImageFont, ImageDraw
 
-from ..google_plugins.google_api import get_service
 from ..botmessage import botsend, botwebapi
+from ..google_plugins.google_api import get_service
 
 # Clean JIRA Url to not have trailing / if exists
 CLEAN_JIRA_URL = settings.JIRA_URL

@@ -1,10 +1,9 @@
 import xml.etree.ElementTree as ET
 
-from slackbot import settings
-from slackbot.bot import respond_to
-
 import requests
 from langdetect import detect
+from slackbot import settings
+from slackbot.bot import respond_to
 
 from ..botmessage import botsend
 
