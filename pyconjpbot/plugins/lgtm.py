@@ -9,15 +9,15 @@ from slackbot.bot import respond_to
 
 from ..botmessage import botsend
 
-FONT = 'NotoSansCJKjp-Bold.otf'
+FONT = "NotoSansCJKjp-Bold.otf"
 
 HELP = """
 `$lgtm create URL (テキスト)`: 指定したURLの画像をもとにLGTM画像を生成する。テキストを指定するとそのテキストを描画する
 """
 
 # 文字の色と影の色
-FILL = 'white'
-SHADOW = 'black'
+FILL = "white"
+SHADOW = "black"
 
 
 def get_font_size(size, font_file, text):
@@ -72,7 +72,7 @@ def generate_lgtm_image(im, text):
     width, height = im.size
 
     # フォント生成
-    font_file = str(Path(__file__).parent / 'fonts' / FONT)
+    font_file = str(Path(__file__).parent / "fonts" / FONT)
     font_size = get_font_size(min(width, height), font_file, text)
     font = ImageFont.truetype(font_file, font_size, encoding="utf-8")
 
@@ -86,52 +86,52 @@ def generate_lgtm_image(im, text):
         images.append(copied_im)
         draw_im = ImageDraw.Draw(copied_im)
         # 枠線を描画
-        draw_im.text((x-1, y-1), text, font=font, fill=SHADOW)
-        draw_im.text((x+1, y-1), text, font=font, fill=SHADOW)
-        draw_im.text((x-1, y+1), text, font=font, fill=SHADOW)
-        draw_im.text((x+1, y+1), text, font=font, fill=SHADOW)
+        draw_im.text((x - 1, y - 1), text, font=font, fill=SHADOW)
+        draw_im.text((x + 1, y - 1), text, font=font, fill=SHADOW)
+        draw_im.text((x - 1, y + 1), text, font=font, fill=SHADOW)
+        draw_im.text((x + 1, y + 1), text, font=font, fill=SHADOW)
         # テキストを描画
         draw_im.text((x, y), text, font=font, fill=FILL)
 
     return images
 
 
-@respond_to('^lgtm\s+create\s+(\S+)$')
-@respond_to('^lgtm\s+create\s+(\S+)\s+(.+)')
-def lgtm_create(message, url, text='LGTM'):
+@respond_to("^lgtm\s+create\s+(\S+)$")
+@respond_to("^lgtm\s+create\s+(\S+)\s+(.+)")
+def lgtm_create(message, url, text="LGTM"):
     try:
-        url = url.replace('<', '').replace('>', '')
+        url = url.replace("<", "").replace(">", "")
         r = requests.get(url)
     except:
-        botsend(message, '正しい画像URLを指定してください')
+        botsend(message, "正しい画像URLを指定してください")
         return
 
     if r.status_code != requests.codes.ok:
-        botsend(message, 'エラーが発生しました({})'.format(r.status_code))
+        botsend(message, "エラーが発生しました({})".format(r.status_code))
         return
 
     try:
         # 画像を読み込む
         im = Image.open(BytesIO(r.content))
     except OSError:
-        botsend(message, '画像ファイルのURLを指定してください')
+        botsend(message, "画像ファイルのURLを指定してください")
         return
 
     # ファイルのbasenameを取得
-    basename = urlparse(url).path.split('/')[-1].split('.')[0]
+    basename = urlparse(url).path.split("/")[-1].split(".")[0]
 
     # LGTM画像を生成する
     images = generate_lgtm_image(im, text)
 
     for idx, im in enumerate(images):
         # 一時ファイルに画像を保存してアップロードする
-        with NamedTemporaryFile(suffix='.png') as fp:
-            im.save(fp, format='png')
-            fname = '{}-{}{}.png'.format(basename, text.lower(), idx)
+        with NamedTemporaryFile(suffix=".png") as fp:
+            im.save(fp, format="png")
+            fname = "{}-{}{}.png".format(basename, text.lower(), idx)
             message.channel.upload_file(fname=fname, fpath=fp.name)
 
 
-@respond_to('^lgtm\s+help')
+@respond_to("^lgtm\s+help")
 def lgtm_help(message):
     """
     ヘルプメッセージを返す

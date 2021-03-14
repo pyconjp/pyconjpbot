@@ -7,13 +7,13 @@ from slackbot.bot import respond_to
 from ..botmessage import botsend
 
 
-@respond_to(r'google\s+(.*)')
+@respond_to(r"google\s+(.*)")
 def google(message, keywords):
     """
     google で検索した結果を返す
     """
 
-    if keywords == 'help':
+    if keywords == "help":
         return
 
     # 検索を実行して結果を取得
@@ -29,9 +29,9 @@ def google(message, keywords):
     try:
         # 検索結果からURLとテキストを取得して返す
         text = answer.text
-        href = answer.parent['href']
-        href = href.replace('/url?q=', '')
-        href = href.split('&', 1)[0]
+        href = answer.parent["href"]
+        href = href.replace("/url?q=", "")
+        href = href.split("&", 1)[0]
         botsend(message, f"{text} {unquote(href)}")
     except IndexError:
         botsend(message, f"`{keywords}` での検索結果はありませんでした")
@@ -46,7 +46,7 @@ def unescape(url):
     return url.replace(r"\x", "%")
 
 
-@respond_to(r'image\s+(.*)')
+@respond_to(r"image\s+(.*)")
 def google_image(message, keywords):
     """
     google で画像検索した結果を返す
@@ -62,16 +62,19 @@ def google_image(message, keywords):
 
     r = requests.get(url, headers={"User-agent": useragent})
     soup = BeautifulSoup(r.text, "html.parser")
-    images = soup.find_all('img')[1:]
+    images = soup.find_all("img")[1:]
 
     if images:
         image = images[0]
-        botsend(message, image['src'])
+        botsend(message, image["src"])
     else:
         botsend(message, f"`{keywords}` での検索結果はありませんでした")
 
 
-@respond_to(r'google\s+help$')
+@respond_to(r"google\s+help$")
 def google_help(message):
-    botsend(message, '''- `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
-- `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す''')
+    botsend(
+        message,
+        """- `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
+- `$image keywords`: 指定したキーワードでgoogle画像検索した結果からランダムに返す""",
+    )

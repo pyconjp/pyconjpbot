@@ -10,7 +10,7 @@ from ..botmessage import botsend, botwebapi
 
 # Clean JIRA Url to not have trailing / if exists
 CLEAN_JIRA_URL = settings.JIRA_URL
-if settings.JIRA_URL[-1:] == '/':
+if settings.JIRA_URL[-1:] == "/":
     CLEAN_JIRA_URL = CLEAN_JIRA_URL[:-1]
 
 # Login to jira
@@ -22,13 +22,13 @@ DEFAULT_PROJECT = settings.JIRA_DEFAULT_PROJECT
 
 # コンポーネントの一覧
 COMPONENT = {
-    '全体': '0.全体',
-    '事務局': '1.事務局',
-    '会場': '2.会場',
-    'プログラム': '3.プログラム',
-    'システム': '4.システム',
-    'デザイン': '5.デザイン・グッズ',
-    'その他': '9.その他',
+    "全体": "0.全体",
+    "事務局": "1.事務局",
+    "会場": "2.会場",
+    "プログラム": "3.プログラム",
+    "システム": "4.システム",
+    "デザイン": "5.デザイン・グッズ",
+    "その他": "9.その他",
 }
 
 # $jira コマンドの引数処理用 argparse
@@ -49,16 +49,23 @@ $jira {} [-p PROJECT] [-c COMPONENT] [-l LABEL] [-s] [keywords ...]
 """
 
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('-p', '--project', default=DEFAULT_PROJECT, type=str,
-                    help='検索対象のプロジェクトを指定する(default: {})'.format(DEFAULT_PROJECT))
-parser.add_argument('-c', '--component', type=str,
-                    help='検索対象のコンポーネントを指定する')
-parser.add_argument('-l', '--label', type=str,
-                    help='検索対象のラベルを指定する')
-parser.add_argument('-s', '--summary', default=False, action='store_true',
-                    help='要約(タイトル)のみを検索対象にする(未指定時は全文検索)')
-parser.add_argument('keywords', nargs='*', type=str,
-                    help='検索対象のキーワードを指定する')
+parser.add_argument(
+    "-p",
+    "--project",
+    default=DEFAULT_PROJECT,
+    type=str,
+    help="検索対象のプロジェクトを指定する(default: {})".format(DEFAULT_PROJECT),
+)
+parser.add_argument("-c", "--component", type=str, help="検索対象のコンポーネントを指定する")
+parser.add_argument("-l", "--label", type=str, help="検索対象のラベルを指定する")
+parser.add_argument(
+    "-s",
+    "--summary",
+    default=False,
+    action="store_true",
+    help="要約(タイトル)のみを検索対象にする(未指定時は全文検索)",
+)
+parser.add_argument("keywords", nargs="*", type=str, help="検索対象のキーワードを指定する")
 
 
 def create_attachments(issue_id):
@@ -68,7 +75,7 @@ def create_attachments(issue_id):
 
     :param issue_id: JIRAのissue番号
     """
-    project, _ = issue_id.split('-')
+    project, _ = issue_id.split("-")
     # 存在しないプロジェクトの場合はNoneを返す
     if project not in settings.JIRA_PROJECTS:
         return None
@@ -81,43 +88,45 @@ def create_attachments(issue_id):
         return None
 
     summary = issue.fields.summary
-    assignee = '未割り当て'
+    assignee = "未割り当て"
     if issue.fields.assignee:
         assignee = issue.fields.assignee.displayName
     status = issue.fields.status.name
     issue_url = issue.permalink()
 
-    attachments = [{
-        'fallback': '{} {}'.format(issue_id, summary),
-        'pretext': '<{}|{}> {}'.format(issue_url, issue_id, summary),
-        'fields': [
-            {
-                'title': '担当者',
-                'value': assignee,
-                'short': True,
-            },
-            {
-                'title': 'ステータス',
-                'value': status,
-                'short': True,
-            },
-        ],
-    }]
+    attachments = [
+        {
+            "fallback": "{} {}".format(issue_id, summary),
+            "pretext": "<{}|{}> {}".format(issue_url, issue_id, summary),
+            "fields": [
+                {
+                    "title": "担当者",
+                    "value": assignee,
+                    "short": True,
+                },
+                {
+                    "title": "ステータス",
+                    "value": status,
+                    "short": True,
+                },
+            ],
+        }
+    ]
     return attachments
 
 
-@listen_to(r'[A-Za-z]{3,5}-[\d]+')
+@listen_to(r"[A-Za-z]{3,5}-[\d]+")
 def jira_listener(message):
     """
     JIRAのissue idっぽいものを取得したら、そのissueの情報を返す
     """
     # botメッセージの場合は無視する
-    if message.body.get('subtype', '') == 'bot_message':
+    if message.body.get("subtype", "") == "bot_message":
         return
 
-    text = message.body['text'].upper()
+    text = message.body["text"].upper()
     # JIRAのissue idっぽい文字列を取得
-    for issue_id in re.findall(r'[A-Z]{3,5}-[\d]+', text):
+    for issue_id in re.findall(r"[A-Z]{3,5}-[\d]+", text):
         # issue_id から issue 情報の attachments を取得
         attachments = create_attachments(issue_id)
         if attachments:
@@ -132,29 +141,29 @@ def _drive_help(message, cmd1, cmd2):
     botsend(message, HELP.format(cmd1, cmd2, DEFAULT_PROJECT))
 
 
-def _build_jql(args, jql_base=''):
+def _build_jql(args, jql_base=""):
     """
     引数から JIRA を検索するための JQL を生成する
     """
     jql = jql_base
-    jql += 'project = {}'.format(args.project)
+    jql += "project = {}".format(args.project)
     if args.component:
         component = COMPONENT.get(args.component, args.component)
-        jql += ' AND component = {}'.format(component)
+        jql += " AND component = {}".format(component)
     if args.label:
-        jql += ' AND labels = {}'.format(args.label)
+        jql += " AND labels = {}".format(args.label)
     if args.keywords:
-        target = 'text'
+        target = "text"
         if args.summary:
             # 要約を検索対象にする
-            target = 'summary'
-        jql += ' AND {} ~ "{}"'.format(target, ' '.join(args.keywords))
+            target = "summary"
+        jql += ' AND {} ~ "{}"'.format(target, " ".join(args.keywords))
 
     return jql
 
 
-@respond_to('^jira\s+search\s+(.*)')
-@respond_to('^jira\s+検索\s+(.*)')
+@respond_to("^jira\s+search\s+(.*)")
+@respond_to("^jira\s+検索\s+(.*)")
 def jira_search(message, keywords):
     """
     JIRAをキーワード検索した結果を返す(オープン状態のみ)
@@ -164,19 +173,19 @@ def jira_search(message, keywords):
     try:
         args, argv = parser.parse_known_args(keywords.split())
     except SystemExit:
-        botsend(message, '引数の形式が正しくありません')
-        _drive_help(message, 'search', '検索')
+        botsend(message, "引数の形式が正しくありません")
+        _drive_help(message, "search", "検索")
         return
 
     # 引数から query を生成
     jql = _build_jql(args, 'status in (Open, "In Progress", Reopened) AND ')
 
-    title = '「{}」の検索結果(オープンのみ)'.format(keywords)
+    title = "「{}」の検索結果(オープンのみ)".format(keywords)
     _send_jira_search_responce(message, jql, title)
 
 
-@respond_to('^jira\s+allsearch\s+(.*)')
-@respond_to('^jira\s+全検索\s+(.*)')
+@respond_to("^jira\s+allsearch\s+(.*)")
+@respond_to("^jira\s+全検索\s+(.*)")
 def jira_allsearch(message, keywords):
     """
     JIRAをキーワード検索した結果を返す(全ステータス対象)
@@ -185,25 +194,25 @@ def jira_allsearch(message, keywords):
     try:
         args, argv = parser.parse_known_args(keywords.split())
     except SystemExit:
-        botsend(message, '引数の形式が正しくありません')
-        _drive_help(message, 'search', '検索')
+        botsend(message, "引数の形式が正しくありません")
+        _drive_help(message, "search", "検索")
         return
 
     # 引数から query を生成
     jql = _build_jql(args)
-    
-    title = '「{}」の検索結果(全ステータス)'.format(keywords)
+
+    title = "「{}」の検索結果(全ステータス)".format(keywords)
     _send_jira_search_responce(message, jql, title)
 
 
-@respond_to('^jira\s+assignee\s+(.*)')
-@respond_to('^jira\s+担当者?\s+(.*)')
+@respond_to("^jira\s+assignee\s+(.*)")
+@respond_to("^jira\s+担当者?\s+(.*)")
 def jira_assignee(message, user):
     """
     指定されたユーザーにアサインされた課題の一覧を返す
     """
     jql = 'status in (Open, "In Progress", Reopened) AND assignee in ({})'
-    title = '「{}」の担当課題'.format(user)
+    title = "「{}」の担当課題".format(user)
     _send_jira_search_responce(message, jql.format(user), title)
 
 
@@ -212,14 +221,14 @@ def _send_jira_search_responce(message, query, title):
     JIRAをqueryで検索した結果を返すメソッド
     """
     pretext = title
-    pretext += '(<{}/issues/?jql={}|JIRAで見る>)'.format(CLEAN_JIRA_URL, quote(query))
-    text = ''
+    pretext += "(<{}/issues/?jql={}|JIRAで見る>)".format(CLEAN_JIRA_URL, quote(query))
+    text = ""
 
     try:
         issues = jira.search_issues(query)
     except JIRAError as err:
         # なんらかのエラーが発生
-        botsend(message, 'JIRAError: `{}`'.format(err.text))
+        botsend(message, "JIRAError: `{}`".format(err.text))
         return
 
     if issues:
@@ -228,53 +237,61 @@ def _send_jira_search_responce(message, query, title):
             key = issue.key
             url = issue.permalink()
             status = issue.fields.status.name
-            text += '- <{}|{}> {}({})\n'.format(url, key, summary, status)
+            text += "- <{}|{}> {}({})\n".format(url, key, summary, status)
     else:
-        text += '該当するJIRA issueは見つかりませんでした'
+        text += "該当するJIRA issueは見つかりませんでした"
 
-    attachments = [{
-        'fallback': title,
-        'pretext': pretext,
-        'text': text,
-    }]
+    attachments = [
+        {
+            "fallback": title,
+            "pretext": pretext,
+            "text": text,
+        }
+    ]
     botwebapi(message, attachments)
 
 
-@respond_to('^jira\s+filters?')
-@respond_to('^jira\s+フィルター?')
+@respond_to("^jira\s+filters?")
+@respond_to("^jira\s+フィルター?")
 def jira_filter(message):
     """
     フィルターの一覧を返す
     """
-    pretext = 'フィルター一覧'
+    pretext = "フィルター一覧"
     filters = [
-        ('1.事務局チーム', '10301'),
-        ('2.会場チーム', '10302'),
-        ('3.プログラムチーム', '10300'),
-        ('4.メディアチーム ', '10303'),
-        ('一般社団法人PyCon JP', '11500'),
-        ]
+        ("1.事務局チーム", "10301"),
+        ("2.会場チーム", "10302"),
+        ("3.プログラムチーム", "10300"),
+        ("4.メディアチーム ", "10303"),
+        ("一般社団法人PyCon JP", "11500"),
+    ]
     flist = []
     for label, key in filters:
-        flist.append('<{}/issues/?filter={}|{}>'.format(CLEAN_JIRA_URL, key, label))
+        flist.append("<{}/issues/?filter={}|{}>".format(CLEAN_JIRA_URL, key, label))
 
-    attachments = [{
-        'fallback': pretext,
-        'pretext': pretext,
-        'text': ' / '.join(flist),
-    }]
+    attachments = [
+        {
+            "fallback": pretext,
+            "pretext": pretext,
+            "text": " / ".join(flist),
+        }
+    ]
     botwebapi(message, attachments)
 
 
-@respond_to('^jira\s+help$')
+@respond_to("^jira\s+help$")
 def jira_help(message):
     """
     jiraコマンドのヘルプを返す
     """
-    botsend(message, '''- `INU-123`: 指定されたチケットの詳細情報を返す
+    botsend(
+        message,
+        """- `INU-123`: 指定されたチケットの詳細情報を返す
 - `$jira search keywords` `$jira 検索 keywords`: 指定されたキーワードで検索(オープンのみ)
 - `$jira allsearch keywords` `$jira 全検索 keywords`: 指定されたキーワードで検索(全ステータス)
 - `$jira assignee user` `$jira 担当 user`: 指定されたユーザーが担当しているissueを返す
 - `$jira filter` `$jira フィルター`: フィルターの一覧を返す
 
-検索/全検索時に使用できるオプション''' + HELP.format('検索', '全検索', DEFAULT_PROJECT))
+検索/全検索時に使用できるオプション"""
+        + HELP.format("検索", "全検索", DEFAULT_PROJECT),
+    )
