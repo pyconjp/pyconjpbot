@@ -58,8 +58,10 @@ def google_image(message, keywords):
     url = f"https://www.google.com/search?q={query}&source=lnms&tbm=isch"
 
     # this is an old iphone user agent. Seems to make google return good results.
-    useragent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36"
-
+    useragent = (
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36"
+    )
     r = requests.get(url, headers={"User-agent": useragent})
     soup = BeautifulSoup(r.text, "html.parser")
     images = soup.find_all("img")[1:]

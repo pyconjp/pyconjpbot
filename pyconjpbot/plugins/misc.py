@@ -10,7 +10,7 @@ from slackbot.bot import respond_to
 from ..botmessage import botreply, botsend, botwebapi
 
 
-@respond_to("^help$")
+@respond_to(r"^help$")
 def help(message):
     """
     helpページのURLを返す
@@ -18,7 +18,7 @@ def help(message):
     botsend(message, "ヘルプはこちら→ https://github.com/pyconjp/pyconjpbot#commands")
 
 
-@respond_to("^shuffle\s+(.*)")
+@respond_to(r"^shuffle\s+(.*)")
 def shuffle(message, words):
     """
     指定したキーワードをシャッフルして返す
@@ -31,7 +31,7 @@ def shuffle(message, words):
         botsend(message, " ".join(words))
 
 
-@respond_to("^choice\s+(.*)")
+@respond_to(r"^choice\s+(.*)")
 def choice(message, words):
     """
     指定したキーワードから一つを選んで返す
@@ -43,7 +43,7 @@ def choice(message, words):
         botsend(message, random.choice(words))
 
 
-@respond_to("^ping$")
+@respond_to(r"^ping$")
 def ping(message):
     """
     pingに対してpongで応答する
@@ -51,7 +51,7 @@ def ping(message):
     botreply(message, "pong")
 
 
-@respond_to("^version$")
+@respond_to(r"^version$")
 def version(message):
     """
     バージョン情報を返す
@@ -69,8 +69,8 @@ def version(message):
     botwebapi(message, attachments)
 
 
-@respond_to("^random$")
-@respond_to("^random\s+(active|help)$")
+@respond_to(r"^random$")
+@respond_to(r"^random\s+(active|help)$")
 def random_command(message, subcommand=None):
     """
     チャンネルにいるメンバーからランダムに一人を選んで返す
@@ -116,9 +116,9 @@ def random_command(message, subcommand=None):
     botsend(message, "{} さん、君に決めた！".format(name))
 
 
-@respond_to("^cal$")
-@respond_to("^cal\s+(\d+)$")
-@respond_to("^cal\s+(\d+)\s+(\d+)$")
+@respond_to(r"^cal$")
+@respond_to(r"^cal\s+(\d+)$")
+@respond_to(r"^cal\s+(\d+)\s+(\d+)$")
 def cal_command(message, month=None, year=None):
     """
     一ヶ月のカレンダーを返す
@@ -135,7 +135,7 @@ def cal_command(message, month=None, year=None):
         pass
 
 
-@respond_to("^cal\s+help$")
+@respond_to(r"^cal\s+help$")
 def cal_help(message):
     """
     cal コマンドのヘルプを返す

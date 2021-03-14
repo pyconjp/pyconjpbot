@@ -8,7 +8,7 @@ from ..botmessage import botsend
 URL = "http://manual.pycon.jp/"
 
 
-@respond_to("^manual$")
+@respond_to(r"^manual$")
 def manual(message):
     """
     マニュアルのURLを返す
@@ -16,7 +16,7 @@ def manual(message):
     botsend(message, "PyCon JP 運営マニュアル {}".format(URL))
 
 
-@respond_to("^manual\s+(.*)")
+@respond_to(r"^manual\s+(.*)")
 def manual_search(message, query):
     """
     マニュアルをキーワード検索したURLを返す
@@ -25,7 +25,7 @@ def manual_search(message, query):
         botsend(message, "{}search.html?q={}".format(URL, quote_plus(query)))
 
 
-@respond_to("^manual\s+help$")
+@respond_to(r"^manual\s+help$")
 def manual_help(message):
     """
     マニュアルコマンドのヘルプを返す

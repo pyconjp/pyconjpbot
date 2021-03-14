@@ -8,7 +8,7 @@ github = Github(settings.GITHUB_TOKEN)
 org = github.get_organization(settings.GITHUB_ORGANIZATION)
 
 
-@respond_to("^github\s+repos")
+@respond_to(r"^github\s+repos")
 def github_repos(message):
     """
     リポジトリの一覧を返す
@@ -27,7 +27,7 @@ def github_repos(message):
     botwebapi(message, attachments)
 
 
-@respond_to("^github\s+search\s+(.*)")
+@respond_to(r"^github\s+search\s+(.*)")
 def github_search(message, keywords):
     """
     指定されたキーワードでissueを検索する
@@ -57,7 +57,7 @@ def github_search(message, keywords):
         botsend(message, "`{}` にマッチするissueはありません".format(keywords))
 
 
-@respond_to("^github\s+code\s+(.*)")
+@respond_to(r"^github\s+code\s+(.*)")
 def github_code(message, keywords):
     """
     指定されたキーワードでコードを検索する
@@ -87,7 +87,7 @@ def github_code(message, keywords):
         botsend(message, "`{}` にマッチするコードはありません".format(keywords))
 
 
-@respond_to("^github\s+help$")
+@respond_to(r"^github\s+help$")
 def github_help(message):
     """
     githubコマンドのヘルプを返す

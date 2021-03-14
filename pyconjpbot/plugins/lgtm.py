@@ -96,8 +96,8 @@ def generate_lgtm_image(im, text):
     return images
 
 
-@respond_to("^lgtm\s+create\s+(\S+)$")
-@respond_to("^lgtm\s+create\s+(\S+)\s+(.+)")
+@respond_to(r"^lgtm\s+create\s+(\S+)$")
+@respond_to(r"^lgtm\s+create\s+(\S+)\s+(.+)")
 def lgtm_create(message, url, text="LGTM"):
     try:
         url = url.replace("<", "").replace(">", "")
@@ -131,7 +131,7 @@ def lgtm_create(message, url, text="LGTM"):
             message.channel.upload_file(fname=fname, fpath=fp.name)
 
 
-@respond_to("^lgtm\s+help")
+@respond_to(r"^lgtm\s+help")
 def lgtm_help(message):
     """
     ヘルプメッセージを返す

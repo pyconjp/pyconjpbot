@@ -4,7 +4,7 @@ from slackbot.bot import respond_to
 from ..botmessage import botsend, botwebapi
 
 
-@respond_to("^wikipedia(\s+-\w+)?\s+(.*)")
+@respond_to(r"^wikipedia(\s+-\w+)?\s+(.*)")
 def wikipedia_page(message, option, query):
     """
     Wikipediaで検索した結果を返す
@@ -41,7 +41,7 @@ def wikipedia_page(message, option, query):
         botsend(message, "`{}` に該当するページはありません".format(query))
 
 
-@respond_to("^wikipedia\s+help")
+@respond_to(r"^wikipedia\s+help")
 def wikipedia_help(message):
     botsend(
         message,

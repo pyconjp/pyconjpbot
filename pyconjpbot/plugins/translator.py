@@ -11,7 +11,7 @@ from ..botmessage import botsend
 API_BASE_URL = "https://api.microsofttranslator.com/V2/Http.svc/"
 
 
-@respond_to("^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)")
+@respond_to(r"^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)")
 def translate(message, cmd, option, text):
     """
     指定した文字列を翻訳する
@@ -53,7 +53,7 @@ def translate(message, cmd, option, text):
     botsend(message, tree.text)
 
 
-@respond_to("^(translate|翻訳)\s+(list|リスト)")
+@respond_to(r"^(translate|翻訳)\s+(list|リスト)")
 def translate_list(message, cmd, option):
     """
     使用できる言語の一覧を返す
@@ -68,11 +68,11 @@ def translate_list(message, cmd, option):
     # 言語の一覧を取得
     tree = ET.fromstring(r.text)
     langs = sorted(child.text for child in tree)
-    reply = " ".join(("`{}`".format(l) for l in langs))
+    reply = " ".join(("`{}`".format(lang) for lang in langs))
     botsend(message, "使用できる言語: {}".format(reply))
 
 
-@respond_to("^(translate|翻訳)\s+help")
+@respond_to(r"^(translate|翻訳)\s+help")
 def translate_help(message, cmd):
     botsend(
         message,

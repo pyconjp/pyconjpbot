@@ -168,7 +168,7 @@ def get_subtask_template(service):
     return subtask_template
 
 
-@respond_to("^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)")
+@respond_to(r"^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)")
 def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
     """
     Python Boot Camp の issue をまとめて作成する
@@ -312,8 +312,8 @@ def generate_pycamp_summary(events):
     return attachements
 
 
-@respond_to("^pycamp\s+summary$")
-@respond_to("^pycamp\s+summary\s+(-party)")
+@respond_to(r"^pycamp\s+summary$")
+@respond_to(r"^pycamp\s+summary\s+(-party)")
 def pycamp_summary(message, party=None):
     """
     開催予定のpycampイベントの情報を返す
@@ -444,7 +444,7 @@ def get_staff_info(pycamp_dict):
     return staff_name_dict, staff_attend_dict
 
 
-@respond_to("^pycamp\s+count-staff$")
+@respond_to(r"^pycamp\s+count-staff$")
 def pycamp_count_staff(message):
     """
     pycampにスタッフやTAに2回以上参加した人を調べる
@@ -502,7 +502,7 @@ def pycamp_count_staff(message):
     botsend(message, text)
 
 
-@respond_to("^pycamp\s+logo\s+(\S+)")
+@respond_to(r"^pycamp\s+logo\s+(\S+)")
 def pycamp_logo(message, title):
     botsend(message, "Python Boot Camp ロゴ作成中... :hammer:")
 
@@ -532,7 +532,7 @@ def pycamp_logo(message, title):
     botsend(message, "ロゴ画像を作成しました")
 
 
-@respond_to("^pycamp\s+help")
+@respond_to(r"^pycamp\s+help")
 def pycamp_help(message):
     """
     ヘルプメッセージを返す

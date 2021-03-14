@@ -39,9 +39,9 @@ RESERVED = (
 commands = {term.command for term in Term.select()}
 
 
-@respond_to("^term\s+([\w-]+)$")
-@respond_to("^term\s+create\s+([\w-]+)$")
-@respond_to("^term\s+add\s+([\w-]+)$")
+@respond_to(r"^term\s+([\w-]+)$")
+@respond_to(r"^term\s+create\s+([\w-]+)$")
+@respond_to(r"^term\s+add\s+([\w-]+)$")
 def term_create(message, command):
     """
     指定されたコマンドを生成する
@@ -71,7 +71,7 @@ def term_create(message, command):
         commands.add(command)
 
 
-@respond_to("^term\s+(drop|del|delete)\s+([\w-]+)$")
+@respond_to(r"^term\s+(drop|del|delete)\s+([\w-]+)$")
 def term_drop(message, subcommand, command):
     """
     指定されたコマンドを消去する
@@ -113,7 +113,7 @@ def _create_attachments_for_list(pretext, data, command=True):
     return attachments
 
 
-@respond_to("^term\s+search\s+([\w-]+)$")
+@respond_to(r"^term\s+search\s+([\w-]+)$")
 def term_search(message, keyword):
     """
     指定したキーワードを含む用語コマンドの一覧を返す
@@ -127,7 +127,7 @@ def term_search(message, keyword):
     botwebapi(message, attachments)
 
 
-@respond_to("^term\s+list$")
+@respond_to(r"^term\s+list$")
 def term_list(message):
     """
     現在使用可能な用語コマンドの一覧を返す
@@ -165,7 +165,7 @@ def _send_markdown_text(message, text):
     botwebapi(message, attachments)
 
 
-@respond_to("^([\w-]+)$")
+@respond_to(r"^([\w-]+)$")
 def return_response(message, command):
     """
     用語コマンドに登録されている応答をランダムに返す
@@ -183,7 +183,7 @@ def return_response(message, command):
         _send_markdown_text(message, response.text)
 
 
-@respond_to("^([\w-]+)\s+(.*)")
+@respond_to(r"^([\w-]+)\s+(.*)")
 def response(message, command, params):
     """
     用語コマンドの処理をする
@@ -328,7 +328,7 @@ def get_responses(message, command):
         botwebapi(message, attachments)
 
 
-@respond_to("term\s+help")
+@respond_to(r"term\s+help")
 def term_help(message):
     """
     term pluginのヘルプを返す

@@ -21,8 +21,8 @@ def _message_length(message):
     return length
 
 
-@respond_to("^suddendeath$")
-@respond_to("^suddendeath\s+(.*)")
+@respond_to(r"^suddendeath$")
+@respond_to(r"^suddendeath\s+(.*)")
 def suddendeath(message, words="突然の死"):
     """
     突然の死のメッセージを返す
@@ -31,7 +31,7 @@ def suddendeath(message, words="突然の死"):
         return
 
     # slack の絵文字っぽいパターンは全角文字と同じ長さとする
-    words_for_length = re.sub(":[-+\w]+:", "蛇", words)
+    words_for_length = re.sub(r":[-+\w]+:", "蛇", words)
     length = _message_length(words_for_length)
     soft_hyphen = b"\\u00AD".decode("unicode-escape")
 
@@ -42,7 +42,7 @@ def suddendeath(message, words="突然の死"):
     botsend(message, "\n".join([header, middle, footer]))
 
 
-@respond_to("^suddendeath\s+help")
+@respond_to(r"^suddendeath\s+help")
 def suddendeath_help(message):
     botsend(
         message,
