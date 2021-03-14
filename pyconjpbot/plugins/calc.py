@@ -6,10 +6,10 @@ from sympy import SympifyError, sympify
 from ..botmessage import botsend
 
 # 単一の数字っぽい文字列を表すパターン
-NUM_PATTERN = re.compile('^\s*[-+]?[\d.,]+\s*$')
+NUM_PATTERN = re.compile(r"^\s*[-+]?[\d.,]+\s*$")
 
 
-@listen_to('^(([-+*/^%!(),.\d\s]|pi|e|sqrt|sin|cos|tan)+)$')
+@listen_to(r"^(([-+*/^%!(),.\d\s]|pi|e|sqrt|sin|cos|tan)+)$")
 def calc(message, expression, dummy_):
     """
     数式っぽい文字列だったら計算して結果を返す
@@ -20,7 +20,7 @@ def calc(message, expression, dummy_):
         return
     try:
         # カンマを削除
-        expression = expression.replace(',', '')
+        expression = expression.replace(",", "")
         result = sympify(expression)
     except SympifyError:
         # 数式じゃなかったら無視する
@@ -37,4 +37,4 @@ def calc(message, expression, dummy_):
             return
 
     # カンマをつけて出力する
-    botsend(message, '{:,}'.format(answer))
+    botsend(message, "{:,}".format(answer))

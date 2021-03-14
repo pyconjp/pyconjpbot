@@ -8,7 +8,7 @@ def botsend(message, text):
     :param messsage: slackbotのmessageオブジェクト
     :param text: 送信するテキストメッセージ
     """
-    if 'thread_ts' in message.body:
+    if "thread_ts" in message.body:
         # スレッド内のメッセージの場合
         message.send(text, thread_ts=message.thread_ts)
     else:
@@ -23,7 +23,7 @@ def botreply(message, text):
     :param messsage: slackbotのmessageオブジェクト
     :param text: 送信するテキストメッセージ
     """
-    if 'thread_ts' in message.body:
+    if "thread_ts" in message.body:
         # スレッド内のメッセージの場合
         message.reply(text, in_thread=True)
     else:
@@ -42,9 +42,9 @@ def botwebapi(message, attachments):
     if not isinstance(attachments, str):
         attachments = json.dumps(attachments)
 
-    if 'thread_ts' in message.body:
+    if "thread_ts" in message.body:
         # スレッド内のメッセージの場合
-        message.send_webapi('', attachments, thread_ts=message.thread_ts)
+        message.send_webapi("", attachments, thread_ts=message.thread_ts)
     else:
         # 親メッセージの場合
-        message.send_webapi('', attachments)
+        message.send_webapi("", attachments)

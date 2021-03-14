@@ -1,0 +1,25 @@
+name: Linter
+
+on: push
+
+jobs:
+  linter:
+    name: linter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    # https://github.com/marketplace/actions/python-code-quality-and-lint
+    - uses: ricardochaves/python-lint@v1.3.0
+      with:
+        use-pylint: false
+        use-pycodestyle: false
+        use-flake8: true
+        use-black: false
+        use-mypy: false
+        use-isort: true
+        extra-flake8-options: "--max-line-length 88"
+        # extra-black-options: ""
+        # extra-isort-options: ""
+    # https://black.readthedocs.io/en/stable/github_actions.html
+    - uses: actions/setup-python@v2
+    - uses: psf/black@stable
