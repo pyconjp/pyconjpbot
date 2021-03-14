@@ -231,7 +231,7 @@ BOT: @takanory おはようございます
 
 ## How to build
 
-```
+```bash
 $ git clone git@github.com:pyconjp/pyconjpbot.git
 $ cd pyconjpbot
 $ python3.8 -m venv env
@@ -241,3 +241,27 @@ $ . env/bin/activate
 (env) $ vi slackbot_settings.py
 (env) $ python run.py
 ```
+
+## 開発環境の構築とコードのチェック
+
+* 開発環境を構築する際は `requirements-dev.txt` を使用します。
+
+```
+$ git clone git@github.com:pyconjp/pyconjpbot.git
+$ cd pyconjpbot
+$ python3.8 -m venv env
+$ . env/bin/activate
+(env) $ pip install -r requirements-dev.txt
+```
+
+* toxでisort, black, flake8のチェックが実行できます
+
+```bash
+$ tox
+___________________________________ summary ____________________________________
+  py38: commands succeeded
+  lintcheck: commands succeeded
+  congratulations :)
+```
+
+
