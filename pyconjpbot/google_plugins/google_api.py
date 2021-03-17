@@ -55,7 +55,7 @@ def get_credentials():
         flow = client.flow_from_clientsecrets(client_secret_file, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
-        print("credentialsを{}に保存しました".format(credential_path))
+        print(f"credentialsを{credential_path}に保存しました")
     return credentials
 
 
