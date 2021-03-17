@@ -92,7 +92,7 @@ def create_issue(template, params, parent=None, area=None):
         "description": template.get("description", "").format(**params),
         "assignee": {"name": assignee},  # 担当者
         "reporter": {"name": params["core_staff"]},  # 報告者はコアスタッフ
-        "duedate": "{:%Y-%m-%d}".format(duedate),  # 期限
+        "duedate": f"{duedate:%Y-%m-%d}",  # 期限
     }
 
     if parent:
@@ -190,14 +190,14 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
     if core_staff not in CORE_STAFFS:
         msg = "コアスタッフの JIRA ID に正しい値を指定してください\n"
         msg += "有効なID: "
-        msg += ", ".join(("`{}`".format(jid) for jid in CORE_STAFFS))
+        msg += ", ".join((f"`{jira_id}`" for jira_id in CORE_STAFFS))
         botsend(message, msg)
         return
 
     if lecturer not in LECTURERS:
         msg = "講師の JIRA ID に正しい値を指定してください\n"
         msg += "有効なID: "
-        msg += ", ".join(("`{}`".format(jid) for jid in LECTURERS))
+        msg += ", ".join((f"`{jira_id}`" for jira_id in LECTURERS))
         botsend(message, msg)
         return
 
@@ -211,7 +211,7 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
         jira.user(local_staff)
         jira.user(lecturer)
     except JIRAError as e:
-        botsend(message, "`$pycamp` エラー: `{}`".format(e.text))
+        botsend(message, f"`$pycamp` エラー: `{e.text}`")
         return
 
     # Google Sheets API でシートから情報を抜き出す
@@ -237,17 +237,17 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
         # サブタスクを作成する
         for category in sorted(subtask_template.keys()):
             # カテゴリーを description に追加
-            desc += "\r\n\r\nh3. {}\r\n\r\n".format(category)
+            desc += f"\r\n\r\nh3. {category}\r\n\r\n"
             for subtask in subtask_template[category]:
                 sub_issue = create_issue(subtask, params, issue.key, area)
                 _, summary = sub_issue.fields.summary.split(": ", 1)
                 # サブタスクへのリンクを親タスクのdescriptionに追加
-                desc += "* {} {}\r\n".format(sub_issue.key, summary)
+                desc += f"* {sub_issue.key} {summary}\r\n"
 
         # descriptionを更新する
         issue.update(description=desc)
 
-        botsend(message, "チケットを作成しました: {}".format(issue.permalink()))
+        botsend(message, f"チケットを作成しました: {issue.permalink()}")
     except JIRAError as e:
         botsend(message, "`$pycamp` エラー:", e.text)
 
@@ -382,7 +382,7 @@ def get_connpass_info(connpass_url):
 
     # connpass APIを使用してタイトルと終了日を取得する
     # https://connpass.com/about/api/
-    url = "https://connpass.com/api/v1/event/?event_id={}".format(event_id)
+    url = f"https://connpass.com/api/v1/event/?event_id={event_id}"
     r = requests.get(url)
     data = r.json()
     result["title"] = data["events"][0]["title"]
@@ -496,7 +496,7 @@ def pycamp_count_staff(message):
         # イベントタイトルから地域名だけ抜き出す
         areas = [event["title"].split()[-1] for event in events]
         area_text = "、".join(areas)
-        text += "{}, {}, {}, {}\n".format(url, name, len(events), area_text)
+        text += f"{url}, {name}, {len(events)}, {area_text}\n"
     text += "```\n"
 
     botsend(message, text)

@@ -13,7 +13,7 @@ def manual(message):
     """
     マニュアルのURLを返す
     """
-    botsend(message, "PyCon JP 運営マニュアル {}".format(URL))
+    botsend(message, f"PyCon JP 運営マニュアル {URL}")
 
 
 @respond_to(r"^manual\s+(.*)")
@@ -22,7 +22,7 @@ def manual_search(message, query):
     マニュアルをキーワード検索したURLを返す
     """
     if query != "help":
-        botsend(message, "{}search.html?q={}".format(URL, quote_plus(query)))
+        botsend(message, f"{URL}search.html?q={quote_plus(query)}")
 
 
 @respond_to(r"^manual\s+help$")

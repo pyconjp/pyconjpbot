@@ -54,7 +54,7 @@ parser.add_argument(
     "--project",
     default=DEFAULT_PROJECT,
     type=str,
-    help="検索対象のプロジェクトを指定する(default: {})".format(DEFAULT_PROJECT),
+    help=f"検索対象のプロジェクトを指定する(default: {DEFAULT_PROJECT})",
 )
 parser.add_argument("-c", "--component", type=str, help="検索対象のコンポーネントを指定する")
 parser.add_argument("-l", "--label", type=str, help="検索対象のラベルを指定する")
@@ -96,8 +96,8 @@ def create_attachments(issue_id):
 
     attachments = [
         {
-            "fallback": "{} {}".format(issue_id, summary),
-            "pretext": "<{}|{}> {}".format(issue_url, issue_id, summary),
+            "fallback": f"{issue_id} {summary}",
+            "pretext": f"<{issue_url}|{issue_id}> {summary}",
             "fields": [
                 {
                     "title": "担当者",
@@ -146,18 +146,19 @@ def _build_jql(args, jql_base=""):
     引数から JIRA を検索するための JQL を生成する
     """
     jql = jql_base
-    jql += "project = {}".format(args.project)
+    jql += f"project = {args.project}"
     if args.component:
         component = COMPONENT.get(args.component, args.component)
-        jql += " AND component = {}".format(component)
+        jql += f" AND component = {component}"
     if args.label:
-        jql += " AND labels = {}".format(args.label)
+        jql += f" AND labels = {args.label}"
     if args.keywords:
         target = "text"
         if args.summary:
             # 要約を検索対象にする
             target = "summary"
-        jql += ' AND {} ~ "{}"'.format(target, " ".join(args.keywords))
+        keyword = " ".join(args.keywords)
+        jql += f' AND {target} ~ "{keyword}"'
 
     return jql
 
@@ -180,7 +181,7 @@ def jira_search(message, keywords):
     # 引数から query を生成
     jql = _build_jql(args, 'status in (Open, "In Progress", Reopened) AND ')
 
-    title = "「{}」の検索結果(オープンのみ)".format(keywords)
+    title = f"「{keywords}」の検索結果(オープンのみ)"
     _send_jira_search_responce(message, jql, title)
 
 
@@ -201,7 +202,7 @@ def jira_allsearch(message, keywords):
     # 引数から query を生成
     jql = _build_jql(args)
 
-    title = "「{}」の検索結果(全ステータス)".format(keywords)
+    title = "「{keywords}」の検索結果(全ステータス)"
     _send_jira_search_responce(message, jql, title)
 
 
@@ -211,9 +212,9 @@ def jira_assignee(message, user):
     """
     指定されたユーザーにアサインされた課題の一覧を返す
     """
-    jql = 'status in (Open, "In Progress", Reopened) AND assignee in ({})'
-    title = "「{}」の担当課題".format(user)
-    _send_jira_search_responce(message, jql.format(user), title)
+    jql = f'status in (Open, "In Progress", Reopened) AND assignee in ({user})'
+    title = f"「{user}」の担当課題"
+    _send_jira_search_responce(message, jql, title)
 
 
 def _send_jira_search_responce(message, query, title):
@@ -221,14 +222,14 @@ def _send_jira_search_responce(message, query, title):
     JIRAをqueryで検索した結果を返すメソッド
     """
     pretext = title
-    pretext += "(<{}/issues/?jql={}|JIRAで見る>)".format(CLEAN_JIRA_URL, quote(query))
+    pretext += f"(<{CLEAN_JIRA_URL}/issues/?jql={quote(query)}|JIRAで見る>)"
     text = ""
 
     try:
         issues = jira.search_issues(query)
     except JIRAError as err:
         # なんらかのエラーが発生
-        botsend(message, "JIRAError: `{}`".format(err.text))
+        botsend(message, f"JIRAError: `{err.text}`")
         return
 
     if issues:
@@ -237,7 +238,7 @@ def _send_jira_search_responce(message, query, title):
             key = issue.key
             url = issue.permalink()
             status = issue.fields.status.name
-            text += "- <{}|{}> {}({})\n".format(url, key, summary, status)
+            text += f"- <{url}|{key}> {summary}({status})\n"
     else:
         text += "該当するJIRA issueは見つかりませんでした"
 
@@ -267,7 +268,7 @@ def jira_filter(message):
     ]
     flist = []
     for label, key in filters:
-        flist.append("<{}/issues/?filter={}|{}>".format(CLEAN_JIRA_URL, key, label))
+        flist.append(f"<{CLEAN_JIRA_URL}/issues/?filter={key}|{label}>")
 
     attachments = [
         {

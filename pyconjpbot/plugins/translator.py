@@ -44,9 +44,9 @@ def translate(message, cmd, option, text):
         # エラーが発生したので内容を表示する
         error_message = r.text
         if "Message: 'to' must be a valid language" in error_message:
-            botsend(message, "`{}` は無効な言語です".format(lang))
+            botsend(message, f"`{lang}` は無効な言語です")
         else:
-            botsend(message, "エラーが発生しました\n```\n{}\n```".format(r.text))
+            botsend(message, f"エラーが発生しました\n```\n{r.text}\n```")
         return
 
     tree = ET.fromstring(r.text)
@@ -68,8 +68,8 @@ def translate_list(message, cmd, option):
     # 言語の一覧を取得
     tree = ET.fromstring(r.text)
     langs = sorted(child.text for child in tree)
-    reply = " ".join(("`{}`".format(lang) for lang in langs))
-    botsend(message, "使用できる言語: {}".format(reply))
+    reply = " ".join((f"`{lang}`" for lang in langs))
+    botsend(message, f"使用できる言語: {reply}")
 
 
 @respond_to(r"^(translate|翻訳)\s+help")

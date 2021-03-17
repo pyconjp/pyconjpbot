@@ -56,7 +56,7 @@ def _update_count(message, target, plusplus):
         msg = random.choice(MINUS_MESSAGE)
     plus.save()
 
-    botsend(message, "{} {} (通算: {})".format(target, msg, plus.counter))
+    botsend(message, f"{target} {msg} (通算: {plus.counter})")
 
 
 @listen_to(r"^(.*):?\s*(\+\+|--)")
@@ -91,17 +91,17 @@ def plusplus_delete(message, subcommand, name):
     try:
         plus = Plusplus.get(name=name)
     except Plusplus.DoesNotExist:
-        message.send("`{}` という名前は登録されていません".format(name))
+        message.send(f"`{name}` という名前は登録されていません")
         return
 
     if abs(plus.counter) > 10:
         botsend(
-            message, "`{}` のカウントが多いので削除を取り消しました(count: {})".format(name, plus.counter)
+            message, f"`{name}` のカウントが多いので削除を取り消しました(count: {plus.counter})"
         )
         return
 
     plus.delete_instance()
-    message.send("`{}` を削除しました".format(name))
+    message.send(f"`{name}` を削除しました")
 
 
 @respond_to(r"^plusplus\s+rename\s+(\S+)\s+(\S+)")
@@ -112,19 +112,19 @@ def plusplus_rename(message, old, new):
     try:
         oldplus = Plusplus.get(name=old)
     except Plusplus.DoesNotExist:
-        botsend(message, "`{}` という名前は登録されていません".format(old))
+        botsend(message, f"`{old}` という名前は登録されていません")
         return
 
-    newplus, created = Plusplus.create_or_get(name=new, counter=oldplus.counter)
+    newplus, created = Plusplus.get_or_create(name=new, counter=oldplus.counter)
     if not created:
         # すでに存在している
-        message.send("`{}` という名前はすでに登録されています".format(new))
+        message.send(f"`{new}` という名前はすでに登録されています")
         return
 
     # 入れ替える
     oldplus.delete_instance()
     botsend(
-        message, "`{}` から `{}` に名前を変更しました(count: {})".format(old, new, oldplus.counter)
+        message, f"`{old}` から `{new}` に名前を変更しました(count: {oldplus.counter})"
     )
 
 
@@ -136,13 +136,13 @@ def plusplus_merge(message, old, new):
     try:
         oldplus = Plusplus.get(name=old)
     except Plusplus.DoesNotExist:
-        botsend(message, "`{}` という名前は登録されていません".format(old))
+        botsend(message, f"`{old}` という名前は登録されていません")
         return
 
     try:
         newplus = Plusplus.get(name=new)
     except Plusplus.DoesNotExist:
-        botsend(message, "`{}` という名前は登録されていません".format(new))
+        botsend(message, f"`{new}` という名前は登録されていません")
         return
 
     oldcount = oldplus.counter
@@ -155,9 +155,7 @@ def plusplus_merge(message, old, new):
 
     botsend(
         message,
-        "`{}` を `{}` に統合しました(count: {} + {} = {})".format(
-            old, new, oldcount, newcount, newplus.counter
-        ),
+        f"`{old}` を `{new}` に統合しました(count: {oldcount} + {newcount} = {newplus.counter})"
     )
 
 
@@ -166,16 +164,16 @@ def plusplus_search(message, keyword):
     """
     指定されたキーワードを含む名前とカウントの一覧を返す
     """
-    pattern = "%{}%".format(keyword)
+    pattern = f"%{keyword}%"
     pluses = Plusplus.select().where(Plusplus.name ** pattern)
 
     if len(pluses) == 0:
-        botsend(message, "`{}` を含む名前はありません".format(keyword))
+        botsend(message, f"`{keyword}` を含む名前はありません")
     else:
-        pretext = "`{}` を含む名前とカウントの一覧です\n".format(keyword)
+        pretext = f"`{keyword}` を含む名前とカウントの一覧です\n"
         text = ""
         for plus in pluses:
-            text += "- {}(count: {})\n".format(plus.name, plus.counter)
+            text += f"- {plus.name}(count: {plus.counter})\n"
         attachments = [
             {
                 "pretext": pretext,

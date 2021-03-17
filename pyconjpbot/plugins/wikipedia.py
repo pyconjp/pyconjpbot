@@ -22,7 +22,7 @@ def wikipedia_page(message, option, query):
         # search with query
         results = wikipedia.search(query)
     except Exception:
-        botsend(message, "指定された言語 `{}` は存在しません".format(lang))
+        botsend(message, f"指定された言語 `{lang}` は存在しません")
         return
 
     # get first result
@@ -31,14 +31,14 @@ def wikipedia_page(message, option, query):
 
         attachments = [
             {
-                "fallback": "Wikipedia: {}".format(page.title),
-                "pretext": "Wikipedia: <{}|{}>".format(page.url, page.title),
+                "fallback": f"Wikipedia: {page.title}",
+                "pretext": f"Wikipedia: <{page.url}|{page.title}>",
                 "text": page.summary,
             }
         ]
         botwebapi(message, attachments)
     else:
-        botsend(message, "`{}` に該当するページはありません".format(query))
+        botsend(message, f"`{query}` に該当するページはありません")
 
 
 @respond_to(r"^wikipedia\s+help")
