@@ -95,9 +95,7 @@ def plusplus_delete(message, subcommand, name):
         return
 
     if abs(plus.counter) > 10:
-        botsend(
-            message, f"`{name}` のカウントが多いので削除を取り消しました(count: {plus.counter})"
-        )
+        botsend(message, f"`{name}` のカウントが多いので削除を取り消しました(count: {plus.counter})")
         return
 
     plus.delete_instance()
@@ -123,9 +121,7 @@ def plusplus_rename(message, old, new):
 
     # 入れ替える
     oldplus.delete_instance()
-    botsend(
-        message, f"`{old}` から `{new}` に名前を変更しました(count: {oldplus.counter})"
-    )
+    botsend(message, f"`{old}` から `{new}` に名前を変更しました(count: {oldplus.counter})")
 
 
 @respond_to(r"^plusplus\s+merge\s+(\S+)\s+(\S+)")
@@ -155,7 +151,10 @@ def plusplus_merge(message, old, new):
 
     botsend(
         message,
-        f"`{old}` を `{new}` に統合しました(count: {oldcount} + {newcount} = {newplus.counter})"
+        (
+            f"`{old}` を `{new}` に統合しました"
+            f"(count: {oldcount} + {newcount} = {newplus.counter})"
+        ),
     )
 
 

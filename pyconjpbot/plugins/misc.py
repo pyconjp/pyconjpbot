@@ -58,7 +58,10 @@ def version(message):
     """
     obj = git.Repo("").head.object
     url = f"https://github.com/pyconjp/pyconjpbot/commit/{obj.hexsha}"
-    text = f"<{url}|{obj.hexsha[:6]}> {obj.summary} - {obj.committer.name}({obj.committed_datetime})"
+    text = (
+        f"<{url}|{obj.hexsha[:6]}> {obj.summary}"
+        f"- {obj.committer.name}({obj.committed_datetime})"
+    )
     attachments = [
         {
             "pretext": text,
