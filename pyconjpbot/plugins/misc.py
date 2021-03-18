@@ -77,8 +77,6 @@ def random_command(message, subcommand=None):
     チャンネルにいるメンバーからランダムに一人を選んで返す
 
     - https://github.com/os/slacker
-    - https://api.slack.com/methods/channels.info
-    - https://api.slack.com/methods/conversations.info
     - https://api.slack.com/methods/conversations.members
     - https://api.slack.com/methods/users.getPresence
     - https://api.slack.com/methods/users.info

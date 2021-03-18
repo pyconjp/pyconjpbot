@@ -202,7 +202,7 @@ def jira_allsearch(message, keywords):
     # 引数から query を生成
     jql = _build_jql(args)
 
-    title = "「{keywords}」の検索結果(全ステータス)"
+    title = f"「{keywords}」の検索結果(全ステータス)"
     _send_jira_search_responce(message, jql, title)
 
 

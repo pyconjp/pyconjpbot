@@ -70,12 +70,12 @@ def github_code(message, keywords):
         if files:
             text += f"リポジトリ: <{repo.html_url}|{repo.name}>\n"
             for f in files:
-                text += "- <{f.html_url}|{f.name}>\n"
+                text += f"- <{f.html_url}|{f.name}>\n"
 
     if text:
         attachments = [
             {
-                "pretext": "`{keywords}` の検索結果",
+                "pretext": f"`{keywords}` の検索結果",
                 "text": text,
                 "mrkdwn_in": ["pretext", "text"],
             }
@@ -84,7 +84,7 @@ def github_code(message, keywords):
 
     # 結果が一つもない場合
     else:
-        botsend(message, "`{keywords}` にマッチするコードはありません")
+        botsend(message, f"`{keywords}` にマッチするコードはありません")
 
 
 @respond_to(r"^github\s+help$")
