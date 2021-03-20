@@ -1,10 +1,10 @@
 import os.path
 from datetime import datetime
 
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 
 SCOPES = [
     # Google Spreadseets
@@ -62,11 +62,10 @@ def get_credentials():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                credential_file, SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(credential_file, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open(token_file, 'w') as token:
+        with open(token_file, "w") as token:
             token.write(creds.to_json())
     return creds
 
@@ -101,9 +100,12 @@ def main():
     print("10名のユーザーを表示")
     service = get_service("admin", "directory_v1")
 
-    results = service.users().list(domain="pycon.jp", maxResults=10,
-                                   orderBy='email').execute()
-    users = results.get('users', [])
+    results = (
+        service.users()
+        .list(domain="pycon.jp", maxResults=10, orderBy="email")
+        .execute()
+    )
+    users = results.get("users", [])
     for user in users:
         print(user["name"]["fullName"], user["primaryEmail"])
 
