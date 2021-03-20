@@ -3,6 +3,7 @@ Unreleased
 
 Release Notes - 2021-03-20
 --------------------------
+- [ISSHA-2322] update library version and update google api
 - [ISSHA-2316] use f-strings
 
 Release Notes - 2021-03-14
