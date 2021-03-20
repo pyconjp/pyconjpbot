@@ -11,7 +11,7 @@ from .google_api import get_service
 
 DOMAIN = "pycon.jp"
 
-# https://developers.google.com/admin-sdk/directory/v1/reference/?hl=ja
+# https://developers.google.com/admin-sdk/directory
 # https://developers.google.com/resources/api-libraries/documentation/admin/directory_v1/python/latest/index.html
 
 HELP = """
