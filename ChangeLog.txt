@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2021-03-20
+--------------------------
+- [ISSHA-2316] use f-strings
+
 Release Notes - 2021-03-14
 --------------------------
 - [ISSHA-2313] add black, flake8, isort support

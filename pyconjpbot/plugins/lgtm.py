@@ -107,7 +107,7 @@ def lgtm_create(message, url, text="LGTM"):
         return
 
     if r.status_code != requests.codes.ok:
-        botsend(message, "エラーが発生しました({})".format(r.status_code))
+        botsend(message, f"エラーが発生しました({r.status_code})")
         return
 
     try:
@@ -127,7 +127,7 @@ def lgtm_create(message, url, text="LGTM"):
         # 一時ファイルに画像を保存してアップロードする
         with NamedTemporaryFile(suffix=".png") as fp:
             im.save(fp, format="png")
-            fname = "{}-{}{}.png".format(basename, text.lower(), idx)
+            fname = f"{basename}-{text.lower()}{idx}.png"
             message.channel.upload_file(fname=fname, fpath=fp.name)
 
 

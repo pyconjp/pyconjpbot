@@ -57,9 +57,10 @@ def version(message):
     バージョン情報を返す
     """
     obj = git.Repo("").head.object
-    url = "https://github.com/pyconjp/pyconjpbot/commit/{}".format(obj.hexsha)
-    text = "<{}|{}> {} - {}({})".format(
-        url, obj.hexsha[:6], obj.summary, obj.committer.name, obj.committed_datetime
+    url = f"https://github.com/pyconjp/pyconjpbot/commit/{obj.hexsha}"
+    text = (
+        f"<{url}|{obj.hexsha[:6]}> {obj.summary}"
+        f"- {obj.committer.name}({obj.committed_datetime})"
     )
     attachments = [
         {
@@ -76,7 +77,7 @@ def random_command(message, subcommand=None):
     チャンネルにいるメンバーからランダムに一人を選んで返す
 
     - https://github.com/os/slacker
-    - https://api.slack.com/methods/channels.info
+    - https://api.slack.com/methods/conversations.members
     - https://api.slack.com/methods/users.getPresence
     - https://api.slack.com/methods/users.info
     """
@@ -93,8 +94,8 @@ def random_command(message, subcommand=None):
     # チャンネルのメンバー一覧を取得
     channel = message.body["channel"]
     webapi = slacker.Slacker(settings.API_TOKEN)
-    cinfo = webapi.channels.info(channel)
-    members = cinfo.body["channel"]["members"]
+    result = webapi.conversations.members(channel)
+    members = result.body["members"]
 
     # bot の id は除く
     bot_id = message._client.login_data["self"]["id"]
@@ -113,7 +114,7 @@ def random_command(message, subcommand=None):
 
     user_info = webapi.users.info(member_id)
     name = user_info.body["user"]["name"]
-    botsend(message, "{} さん、君に決めた！".format(name))
+    botsend(message, f"{name} さん、君に決めた！")
 
 
 @respond_to(r"^cal$")
@@ -129,7 +130,7 @@ def cal_command(message, month=None, year=None):
 
     cal = calendar.TextCalendar(firstweekday=calendar.SUNDAY)
     try:
-        botsend(message, "```{}```".format(cal.formatmonth(year, month)))
+        botsend(message, f"```{cal.formatmonth(year, month)}```")
     except IndexError:
         # 数字が範囲外の場合は無視する
         pass

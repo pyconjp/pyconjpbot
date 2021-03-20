@@ -105,13 +105,13 @@ def _build_query(args):
 
     # キーワードは and 検索
     # 例: name contains key1 and name contains key2...
-    keyword_queries = ["{} contains '{}'".format(target, x) for x in args.keywords]
+    keyword_queries = [f"{target} contains '{x}'" for x in args.keywords]
     query = " and ".join(keyword_queries)
 
     # mime_type が指定されている場合
     # 例: mimeType = 'application/vnd.google-apps.folder'
     if args.type:
-        query += " and mimeType = '{}'".format(MIME_TYPE[args.type])
+        query += f" and mimeType = '{MIME_TYPE[args.type]}'"
 
     # 対象となるパスのフォルダ一覧を取得
     path = FOLDER[args.folder] + "*"
@@ -119,7 +119,7 @@ def _build_query(args):
 
     # フォルダーは or 検索
     # 例: '12345' in parents or '12346' in parents...
-    folder_queries = ["'{}' in parents".format(x.id) for x in folders]
+    folder_queries = [f"'{x.id}' in parents" for x in folders]
     query += " and (" + " or ".join(folder_queries) + ")"
 
     return query
@@ -171,10 +171,10 @@ def drive_search(message, keywords):
 
     items = results.get("files", [])
     if not items:
-        botsend(message, "パラメーター: `{}` にマッチするファイルはありません".format(keywords))
+        botsend(message, f"パラメーター: `{keywords}` にマッチするファイルはありません")
         return
 
-    pretext = "パラメーター: `{}` の検索結果".format(keywords)
+    pretext = f"パラメーター: `{keywords}` の検索結果"
     text = ""
     for item in items:
         item["type"] = MIME_TYPE_INV.get(item["mimeType"], item["mimeType"])
@@ -229,9 +229,10 @@ def _drive_walk(service, path, folder_id):
     """
     フォルダの階層をたどる
     """
-    # print("フォルダ: {}".format(path))
+    # print(f"フォルダ: {path}")
     # フォルダのみを取得する
-    q = "'{}' in parents and mimeType = '{}'".format(folder_id, MIME_TYPE["フォルダ"])
+    mime = MIME_TYPE["フォルダ"]
+    q = f"'{folder_id}' in parents and mimeType = '{mime}'"
     response = service.files().list(fields="files(id, name)", q=q).execute()
 
     for file in response.get("files", []):

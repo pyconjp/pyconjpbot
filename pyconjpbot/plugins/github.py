@@ -15,11 +15,11 @@ def github_repos(message):
     """
     text = ""
     for repo in org.get_repos():
-        text += "- <{}|{}> {}\n".format(repo.html_url, repo.name, repo.description)
+        text += f"- <{repo.html_url}|{repo.name}> {repo.description}\n"
 
     attachments = [
         {
-            "pretext": "{} のリポジトリ一覧".format(settings.GITHUB_ORGANIZATION),
+            "pretext": f"{settings.GITHUB_ORGANIZATION} のリポジトリ一覧",
             "text": text,
             "mrkdwn_in": ["text"],
         }
@@ -38,14 +38,14 @@ def github_search(message, keywords):
         # リポジトリを指定して検索
         issues = list(github.search_issues(keywords, repo=repo.full_name))
         if issues:
-            text += "リポジトリ: <{}|{}>\n".format(repo.html_url, repo.name)
+            text += f"リポジトリ: <{repo.html_url}|{repo.name}>\n"
             for issue in issues:
-                text += "- <{}|{}>\n".format(issue.html_url, issue.title)
+                text += f"- <{issue.html_url}|{issue.title}>\n"
 
     if text:
         attachments = [
             {
-                "pretext": "`{}` の検索結果".format(keywords),
+                "pretext": f"`{keywords}` の検索結果",
                 "text": text,
                 "mrkdwn_in": ["pretext", "text"],
             }
@@ -54,7 +54,7 @@ def github_search(message, keywords):
 
     # 結果が一つもない場合
     else:
-        botsend(message, "`{}` にマッチするissueはありません".format(keywords))
+        botsend(message, f"`{keywords}` にマッチするissueはありません")
 
 
 @respond_to(r"^github\s+code\s+(.*)")
@@ -68,14 +68,14 @@ def github_code(message, keywords):
         # リポジトリを指定して検索
         files = list(github.search_code(keywords, repo=repo.full_name))
         if files:
-            text += "リポジトリ: <{}|{}>\n".format(repo.html_url, repo.name)
+            text += f"リポジトリ: <{repo.html_url}|{repo.name}>\n"
             for f in files:
-                text += "- <{}|{}>\n".format(f.html_url, f.name)
+                text += f"- <{f.html_url}|{f.name}>\n"
 
     if text:
         attachments = [
             {
-                "pretext": "`{}` の検索結果".format(keywords),
+                "pretext": f"`{keywords}` の検索結果",
                 "text": text,
                 "mrkdwn_in": ["pretext", "text"],
             }
@@ -84,7 +84,7 @@ def github_code(message, keywords):
 
     # 結果が一つもない場合
     else:
-        botsend(message, "`{}` にマッチするコードはありません".format(keywords))
+        botsend(message, f"`{keywords}` にマッチするコードはありません")
 
 
 @respond_to(r"^github\s+help$")

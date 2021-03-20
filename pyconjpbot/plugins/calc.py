@@ -37,4 +37,4 @@ def calc(message, expression, dummy_):
             return
 
     # カンマをつけて出力する
-    botsend(message, "{:,}".format(answer))
+    botsend(message, f"{answer:,}")

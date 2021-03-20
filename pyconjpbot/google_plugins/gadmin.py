@@ -110,7 +110,7 @@ def _send_password_on_dm(message, email, password):
     result = slack.im.open(user)
     dm_channel = result.body["channel"]["id"]
 
-    msg = "ユーザー `{}` のパスワードは `{}` です".format(email, password)
+    msg = f"ユーザー `{email}` のパスワードは `{password}` です"
     # DMチャンネルにメッセージを送信する
     message._client.rtm_send_message(dm_channel, msg)
 
@@ -129,9 +129,9 @@ def gadmin_user_list(message):
     for user in users_list.get("users", []):
         email = user["primaryEmail"]
         fullname = user["name"]["fullName"]
-        msg += "- {} {}\n".format(email, fullname)
+        msg += f"- {email} {fullname}\n"
         count += 1
-    msg = "{}ドメインのユーザー一覧({}ユーザー)\n".format(DOMAIN, count) + msg
+    msg = f"{DOMAIN}ドメインのユーザー一覧({count}ユーザー)\n{msg}"
     botsend(message, msg)
 
 
@@ -156,11 +156,11 @@ def _gadmin_user_insert(service, message, email, fname, lname):
     }
     try:
         service.users().insert(body=body).execute()
-        botsend(message, "ユーザー `{}` を追加しました".format(email))
+        botsend(message, f"ユーザー `{email}` を追加しました")
         # password をユーザーにDMで伝える
         _send_password_on_dm(message, email, password)
     except HttpError as e:
-        botsend(message, "ユーザーの追加に失敗しました\n`{}`".format(e))
+        botsend(message, f"ユーザーの追加に失敗しました\n`{e}`")
 
 
 def _gadmin_user_delete(service, message, email):
@@ -177,13 +177,13 @@ def _gadmin_user_delete(service, message, email):
             botsend(
                 message,
                 "ユーザーはアクティブなため削除できません\n"
-                "`$gadmin user suspend {}` でユーザーを停止してから削除してください".format(email),
+                f"`$gadmin user suspend {email}` でユーザーを停止してから削除してください",
             )
         else:
             service.users().delete(userKey=email).execute()
-            botsend(message, "ユーザー `{}` を削除しました".format(email))
+            botsend(message, f"ユーザー `{email}` を削除しました")
     except HttpError as e:
-        botsend(message, "ユーザーの削除に失敗しました\n`{}`".format(e))
+        botsend(message, f"ユーザーの削除に失敗しました\n`{e}`")
 
 
 def _gadmin_user_update(service, message, email, suspended):
@@ -200,11 +200,11 @@ def _gadmin_user_update(service, message, email, suspended):
     try:
         service.users().update(userKey=email, body=body).execute()
         if suspended:
-            botsend(message, "ユーザー `{}` を停止しました".format(email))
+            botsend(message, f"ユーザー `{email}` を停止しました")
         else:
-            botsend(message, "ユーザー `{}` を再開しました".format(email))
+            botsend(message, f"ユーザー `{email}` を再開しました")
     except HttpError as e:
-        botsend(message, "ユーザー情報の更新に失敗しました\n`{}`".format(e))
+        botsend(message, f"ユーザー情報の更新に失敗しました\n`{e}`")
 
 
 def _gadmin_user_password_reset(service, message, email):
@@ -221,11 +221,11 @@ def _gadmin_user_password_reset(service, message, email):
     }
     try:
         service.users().update(userKey=email, body=body).execute()
-        botsend(message, "ユーザー `{}` のパスワードをリセットしました".format(email))
+        botsend(message, f"ユーザー `{email}` のパスワードをリセットしました")
         # password を実行ユーザーにDMで伝える
         _send_password_on_dm(message, email, password)
     except HttpError as e:
-        botsend(message, "ユーザーパスワードのリセットに失敗しました\n`{}`".format(e))
+        botsend(message, f"ユーザーパスワードのリセットに失敗しました\n`{e}`")
 
 
 @respond_to(r"^gadmin\s+user\s+(insert)\s+(\S+)\s+(\S+)\s+(\S+)")
@@ -284,14 +284,14 @@ def gadmin_alias_list(message, email):
         msg = ""
         aliases = result.get("aliases", [])
         if aliases:
-            msg = "`{}` のエイリアス一覧\n".format(email)
-            msg += ", ".join("`{}`".format(alias["alias"]) for alias in aliases)
+            msg = f"`{email}` のエイリアス一覧\n"
+            msg += ", ".join(f"`{alias['alias']}`" for alias in aliases)
             botsend(message, msg)
         else:
-            msg = "`{}` のエイリアスはありません".format(email)
+            msg = f"`{email}` のエイリアスはありません"
             botsend(message, msg)
     except HttpError as e:
-        botsend(message, "エイリアスの取得失敗しました\n`{}`".format(e))
+        botsend(message, f"エイリアスの取得失敗しました\n`{e}`")
 
 
 def _gadmin_alias_insert(service, message, email, alias):
@@ -307,9 +307,9 @@ def _gadmin_alias_insert(service, message, email, alias):
     }
     try:
         service.users().aliases().insert(userKey=email, body=body).execute()
-        botsend(message, "`{}` にエイリアス `{}` を追加しました".format(email, alias))
+        botsend(message, f"`{email}` にエイリアス `{alias}` を追加しました")
     except HttpError as e:
-        botsend(message, "エイリアスの追加に失敗しました\n`{}`".format(e))
+        botsend(message, f"エイリアスの追加に失敗しました\n`{e}`")
 
 
 def _gadmin_alias_delete(service, message, email, alias):
@@ -322,9 +322,9 @@ def _gadmin_alias_delete(service, message, email, alias):
     """
     try:
         service.users().aliases().delete(userKey=email, alias=alias).execute()
-        botsend(message, "`{}` からエイリアス `{}` を削除しました".format(email, alias))
+        botsend(message, f"`{email}` からエイリアス `{alias}` を削除しました")
     except HttpError as e:
-        botsend(message, "エイリアスの削除に失敗しました\n`{}`".format(e))
+        botsend(message, f"エイリアスの削除に失敗しました\n`{e}`")
 
 
 @respond_to(r"^gadmin\s+alias\s+(insert|delete)\s+(.*)\s+(.*)")
@@ -363,9 +363,9 @@ def gadmin_group_list(message):
         email = group["email"]
         name = group["name"]
         member_count = group["directMembersCount"]
-        msg += "- {} {}({}ユーザー)\n".format(email, name, member_count)
+        msg += f"- {email} {name}({member_count}ユーザー)\n"
         count += 1
-    msg = "{}ドメインのグループ一覧({}グループ)\n".format(DOMAIN, count) + msg
+    msg = f"{DOMAIN}ドメインのグループ一覧({count}グループ)\n{msg}"
     botsend(message, msg)
 
 
@@ -384,12 +384,10 @@ def _gadmin_group_insert(message, service, group, name):
     try:
         service.groups().insert(body=body).execute()
     except HttpError as e:
-        botsend(message, "グループの追加に失敗しました\n`{}`".format(e))
+        botsend(message, f"グループの追加に失敗しました\n`{e}`")
         return
-    botsend(message, "`{}` グループを追加しました".format(group))
-    botsend(
-        message, "`$gadmin member insert {} メールアドレス` コマンドでメンバーを追加してください".format(group)
-    )
+    botsend(message, f"`{group}` グループを追加しました")
+    botsend(message, f"`$gadmin member insert {group} メールアドレス` コマンドでメンバーを追加してください")
 
 
 def _gadmin_group_delete(message, service, group):
@@ -406,19 +404,17 @@ def _gadmin_group_delete(message, service, group):
             # メンバーがいる場合は削除できない
             botsend(
                 message,
-                """
+                f"""
 `{group}` グループはメンバーがいるので削除できません
 `$gadmin member delete {group} メールアドレス` コマンドでメンバーを削除してから実行してください
 `$gadmin member list {group}` コマンドでメンバー一覧が確認できます
-""".format(
-                    group=group
-                ),
+""",
             )
         else:
             service.groups().delete(groupKey=group).execute()
-            botsend(message, "`{}` グループを削除しました".format(group))
+            botsend(message, f"`{group}` グループを削除しました")
     except HttpError as e:
-        botsend(message, "グループの削除に失敗しました\n`{}`".format(e))
+        botsend(message, f"グループの削除に失敗しました\n`{e}`")
         return
 
 
@@ -461,16 +457,16 @@ def gadmin_member_list(message, group):
     try:
         members_list = service.members().list(groupKey=group).execute()
     except HttpError:
-        botsend(message, "`{}` に合致するグループはありません".format(group))
+        botsend(message, f"`{group}` に合致するグループはありません")
         return
 
     count = 0
     msg = ""
     for member in members_list.get("members", []):
         email = member["email"]
-        msg += "- {}\n".format(email)
+        msg += f"- {email}\n"
         count += 1
-    msg = "*{}* グループのメンバー({}ユーザー)\n".format(group, count) + msg
+    msg = f"*{group}* グループのメンバー({count}ユーザー)\n{msg}"
     botsend(message, msg)
 
 
@@ -489,10 +485,10 @@ def _gadmin_member_insert(message, service, group, emails):
         }
         try:
             service.members().insert(groupKey=group, body=body).execute()
-            botsend(message, "`{}` グループに `{}` を追加しました".format(group, email))
+            botsend(message, f"`{group}` グループに `{email}` を追加しました")
         except HttpError as e:
             # TODO: グループが間違っている場合とメンバーのエラーの場合わけ
-            botsend(message, "メンバーの追加に失敗しました\n`{}`".format(e))
+            botsend(message, f"メンバーの追加に失敗しました\n`{e}`")
 
 
 def _gadmin_member_delete(message, service, group, emails):
@@ -507,10 +503,10 @@ def _gadmin_member_delete(message, service, group, emails):
 
         try:
             service.members().delete(groupKey=group, memberKey=email).execute()
-            botsend(message, "`{}` グループから `{}` を削除しました".format(group, email))
+            botsend(message, f"`{group}` グループから `{email}` を削除しました")
         except HttpError as e:
             # TODO: グループが間違っている場合とメンバーのエラーの場合わけ
-            botsend(message, "メンバーの削除に失敗しました\n`{}`".format(e))
+            botsend(message, f"メンバーの削除に失敗しました\n`{e}`")
 
 
 @respond_to(r"^gadmin\s+member\s+(insert|delete)\s+(\S*)\s+(.*)")

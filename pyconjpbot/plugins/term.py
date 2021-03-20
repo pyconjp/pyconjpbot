@@ -53,18 +53,18 @@ def term_create(message, command):
     command = command.lower()
     # 予約語の場合は実行しない
     if command in RESERVED:
-        botsend(message, "コマンド `${}` は予約語なので登録できません".format(command))
+        botsend(message, f"コマンド `${command}` は予約語なので登録できません")
         return
 
     creator = message.body["user"]
     term, created = Term.get_or_create(command=command, creator=creator)
     if not created:
         # すでに登録してあるコマンドは登録しない
-        botsend(message, "コマンド `${}` はすでに登録されています".format(command))
+        botsend(message, f"コマンド `${command}` はすでに登録されています")
 
     else:
-        msg = "コマンド `${}` を作成しました。\n".format(command)
-        msg += "`${} add (レスポンス)` でレスポンスを追加できます".format(command)
+        msg = f"コマンド `${command}` を作成しました。\n"
+        msg += f"`${command} add (レスポンス)` でレスポンスを追加できます"
         botsend(message, msg)
 
         # コマンド一覧の set に追加
@@ -90,7 +90,7 @@ def term_drop(message, subcommand, command):
 
     # コマンド一覧の set から削除
     commands.remove(command)
-    botsend(message, "コマンド `${}` を消去しました".format(command))
+    botsend(message, f"コマンド `${command}` を消去しました")
 
 
 def _create_attachments_for_list(pretext, data, command=True):
@@ -100,7 +100,7 @@ def _create_attachments_for_list(pretext, data, command=True):
     """
     if command:
         # ['foo', 'bar', 'baz'] -> '`$far`, `$bar`, `$baz`'
-        list_text = ", ".join(["`${}`".format(x) for x in data])
+        list_text = ", ".join([f"`${x}`" for x in data])
     else:
         list_text = "\n".join([x for x in data])
     attachments = [
@@ -118,7 +118,7 @@ def term_search(message, keyword):
     """
     指定したキーワードを含む用語コマンドの一覧を返す
     """
-    pretext = "`{}` を含む用語コマンドの一覧です".format(keyword)
+    pretext = f"`{keyword}` を含む用語コマンドの一覧です"
     data = []
     for command in sorted(commands):
         if keyword in command:
@@ -146,7 +146,7 @@ def _available_command(message, command):
     if command in RESERVED:
         result = False
     elif command not in commands:
-        botsend(message, "コマンド `${}` は登録されていません".format(command))
+        botsend(message, f"コマンド `${command}` は登録されていません")
         result = False
 
     return result
@@ -175,8 +175,8 @@ def return_response(message, command):
 
     response_set = Term.get(command=command).response_set
     if len(response_set) == 0:
-        msg = "コマンド `${}` には応答が登録されていません\n".format(command)
-        msg += "`${} add (レスポンス)` で応答を登録してください".format(command)
+        msg = f"コマンド `${command}` には応答が登録されていません\n"
+        msg += f"`${command} add (レスポンス)` で応答を登録してください"
         botsend(message, msg)
     else:
         response = random.choice(response_set)
@@ -239,7 +239,7 @@ def add_response(message, command, text):
 
     # 登録済かどうかを確認する
     if _exist_response(command, text):
-        reply = "コマンド `${}` に「{}」は登録済みです".format(command, text)
+        reply = f"コマンド `${command}` に「{text}」は登録済みです"
         _send_markdown_text(message, reply)
         return
 
@@ -250,7 +250,7 @@ def add_response(message, command, text):
         term=term, text=text, creator=creator, created=datetime.now()
     )
     resp.save()
-    text = "コマンド `${}` に「{}」を追加しました".format(command, text)
+    text = f"コマンド `${command}` に「{text}」を追加しました"
     _send_markdown_text(message, text)
 
 
@@ -262,14 +262,14 @@ def del_response(message, command, text):
     try:
         response = Response.get(term=term, text=text)
     except Response.DoesNotExist:
-        reply = "コマンド `${}` に「{}」は登録されていません".format(command, text)
+        reply = f"コマンド `${command}` に「{text}」は登録されていません"
         _send_markdown_text(message, reply)
         return
 
     # 応答を削除する
     response.delete_instance()
 
-    reply = "コマンド `${}` から「{}」を削除しました".format(command, text)
+    reply = f"コマンド `${command}` から「{text}」を削除しました"
     _send_markdown_text(message, reply)
 
 
@@ -280,8 +280,8 @@ def pop_response(message, command):
     response_set = Term.get(command=command).response_set
     # 応答が登録されていない
     if len(response_set) == 0:
-        msg = "コマンド `${}` には応答が登録されていません\n".format(command)
-        msg += "`${} add (レスポンス)` で応答を登録してください".format(command)
+        msg = f"コマンド `${command}` には応答が登録されていません\n"
+        msg += f"`${command} add (レスポンス)` で応答を登録してください"
         botsend(message, msg)
         return
 
@@ -289,7 +289,7 @@ def pop_response(message, command):
     text = last_response.text
     last_response.delete_instance()
 
-    reply = "コマンド `${}` から「{}」を削除しました".format(command, text)
+    reply = f"コマンド `${command}` から「{text}」を削除しました"
     _send_markdown_text(message, reply)
 
 
@@ -298,15 +298,13 @@ def search_responses(message, command, keyword):
     用語コマンドに登録されている応答のうち、キーワードにマッチするものを返す
     """
     term = Term.get(command=command)
-    pat = "%{}%".format(keyword)
+    pat = f"%{keyword}%"
     responses = Response.select().where(term == term, Response.text ** pat)
 
     if len(responses) == 0:
-        botsend(message, "コマンド `${}` に `{}` を含む応答はありません".format(command, keyword))
+        botsend(message, f"コマンド `${command}` に `{keyword}` を含む応答はありません")
     else:
-        pretext = "コマンド `${}` の `{}` を含む応答は {} 件あります\n".format(
-            command, keyword, len(responses)
-        )
+        pretext = f"コマンド `${command}` の `{keyword}` を含む応答は {len(responses)} 件あります\n"
         data = [x.text for x in responses]
         attachments = _create_attachments_for_list(pretext, data, False)
         botwebapi(message, attachments)
@@ -318,11 +316,11 @@ def get_responses(message, command):
     """
     response_set = Term.get(command=command).response_set
     if len(response_set) == 0:
-        msg = "コマンド `${}` には応答が登録されていません\n".format(command)
-        msg += "`${} add (レスポンス)` で応答を登録してください".format(command)
+        msg = f"コマンド `${command}` には応答が登録されていません\n"
+        msg += f"`${command} add (レスポンス)` で応答を登録してください"
         botsend(message, msg)
     else:
-        pretext = "コマンド `${}` の応答は {} 件あります\n".format(command, len(response_set))
+        pretext = f"コマンド `${command}` の応答は {len(response_set)} 件あります\n"
         data = [x.text for x in response_set]
         attachments = _create_attachments_for_list(pretext, data, False)
         botwebapi(message, attachments)
