@@ -216,15 +216,13 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
         return
 
     if core_staff not in CORE_STAFF_DICT:
-        msg = "コアスタッフ名に正しい値を指定してください\n"
-        msg += "有効なID: "
+        msg = "「コアスタッフ」に正しい値を指定してください: "
         msg += ", ".join((f"`{key}`" for key in CORE_STAFF_DICT))
         botsend(message, msg)
         return
 
     if lecturer not in LECTURER_DICT:
-        msg = "講師名に正しい値を指定してください\n"
-        msg += "有効なID: "
+        msg = "「講師」に正しい値を指定してください: "
         msg += ", ".join((f"`{key}`" for key in LECTURER_DICT))
         botsend(message, msg)
         return
