@@ -193,7 +193,7 @@ def get_jira_account_id(name: str) -> str:
     r = requests.request("GET", url, headers=headers, params=query, auth=auth)
 
     # 最初のユーザーのaccountIdを返す
-    return r.json()[0]['accountId']
+    return r.json()[0]["accountId"]
 
 
 @respond_to(r"^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)")
@@ -231,8 +231,8 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
 
     # メールアドレス形式だったら、元のメールアドレスを抜き出す
     # <mailto:takanori@pycon.jp|takanori@pycon.jp> -> takanori@pycon.jp
-    if local_staff.startswith('<mailto:'):
-        _, local_staff = local_staff.split('|')
+    if local_staff.startswith("<mailto:"):
+        _, local_staff = local_staff.split("|")
         local_staff = local_staff[:-1]
 
     # 開催日(target_date)が過去の場合は1年後にする
