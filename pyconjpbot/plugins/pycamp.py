@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser
 from jira import JIRA, JIRAError
 from PIL import Image, ImageDraw, ImageFont
+from requests.auth import HTTPBasicAuth
 from slackbot import settings
 from slackbot.bot import respond_to
 from slackbot.utils import create_tmp_file
@@ -32,9 +33,17 @@ COMPONENT = "Python Boot Camp"
 ISSUE_TYPE_TASK = 3  # タスク
 ISSUE_TYPE_SUBTASK = 5  # サブタスク
 
-# コアスタッフ、講師の JIRA username
-CORE_STAFFS = ("makoto-kimura", "takanory", "ryu22e", "kobatomo", "kor.miyamoto")
-LECTURERS = ("takanory", "terada", "shimizukawa", "massa142")
+# コアスタッフと講師のSlack名とJIRAのdisplayName
+CORE_STAFF_DICT = {
+    "kobatomo": "Tomohiro Kobayashi",
+    "ryu22e": "Ryuji Tsutsui",
+}
+LECTURER_DICT = {
+    "takanory": "Takanori Suzuki",
+    "terada": "Manabu Terada",
+    "shimizukawa": "Takayuki Shimizukawa",
+    "arai": "Masataka Arai",
+}
 
 ASSIGNEE_TYPE = {
     "コアスタッフ": "core_staff",
@@ -78,6 +87,7 @@ def create_issue(template, params, parent=None, area=None):
     :params area: 地域名(東京、大阪など)
     """
 
+    breakpoint()
     # 担当者情報を作成
     assignee_type = template.get("assignee_type", "core_staff")
     assignee = params[assignee_type]
@@ -90,8 +100,8 @@ def create_issue(template, params, parent=None, area=None):
         "components": [{"name": COMPONENT}],
         "summary": template.get("summary", "").format(**params),
         "description": template.get("description", "").format(**params),
-        "assignee": {"name": assignee},  # 担当者
-        "reporter": {"name": params["core_staff"]},  # 報告者はコアスタッフ
+        "assignee": {"id": assignee},  # 担当者
+        "reporter": {"id": params["core_staff"]},  # 報告者はコアスタッフ
         "duedate": f"{duedate:%Y-%m-%d}",  # 期限
     }
 
@@ -111,7 +121,7 @@ def create_issue(template, params, parent=None, area=None):
     # JIRA bot を watcher からはずす
     jira.remove_watcher(issue, settings.JIRA_USERNAME)
     # コアスタッフを watcher に追加
-    for watcher in CORE_STAFFS:
+    for watcher in CORE_STAFF_DICT:
         jira.add_watcher(issue, watcher)
 
     return issue
@@ -168,6 +178,24 @@ def get_subtask_template(service):
     return subtask_template
 
 
+def get_jira_account_id(name: str) -> str:
+    """指定した文字列で取得したアカウントのaccountIdを返す
+
+    ユーザーを /rest/api/2/user/search で検索する
+    https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-user-search/#api-rest-api-2-user-search-get
+    GET /rest/api/2/user/search?query=name
+    """
+
+    url = CLEAN_JIRA_URL + "/rest/api/2/user/search"
+    auth = HTTPBasicAuth(settings.JIRA_USER, settings.JIRA_PASS)
+    headers = {"Accept": "application/json"}
+    query = {"query": name}
+    r = requests.request("GET", url, headers=headers, params=query, auth=auth)
+
+    # 最初のユーザーのaccountIdを返す
+    return r.json()[0]['accountId']
+
+
 @respond_to(r"^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)")
 def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
     """
@@ -187,32 +215,39 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
         botsend(message, "Python Boot Campの開催日に正しい日付を指定してください")
         return
 
-    if core_staff not in CORE_STAFFS:
-        msg = "コアスタッフの JIRA ID に正しい値を指定してください\n"
+    if core_staff not in CORE_STAFF_DICT:
+        msg = "コアスタッフ名に正しい値を指定してください\n"
         msg += "有効なID: "
-        msg += ", ".join((f"`{jira_id}`" for jira_id in CORE_STAFFS))
+        msg += ", ".join((f"`{key}`" for key in CORE_STAFF_DICT))
         botsend(message, msg)
         return
 
-    if lecturer not in LECTURERS:
-        msg = "講師の JIRA ID に正しい値を指定してください\n"
+    if lecturer not in LECTURER_DICT:
+        msg = "講師名に正しい値を指定してください\n"
         msg += "有効なID: "
-        msg += ", ".join((f"`{jira_id}`" for jira_id in LECTURERS))
+        msg += ", ".join((f"`{key}`" for key in LECTURER_DICT))
         botsend(message, msg)
         return
+
+    # メールアドレス形式だったら、元のメールアドレスを抜き出す
+    # <mailto:takanori@pycon.jp|takanori@pycon.jp> -> takanori@pycon.jp
+    if local_staff.startswith('<mailto:'):
+        _, local_staff = local_staff.split('|')
+        local_staff = local_staff[:-1]
 
     # 開催日(target_date)が過去の場合は1年後にする
     if datetime.now() > target_date:
         target_date = target_date.replace(year=target_date.year + 1)
 
-    # 指定されたユーザーの存在チェック
+    # ユーザーのaccountIdを取得する
+    core_staff_id = get_jira_account_id(CORE_STAFF_DICT[core_staff])
+    lecturer_id = get_jira_account_id(LECTURER_DICT[lecturer])
+    local_staff_id = None
     try:
-        jira.user(core_staff)
-        jira.user(local_staff)
-        jira.user(lecturer)
-    except JIRAError as e:
-        botsend(message, f"`$pycamp` エラー: `{e.text}`")
-        return
+        local_staff_id = get_jira_account_id(local_staff)
+    except IndexError:
+        # 現地スタッフのaccountIdが取得できなかったらNoneのままにする
+        pass
 
     # Google Sheets API でシートから情報を抜き出す
     service = get_service("sheets", "v4")
@@ -223,9 +258,9 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
 
     # issue を作成するための情報
     params = {
-        "core_staff": core_staff,
-        "local_staff": local_staff,
-        "lecturer": lecturer,
+        "core_staff": core_staff_id,
+        "local_staff": local_staff_id,
+        "lecturer": lecturer_id,
         "target_date": target_date,
         "area": area,
     }
