@@ -77,6 +77,21 @@ HELP = """
 """
 
 
+def remove_watcher(issue, account_id: str):
+    """指定したユーザーをissueのウォッチャーから削除する
+
+    https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-watchers/#api-rest-api-2-issue-issueidorkey-watchers-delete
+    """
+
+    url = issue.self + "/watchers"
+    auth = HTTPBasicAuth(settings.JIRA_USER, settings.JIRA_PASS)
+    headers = {"Accept": "application/json"}
+    query = {"accountId": account_id}
+    r = requests.delete(url, headers=headers, params=query, auth=auth)
+
+    return r
+
+
 def create_issue(template, params, parent=None, area=None):
     """
     テンプレートにパラメーターを適用して、JIRA issueを作成する
@@ -87,7 +102,6 @@ def create_issue(template, params, parent=None, area=None):
     :params area: 地域名(東京、大阪など)
     """
 
-    breakpoint()
     # 担当者情報を作成
     assignee_type = template.get("assignee_type", "core_staff")
     assignee = params[assignee_type]
@@ -119,10 +133,9 @@ def create_issue(template, params, parent=None, area=None):
     # issue を作成する
     issue = jira.create_issue(fields=issue_dict)
     # JIRA bot を watcher からはずす
-    jira.remove_watcher(issue, settings.JIRA_USERNAME)
-    # コアスタッフを watcher に追加
-    for watcher in CORE_STAFF_DICT:
-        jira.add_watcher(issue, watcher)
+    remove_watcher(issue, params["myself"])
+    # 担当コアスタッフを watcher に追加
+    jira.add_watcher(issue, params["core_staff"])
 
     return issue
 
@@ -227,6 +240,10 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
         botsend(message, msg)
         return
 
+    # 自分の情報を取得する
+    myself = jira.myself()
+    my_account_id = myself["accountId"]
+
     # メールアドレス形式だったら、元のメールアドレスを抜き出す
     # <mailto:takanori@pycon.jp|takanori@pycon.jp> -> takanori@pycon.jp
     if local_staff.startswith("<mailto:"):
@@ -259,6 +276,7 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
         "core_staff": core_staff_id,
         "local_staff": local_staff_id,
         "lecturer": lecturer_id,
+        "myself": my_account_id,
         "target_date": target_date,
         "area": area,
     }
