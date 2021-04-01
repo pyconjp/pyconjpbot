@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2021-04-01
+--------------------------
+- [ISSHA-2209] fix pycamp create command
+
 Release Notes - 2021-03-20
 --------------------------
 - [ISSHA-2322] update library version and update google api
