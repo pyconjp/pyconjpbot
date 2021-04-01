@@ -69,7 +69,7 @@ IMAGES = (
 )
 
 HELP = """
-`$pycamp create (地域) (開催日) (コアスタッフJIRA) (現地スタッフJIRA) (講師のJIRA)`: pycamp のイベント用issueを作成する
+`$pycamp create (地域) (開催日) (講師のID) (コアスタッフID) (現地スタッフメールアドレス)` : pycamp のイベント用issueを作成する
 `$pycamp summary`: 開催予定のpycampイベントの概要を返す
 `$pycamp summary -party`: 開催予定のpycamp懇親会の概要を返す
 `$pycamp count-staff`: pycampにスタッフやTAに2回以上参加した人を調べる
@@ -210,7 +210,7 @@ def get_jira_account_id(name: str) -> str:
 
 
 @respond_to(r"^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)")
-def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
+def pycamp_create(message, area, date_str, lecturer, core_staff, local_staff):
     """
     Python Boot Camp の issue をまとめて作成する
 
@@ -228,15 +228,15 @@ def pycamp_create(message, area, date_str, core_staff, local_staff, lecturer):
         botsend(message, "Python Boot Campの開催日に正しい日付を指定してください")
         return
 
-    if core_staff not in CORE_STAFF_DICT:
-        msg = "「コアスタッフ」に正しい値を指定してください: "
-        msg += ", ".join((f"`{key}`" for key in CORE_STAFF_DICT))
-        botsend(message, msg)
-        return
-
     if lecturer not in LECTURER_DICT:
         msg = "「講師」に正しい値を指定してください: "
         msg += ", ".join((f"`{key}`" for key in LECTURER_DICT))
+        botsend(message, msg)
+        return
+
+    if core_staff not in CORE_STAFF_DICT:
+        msg = "「コアスタッフ」に正しい値を指定してください: "
+        msg += ", ".join((f"`{key}`" for key in CORE_STAFF_DICT))
         botsend(message, msg)
         return
 
