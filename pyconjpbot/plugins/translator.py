@@ -4,6 +4,7 @@ import requests
 from langdetect import detect
 from slackbot import settings
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend
 
@@ -12,7 +13,7 @@ API_BASE_URL = "https://api.microsofttranslator.com/V2/Http.svc/"
 
 
 @respond_to(r"^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)")
-def translate(message, cmd, option, text):
+def translate(message: Message, cmd: str, option: str, text: str) -> None:
     """
     指定した文字列を翻訳する
 
@@ -50,11 +51,14 @@ def translate(message, cmd, option, text):
         return
 
     tree = ET.fromstring(r.text)
-    botsend(message, tree.text)
+    translated = tree.text
+    if translated is None:
+        translated = ""
+    botsend(message, translated)
 
 
 @respond_to(r"^(translate|翻訳)\s+(list|リスト)")
-def translate_list(message, cmd, option):
+def translate_list(message: Message, cmd: str, option: str) -> None:
     """
     使用できる言語の一覧を返す
 
@@ -73,7 +77,7 @@ def translate_list(message, cmd, option):
 
 
 @respond_to(r"^(translate|翻訳)\s+help")
-def translate_help(message, cmd):
+def translate_help(message: Message, cmd: str) -> None:
     botsend(
         message,
         """`$translate python`, `$翻訳 python`: 指定した文字列を日本語に翻訳

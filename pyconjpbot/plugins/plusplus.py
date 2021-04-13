@@ -3,6 +3,7 @@ import random
 import slacker
 from slackbot import settings
 from slackbot.bot import listen_to, respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend, botwebapi
 from .plusplus_model import Plusplus
@@ -22,7 +23,7 @@ MINUS_MESSAGE = (
 )
 
 
-def _get_user_name(user_id):
+def _get_user_name(user_id: str) -> str:
     """
     指定された Slack の user_id に対応する username を返す
 
@@ -38,7 +39,7 @@ def _get_user_name(user_id):
         return ""
 
 
-def _update_count(message, target, plusplus):
+def _update_count(message: Message, target: str, plusplus: str) -> None:
     """
     指定ユーザーのカウンターを更新する
     """
@@ -60,7 +61,7 @@ def _update_count(message, target, plusplus):
 
 
 @listen_to(r"^(.*):?\s*(\+\+|--)")
-def multi_plusplus(message, targets, plusplus):
+def multi_plusplus(message: Message, targets: str, plusplus: str) -> None:
     """
     指定された複数の名前に対して ++ する
 
@@ -82,7 +83,7 @@ def multi_plusplus(message, targets, plusplus):
 
 
 @respond_to(r"^plusplus\s+(del|delete)\s+(\S+)")
-def plusplus_delete(message, subcommand, name):
+def plusplus_delete(message: Message, subcommand: str, name: str) -> None:
     """
     指定された名前を削除する
     カウントが10未満のもののみ削除する
@@ -103,7 +104,7 @@ def plusplus_delete(message, subcommand, name):
 
 
 @respond_to(r"^plusplus\s+rename\s+(\S+)\s+(\S+)")
-def plusplus_rename(message, old, new):
+def plusplus_rename(message: Message, old: str, new: str) -> None:
     """
     指定された old から new に名前を変更する
     """
@@ -125,7 +126,7 @@ def plusplus_rename(message, old, new):
 
 
 @respond_to(r"^plusplus\s+merge\s+(\S+)\s+(\S+)")
-def plusplus_merge(message, old, new):
+def plusplus_merge(message: Message, old: str, new: str) -> None:
     """
     指定された old と new を一つにまとめる
     """
@@ -159,7 +160,7 @@ def plusplus_merge(message, old, new):
 
 
 @respond_to(r"^plusplus\s+search\s+(\S+)")
-def plusplus_search(message, keyword):
+def plusplus_search(message: Message, keyword: str) -> None:
     """
     指定されたキーワードを含む名前とカウントの一覧を返す
     """
@@ -184,7 +185,7 @@ def plusplus_search(message, keyword):
 
 
 @respond_to(r"^plusplus\s+help+")
-def plusplus_help(message):
+def plusplus_help(message: Message) -> None:
     """
     ヘルプメッセージを返す
     """

@@ -1,6 +1,7 @@
 from urllib.parse import quote_plus
 
 from slackbot.bot import respond_to
+from slackbot.displatcher import Message
 
 from ..botmessage import botsend
 
@@ -9,7 +10,7 @@ URL = "http://manual.pycon.jp/"
 
 
 @respond_to(r"^manual$")
-def manual(message):
+def manual(message: Message) -> None:
     """
     マニュアルのURLを返す
     """
@@ -17,7 +18,7 @@ def manual(message):
 
 
 @respond_to(r"^manual\s+(.*)")
-def manual_search(message, query):
+def manual_search(message: Message, query: str) -> None:
     """
     マニュアルをキーワード検索したURLを返す
     """
@@ -26,7 +27,7 @@ def manual_search(message, query):
 
 
 @respond_to(r"^manual\s+help$")
-def manual_help(message):
+def manual_help(message: Message) -> None:
     """
     マニュアルコマンドのヘルプを返す
     """

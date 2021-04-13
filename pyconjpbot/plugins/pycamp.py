@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 from requests.auth import HTTPBasicAuth
 from slackbot import settings
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 from slackbot.utils import create_tmp_file
 
 from ..botmessage import botsend, botwebapi
@@ -210,7 +211,7 @@ def get_jira_account_id(name: str) -> str:
 
 
 @respond_to(r"^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)")
-def pycamp_create(message, area, date_str, lecturer, core_staff, local_staff):
+def pycamp_create(message: Message, area: str, date_str: str, lecturer: str, core_staff: str, local_staff: str) -> None:
     """
     Python Boot Camp の issue をまとめて作成する
 
@@ -303,7 +304,7 @@ def pycamp_create(message, area, date_str, lecturer, core_staff, local_staff):
         botsend(message, "`$pycamp` エラー:", e.text)
 
 
-def get_participants(url):
+def get_participants(url: str) -> list[dict]:
     """
     イベント情報のWebページから参加者情報を取得する
 
@@ -365,7 +366,7 @@ def generate_pycamp_summary(events):
 
 @respond_to(r"^pycamp\s+summary$")
 @respond_to(r"^pycamp\s+summary\s+(-party)")
-def pycamp_summary(message, party=None):
+def pycamp_summary(message: Message, party: str = None) -> None:
     """
     開催予定のpycampイベントの情報を返す
     """
@@ -410,7 +411,7 @@ def pycamp_summary(message, party=None):
     botwebapi(message, attachements)
 
 
-def get_connpass_info(connpass_url):
+def get_connpass_info(connpass_url: str):
     """
         connpassのページからタイトル、状態、TA、スタッフの一覧を取得して返す
 
@@ -496,7 +497,7 @@ def get_staff_info(pycamp_dict):
 
 
 @respond_to(r"^pycamp\s+count-staff$")
-def pycamp_count_staff(message):
+def pycamp_count_staff(message: Message) -> None:
     """
     pycampにスタッフやTAに2回以上参加した人を調べる
     """
@@ -554,7 +555,7 @@ def pycamp_count_staff(message):
 
 
 @respond_to(r"^pycamp\s+logo\s+(\S+)")
-def pycamp_logo(message, title):
+def pycamp_logo(message: Message, title: str) -> None:
     botsend(message, "Python Boot Camp ロゴ作成中... :hammer:")
 
     fontfile = Path(__file__).parent / "fonts" / FONT
@@ -584,7 +585,7 @@ def pycamp_logo(message, title):
 
 
 @respond_to(r"^pycamp\s+help")
-def pycamp_help(message):
+def pycamp_help(message: Message) -> None:
     """
     ヘルプメッセージを返す
     """

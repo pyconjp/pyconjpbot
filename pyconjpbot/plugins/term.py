@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import random
 from datetime import datetime
 
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend, botwebapi
 from .term_model import Response, Term
@@ -42,7 +45,7 @@ commands = {term.command for term in Term.select()}
 @respond_to(r"^term\s+([\w-]+)$")
 @respond_to(r"^term\s+create\s+([\w-]+)$")
 @respond_to(r"^term\s+add\s+([\w-]+)$")
-def term_create(message, command):
+def term_create(message: Message, command: str) -> None:
     """
     指定されたコマンドを生成する
     """
@@ -72,7 +75,7 @@ def term_create(message, command):
 
 
 @respond_to(r"^term\s+(drop|del|delete)\s+([\w-]+)$")
-def term_drop(message, subcommand, command):
+def term_drop(message: Message, subcommand: str, command: str) -> None:
     """
     指定されたコマンドを消去する
     """
@@ -93,7 +96,7 @@ def term_drop(message, subcommand, command):
     botsend(message, f"コマンド `${command}` を消去しました")
 
 
-def _create_attachments_for_list(pretext, data, command=True):
+def _create_attachments_for_list(pretext: str, data: list[str], command: bool = True) -> list[dict]:
     """
     指定されたリストの一覧を message.send_webapi で送信するための
     attachments を生成する
@@ -114,7 +117,7 @@ def _create_attachments_for_list(pretext, data, command=True):
 
 
 @respond_to(r"^term\s+search\s+([\w-]+)$")
-def term_search(message, keyword):
+def term_search(message: Message, keyword: str) -> None:
     """
     指定したキーワードを含む用語コマンドの一覧を返す
     """
@@ -128,7 +131,7 @@ def term_search(message, keyword):
 
 
 @respond_to(r"^term\s+list$")
-def term_list(message):
+def term_list(message: Message) -> None:
     """
     現在使用可能な用語コマンドの一覧を返す
     """
@@ -137,7 +140,7 @@ def term_list(message):
     botwebapi(message, attachments)
 
 
-def _available_command(message, command):
+def _available_command(message: Message, command: str) -> bool:
     """
     指定されたコマンドが有効化どうかを返す
     """
@@ -152,7 +155,7 @@ def _available_command(message, command):
     return result
 
 
-def _send_markdown_text(message, text):
+def _send_markdown_text(message: Message, text: str) -> None:
     """
     指定されたtextをmarkdown形式で送信する
     """
@@ -166,7 +169,7 @@ def _send_markdown_text(message, text):
 
 
 @respond_to(r"^([\w-]+)$")
-def return_response(message, command):
+def return_response(message: Message, command: str) -> None:
     """
     用語コマンドに登録されている応答をランダムに返す
     """
@@ -184,7 +187,7 @@ def return_response(message, command):
 
 
 @respond_to(r"^([\w-]+)\s+(.*)")
-def response(message, command, params):
+def response(message: Message, command: str, params: str) -> None:
     """
     用語コマンドの処理をする
     """
@@ -218,7 +221,7 @@ def response(message, command, params):
         pass
 
 
-def _exist_response(command, text):
+def _exist_response(command: str, text: str) -> bool:
     """
     指定されたコマンドに応答が登録されているかを調べて返す
     """
@@ -232,7 +235,7 @@ def _exist_response(command, text):
         return True
 
 
-def add_response(message, command, text):
+def add_response(message: Message, command: str, text: str) -> None:
     """
     用語コマンドに応答を追加する
     """
@@ -254,7 +257,7 @@ def add_response(message, command, text):
     _send_markdown_text(message, text)
 
 
-def del_response(message, command, text):
+def del_response(message: Message, command: str, text: str) -> None:
     """
     用語コマンドから応答を削除する
     """
@@ -273,7 +276,7 @@ def del_response(message, command, text):
     _send_markdown_text(message, reply)
 
 
-def pop_response(message, command):
+def pop_response(message: Message, command: str) -> None:
     """
     用語コマンドで最後に登録された応答を削除する
     """
@@ -293,7 +296,7 @@ def pop_response(message, command):
     _send_markdown_text(message, reply)
 
 
-def search_responses(message, command, keyword):
+def search_responses(message: Message, command: str, keyword: str) -> None:
     """
     用語コマンドに登録されている応答のうち、キーワードにマッチするものを返す
     """
@@ -310,7 +313,7 @@ def search_responses(message, command, keyword):
         botwebapi(message, attachments)
 
 
-def get_responses(message, command):
+def get_responses(message: Message, command: str) -> None:
     """
     用語コマンドに登録されている応答の一覧を返す
     """
@@ -327,7 +330,7 @@ def get_responses(message, command):
 
 
 @respond_to(r"term\s+help")
-def term_help(message):
+def term_help(message: Message) -> None:
     """
     term pluginのヘルプを返す
     """

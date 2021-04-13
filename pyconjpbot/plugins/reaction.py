@@ -1,6 +1,8 @@
 import re
+from collections.abc import Sequence
 
 from slackbot.bot import listen_to
+from slackbot.dispatcher import Message
 from slacker import Error
 
 # リアクション対象のキーワードと絵文字
@@ -19,7 +21,7 @@ REACTION = {
 }
 
 
-def _react(message, emojis):
+def _react(message: Message, emojis: Sequence[str]) -> None:
     """
     指定された emoji を reaction で返す
     """
@@ -38,7 +40,7 @@ def _react(message, emojis):
 
 
 @listen_to(".")
-def reaction(message):
+def reaction(message: Message) -> None:
     """
     メッセージの中にリアクションする文字列があれば、emojiでリアクションする
     """
