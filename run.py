@@ -1,7 +1,7 @@
 from slackbot.bot import Bot
 
 
-def main():
+def main() -> None:
     bot = Bot()
     bot.run()
 

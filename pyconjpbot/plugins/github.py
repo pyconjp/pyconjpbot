@@ -1,6 +1,7 @@
 from github import Github
 from slackbot import settings
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend, botwebapi
 
@@ -9,7 +10,7 @@ org = github.get_organization(settings.GITHUB_ORGANIZATION)
 
 
 @respond_to(r"^github\s+repos")
-def github_repos(message):
+def github_repos(message: Message) -> None:
     """
     リポジトリの一覧を返す
     """
@@ -28,7 +29,7 @@ def github_repos(message):
 
 
 @respond_to(r"^github\s+search\s+(.*)")
-def github_search(message, keywords):
+def github_search(message: Message, keywords: str) -> None:
     """
     指定されたキーワードでissueを検索する
     """
@@ -58,7 +59,7 @@ def github_search(message, keywords):
 
 
 @respond_to(r"^github\s+code\s+(.*)")
-def github_code(message, keywords):
+def github_code(message: Message, keywords: str) -> None:
     """
     指定されたキーワードでコードを検索する
     """
@@ -88,7 +89,7 @@ def github_code(message, keywords):
 
 
 @respond_to(r"^github\s+help$")
-def github_help(message):
+def github_help(message: Message) -> None:
     """
     githubコマンドのヘルプを返す
     """

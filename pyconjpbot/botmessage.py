@@ -1,7 +1,9 @@
 import json
 
+from slackbot.dispatcher import Message
 
-def botsend(message, text):
+
+def botsend(message: Message, text: str) -> None:
     """
     スレッドの親かどうかで応答先を切り替える message.send() の代わりの関数
 
@@ -16,7 +18,7 @@ def botsend(message, text):
         message.send(text, thread_ts=None)
 
 
-def botreply(message, text):
+def botreply(message: Message, text: str) -> None:
     """
     スレッドの親かどうかで応答先を切り替える message.reply() の代わりの関数
 
@@ -31,7 +33,7 @@ def botreply(message, text):
         message.reply(text)
 
 
-def botwebapi(message, attachments):
+def botwebapi(message: Message, attachments) -> None:
     """
     スレッドの親かどうかで応答先を切り替える message.send_webapi() の代わりの関数
 

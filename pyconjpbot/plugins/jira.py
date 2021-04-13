@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import argparse
 import re
+from argparse import Namespace
 from urllib.parse import quote
 
 from jira import JIRA, JIRAError
 from slackbot import settings
 from slackbot.bot import listen_to, respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend, botwebapi
 
@@ -68,7 +72,7 @@ parser.add_argument(
 parser.add_argument("keywords", nargs="*", type=str, help="検索対象のキーワードを指定する")
 
 
-def create_attachments(issue_id):
+def create_attachments(issue_id: str) -> list[dict] | None:
     """
     JIRAのissue_idからそのissueに関連する情報をまとめた Slack のメッセージ用の
     attachments を生成して返す
@@ -116,7 +120,7 @@ def create_attachments(issue_id):
 
 
 @listen_to(r"[A-Za-z]{3,5}-[\d]+")
-def jira_listener(message):
+def jira_listener(message: Message) -> None:
     """
     JIRAのissue idっぽいものを取得したら、そのissueの情報を返す
     """
@@ -134,14 +138,14 @@ def jira_listener(message):
             botwebapi(message, attachments)
 
 
-def _drive_help(message, cmd1, cmd2):
+def _drive_help(message: Message, cmd1: str, cmd2: str) -> None:
     """
     jira 検索コマンドのヘルプを返す
     """
     botsend(message, HELP.format(cmd1, cmd2, DEFAULT_PROJECT))
 
 
-def _build_jql(args, jql_base=""):
+def _build_jql(args: Namespace, jql_base: str = "") -> str:
     """
     引数から JIRA を検索するための JQL を生成する
     """
@@ -165,7 +169,7 @@ def _build_jql(args, jql_base=""):
 
 @respond_to(r"^jira\s+search\s+(.*)")
 @respond_to(r"^jira\s+検索\s+(.*)")
-def jira_search(message, keywords):
+def jira_search(message: Message, keywords: str) -> None:
     """
     JIRAをキーワード検索した結果を返す(オープン状態のみ)
     """
@@ -187,7 +191,7 @@ def jira_search(message, keywords):
 
 @respond_to(r"^jira\s+allsearch\s+(.*)")
 @respond_to(r"^jira\s+全検索\s+(.*)")
-def jira_allsearch(message, keywords):
+def jira_allsearch(message: Message, keywords: str) -> None:
     """
     JIRAをキーワード検索した結果を返す(全ステータス対象)
     """
@@ -208,7 +212,7 @@ def jira_allsearch(message, keywords):
 
 @respond_to(r"^jira\s+assignee\s+(.*)")
 @respond_to(r"^jira\s+担当者?\s+(.*)")
-def jira_assignee(message, user):
+def jira_assignee(message: Message, user: str) -> None:
     """
     指定されたユーザーにアサインされた課題の一覧を返す
     """
@@ -217,7 +221,7 @@ def jira_assignee(message, user):
     _send_jira_search_responce(message, jql, title)
 
 
-def _send_jira_search_responce(message, query, title):
+def _send_jira_search_responce(message: Message, query: str, title: str) -> None:
     """
     JIRAをqueryで検索した結果を返すメソッド
     """
@@ -254,7 +258,7 @@ def _send_jira_search_responce(message, query, title):
 
 @respond_to(r"^jira\s+filters?")
 @respond_to(r"^jira\s+フィルター?")
-def jira_filter(message):
+def jira_filter(message: Message) -> None:
     """
     フィルターの一覧を返す
     """
@@ -281,7 +285,7 @@ def jira_filter(message):
 
 
 @respond_to(r"^jira\s+help$")
-def jira_help(message):
+def jira_help(message: Message) -> None:
     """
     jiraコマンドのヘルプを返す
     """
