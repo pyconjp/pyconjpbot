@@ -43,7 +43,9 @@ def get_font_size(size: int, font_file: str, text: str) -> ImageFont:
     return font_size
 
 
-def get_text_xy(width: int, height: int, font: ImageFont, text: str) -> tuple[int, int, int, int]:
+def get_text_xy(
+    width: int, height: int, font: ImageFont, text: str
+) -> tuple[int, int, int, int]:
     """
     指定したテキストを配置する位置を返す
 

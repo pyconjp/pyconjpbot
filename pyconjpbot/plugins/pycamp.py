@@ -211,7 +211,14 @@ def get_jira_account_id(name: str) -> str:
 
 
 @respond_to(r"^pycamp\s+create\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)")
-def pycamp_create(message: Message, area: str, date_str: str, lecturer: str, core_staff: str, local_staff: str) -> None:
+def pycamp_create(
+    message: Message,
+    area: str,
+    date_str: str,
+    lecturer: str,
+    core_staff: str,
+    local_staff: str,
+) -> None:
     """
     Python Boot Camp の issue をまとめて作成する
 

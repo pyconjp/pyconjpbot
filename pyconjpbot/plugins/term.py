@@ -96,7 +96,9 @@ def term_drop(message: Message, subcommand: str, command: str) -> None:
     botsend(message, f"コマンド `${command}` を消去しました")
 
 
-def _create_attachments_for_list(pretext: str, data: list[str], command: bool = True) -> list[dict]:
+def _create_attachments_for_list(
+    pretext: str, data: list[str], command: bool = True
+) -> list[dict]:
     """
     指定されたリストの一覧を message.send_webapi で送信するための
     attachments を生成する
