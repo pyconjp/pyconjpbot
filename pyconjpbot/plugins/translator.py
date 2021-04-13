@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+import json
 
 import requests
 from langdetect import detect
@@ -9,7 +9,7 @@ from slackbot.dispatcher import Message
 from ..botmessage import botsend
 
 # Microsoft Translator API の BASE URL
-API_BASE_URL = "https://api.microsofttranslator.com/V2/Http.svc/"
+API_BASE_URL = "https://api-apc.cognitive.microsofttranslator.com/"
 
 
 @respond_to(r"^(translate|翻訳)(\s+-[-\w]+)?\s+(.*)")
@@ -17,7 +17,7 @@ def translate(message: Message, cmd: str, option: str, text: str) -> None:
     """
     指定した文字列を翻訳する
 
-    http://docs.microsofttranslator.com/text-translate.html#!/default/get_Translate
+    https://docs.microsoft.com/en-us/azure/cognitive-services/translator/reference/v3-0-translate
     """
     if text in ("help", "list"):
         return
@@ -31,15 +31,17 @@ def translate(message: Message, cmd: str, option: str, text: str) -> None:
         # 日本語の場合は英語に翻訳する
         lang = "en"
 
-    url = API_BASE_URL + "Translate"
+    url = API_BASE_URL + "translate"
     headers = {
         "Ocp-Apim-Subscription-Key": settings.TRANSLATOR_API_KEY,
+        "Content-Type": "application/json",
     }
-    query = {
+    params = {
+        "api-version": "3.0",
         "to": lang,
-        "text": text,
     }
-    r = requests.get(url, headers=headers, params=query)
+    payload = [{"Text": text}]
+    r = requests.post(url, headers=headers, params=params, data=json.dumps(payload))
 
     if r.status_code == 400:
         # エラーが発生したので内容を表示する
@@ -50,11 +52,9 @@ def translate(message: Message, cmd: str, option: str, text: str) -> None:
             botsend(message, f"エラーが発生しました\n```\n{r.text}\n```")
         return
 
-    tree = ET.fromstring(r.text)
-    translated = tree.text
-    if translated is None:
-        translated = ""
-    botsend(message, translated)
+    data = r.json()
+    translated_text = data[0]["translations"][0]["text"]
+    botsend(message, translated_text)
 
 
 @respond_to(r"^(translate|翻訳)\s+(list|リスト)")
@@ -62,17 +62,17 @@ def translate_list(message: Message, cmd: str, option: str) -> None:
     """
     使用できる言語の一覧を返す
 
-    http://docs.microsofttranslator.com/text-translate.html#!/default/post_GetLanguageNames
+    https://docs.microsoft.com/en-us/azure/cognitive-services/translator/reference/v3-0-languages
     """
-    url = API_BASE_URL + "GetLanguagesForTranslate"
-    headers = {
-        "Ocp-Apim-Subscription-Key": settings.TRANSLATOR_API_KEY,
+    url = API_BASE_URL + "languages"
+    params = {
+        "api-version": "3.0",
+        "scope": "translation",
     }
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, params=params)
     # 言語の一覧を取得
-    tree = ET.fromstring(r.text)
-    langs = sorted(child.text for child in tree)
-    reply = " ".join((f"`{lang}`" for lang in langs))
+    data = r.json()
+    reply = " ".join((f"`{lang}`" for lang in data["translation"].keys()))
     botsend(message, f"使用できる言語: {reply}")
 
 
