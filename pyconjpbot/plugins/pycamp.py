@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import time
 from datetime import datetime, timedelta
@@ -308,7 +310,7 @@ def pycamp_create(
 
         botsend(message, f"チケットを作成しました: {issue.permalink()}")
     except JIRAError as e:
-        botsend(message, "`$pycamp` エラー:", e.text)
+        botsend(message, f"`$pycamp` エラー: {e.text}")
 
 
 def get_participants(url: str) -> list[dict]:
@@ -378,10 +380,10 @@ def pycamp_summary(message: Message, party: str = None) -> None:
     開催予定のpycampイベントの情報を返す
     """
     params = {
-        "series_id": 137,
+        "series_id": "137",
         "keyword": "Python Boot Camp",
-        "order": 2,  # 開催日時順
-        "count": 20,  # 20件
+        "order": "2",  # 開催日時順
+        "count": "20",  # 20件
     }
     r = requests.get("https://connpass.com/api/v1/event/", params=params)
     now = datetime.now()
@@ -418,7 +420,7 @@ def pycamp_summary(message: Message, party: str = None) -> None:
     botwebapi(message, attachements)
 
 
-def get_connpass_info(connpass_url: str):
+def get_connpass_info(connpass_url: str) -> dict:
     """
         connpassのページからタイトル、状態、TA、スタッフの一覧を取得して返す
 
