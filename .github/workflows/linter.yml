@@ -15,7 +15,7 @@ jobs:
         use-pycodestyle: false
         use-flake8: true
         use-black: false
-        use-mypy: true
+        use-mypy: false
         use-isort: true
         extra-flake8-options: "--max-line-length 88"
         # extra-black-options: ""
