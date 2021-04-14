@@ -4,7 +4,7 @@ from datetime import datetime
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+from googleapiclient.discovery import Resource, build
 
 SCOPES = [
     # Google Spreadseets
@@ -27,7 +27,7 @@ CREDENTIAL_FILE = "credentials.json"
 TOKEN_FILE = "token.json"
 
 
-def get_service(name, version):
+def get_service(name: str, version: str) -> Resource:
     """指定された Google API に接続する
 
     name: APIの名前
@@ -70,7 +70,7 @@ def get_credentials():
     return creds
 
 
-def main():
+def main() -> None:
     # calendar APIの動作確認
     service = get_service("calendar", "v3")
 

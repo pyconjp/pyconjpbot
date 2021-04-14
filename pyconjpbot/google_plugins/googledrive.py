@@ -1,7 +1,10 @@
 import argparse
+from argparse import Namespace
 from collections import OrderedDict
 
+from googleapiclient.discovery import Resource
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend, botwebapi
 from .folder_model import Folder
@@ -85,7 +88,7 @@ parser.add_argument("-t", "--type", type=str, help="検索対象のファイル�
 parser.add_argument("keywords", nargs="+", help="検索対象のキーワードを指定する")
 
 
-def _build_query(args):
+def _build_query(args: Namespace) -> str:
     """
     Google Drive を検索するための query を生成する
 
@@ -126,7 +129,7 @@ def _build_query(args):
 
 
 @respond_to("drive (.*)")
-def drive_search(message, keywords):
+def drive_search(message: Message, keywords: str) -> None:
     """
     指定されたキーワードに対して検索を行う
 
@@ -191,7 +194,7 @@ def drive_search(message, keywords):
     botwebapi(message, attachments)
 
 
-def _drive_db_update():
+def _drive_db_update() -> None:
     """
     フォルダーのパスとidを入れたデータベースを更新する
     """
@@ -202,7 +205,7 @@ def _drive_db_update():
 
 
 @respond_to("drive db update")
-def drive_db_update(message):
+def drive_db_update(message: Message) -> None:
     """
     フォルダーのパスとidを入れたデータベースを更新する
     """
@@ -212,7 +215,7 @@ def drive_db_update(message):
 
 
 @respond_to("drive db refresh")
-def drive_db_refresh(message):
+def drive_db_refresh(message: Message) -> None:
     """
     フォルダーのパスとidを入れたデータベースを最初から作成し直す
     """
@@ -225,7 +228,7 @@ def drive_db_refresh(message):
     botsend(message, "データベースを再構築を完了しました")
 
 
-def _drive_walk(service, path, folder_id):
+def _drive_walk(service: Resource, path: str, folder_id: str) -> None:
     """
     フォルダの階層をたどる
     """
@@ -247,7 +250,7 @@ def _drive_walk(service, path, folder_id):
 
 
 @respond_to("drive help$")
-def drive_help(message):
+def drive_help(message: Message):
     _drive_help(message)
 
 

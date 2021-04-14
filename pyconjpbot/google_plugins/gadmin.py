@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import random
 import string
 
 from googleapiclient.errors import HttpError
+from googleapiclient.discovery import Resource
 from slackbot import settings
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 from slacker import Slacker
 
 from ..botmessage import botsend
@@ -45,7 +49,7 @@ HELP = """
 """
 
 
-def _get_service():
+def _get_service() -> Resource:
     """
     Google Apps Admin SDK の Directory API に接続する
     """
@@ -53,7 +57,7 @@ def _get_service():
     return service
 
 
-def _is_admin(user):
+def _is_admin(user: str) -> bool:
     """
     ユーザーがSlackのAdminかどうかを返す
 
@@ -64,7 +68,7 @@ def _is_admin(user):
     return user_info.body["user"]["is_admin"]
 
 
-def _remove_email_link(email):
+def _remove_email_link(email: str) -> str:
     """
     slack の email 記法 <mailto:hoge@example.com|hoge@example.com> を
     メールアドレスのみに戻す
@@ -76,7 +80,7 @@ def _remove_email_link(email):
     return email
 
 
-def _get_default_domain_email(email):
+def _get_default_domain_email(email: str) -> str:
     """
     ドメインがない場合は、デフォルトのドメインを追加したメールアドレスを返す
     """
@@ -86,7 +90,7 @@ def _get_default_domain_email(email):
     return email
 
 
-def _generate_password(length=8):
+def _generate_password(length: int = 8) -> str:
     """
     パスワード用の文字列を生成する
 
@@ -97,7 +101,7 @@ def _generate_password(length=8):
     return password
 
 
-def _send_password_on_dm(message, email, password):
+def _send_password_on_dm(message: Message, email: str, password: str) -> None:
     """
     ユーザーのパスワード文字列を DM でコマンドを実行したユーザーに送信する
 
@@ -116,7 +120,7 @@ def _send_password_on_dm(message, email, password):
 
 
 @respond_to(r"^gadmin\s+user\s+list")
-def gadmin_user_list(message):
+def gadmin_user_list(message: Message) -> None:
     """
     ユーザーの一覧を返す
     """
@@ -135,7 +139,7 @@ def gadmin_user_list(message):
     botsend(message, msg)
 
 
-def _gadmin_user_insert(service, message, email, fname, lname):
+def _gadmin_user_insert(service: Resource, message: Message, email: str, fname: str, lname: str) -> None:
     """
     指定したユーザーを追加する
 
@@ -163,7 +167,7 @@ def _gadmin_user_insert(service, message, email, fname, lname):
         botsend(message, f"ユーザーの追加に失敗しました\n`{e}`")
 
 
-def _gadmin_user_delete(service, message, email):
+def _gadmin_user_delete(service: Resource, message: Message, email: str) -> None:
     """
     指定したユーザーを削除する
 
@@ -186,7 +190,7 @@ def _gadmin_user_delete(service, message, email):
         botsend(message, f"ユーザーの削除に失敗しました\n`{e}`")
 
 
-def _gadmin_user_update(service, message, email, suspended):
+def _gadmin_user_update(service: Resource, message: Message, email: str, suspended: bool) -> None:
     """
     ユーザーの情報を更新する
 
@@ -207,7 +211,7 @@ def _gadmin_user_update(service, message, email, suspended):
         botsend(message, f"ユーザー情報の更新に失敗しました\n`{e}`")
 
 
-def _gadmin_user_password_reset(service, message, email):
+def _gadmin_user_password_reset(service: Resource, message: Message, email: str) -> None:
     """
     ユーザーのパスワードをリセットする
 
@@ -230,7 +234,7 @@ def _gadmin_user_password_reset(service, message, email):
 
 @respond_to(r"^gadmin\s+user\s+(insert)\s+(\S+)\s+(\S+)\s+(\S+)")
 @respond_to(r"^gadmin\s+user\s+(delete|suspend|resume|reset)\s+(\S+)")
-def gadmin_user_insert_delete(message, command, email, fname=None, lname=None):
+def gadmin_user_insert_delete(message: Message, command: str, email: str, fname: str = "", lname: str = "") -> None:
     """
     指定したユーザーを追加/削除する
 
@@ -270,7 +274,7 @@ def gadmin_user_insert_delete(message, command, email, fname=None, lname=None):
 
 
 @respond_to(r"^gadmin\s+alias\s+list\s+(.*)")
-def gadmin_alias_list(message, email):
+def gadmin_alias_list(message: Message, email: str) -> None:
     """
     指定したユーザーのエイリアスの一覧を返す
 
@@ -294,7 +298,7 @@ def gadmin_alias_list(message, email):
         botsend(message, f"エイリアスの取得失敗しました\n`{e}`")
 
 
-def _gadmin_alias_insert(service, message, email, alias):
+def _gadmin_alias_insert(service: Resource, message: Message, email: str, alias: str) -> None:
     """
     指定したユーザーにエイリアスを追加する
 
@@ -312,7 +316,7 @@ def _gadmin_alias_insert(service, message, email, alias):
         botsend(message, f"エイリアスの追加に失敗しました\n`{e}`")
 
 
-def _gadmin_alias_delete(service, message, email, alias):
+def _gadmin_alias_delete(service: Resource, message: Message, email: str, alias: str) -> None:
     """
     指定したユーザーからエイリアスを削除する
 
@@ -328,7 +332,7 @@ def _gadmin_alias_delete(service, message, email, alias):
 
 
 @respond_to(r"^gadmin\s+alias\s+(insert|delete)\s+(.*)\s+(.*)")
-def gadmin_alias_insert_delete(message, command, email, alias):
+def gadmin_alias_insert_delete(message: Message, command: str, email: str, alias: str) -> None:
     """
     指定したユーザーにエイリアスを追加/削除する
 
@@ -350,7 +354,7 @@ def gadmin_alias_insert_delete(message, command, email, alias):
 
 
 @respond_to(r"^gadmin\s+group\s+list")
-def gadmin_group_list(message):
+def gadmin_group_list(message: Message) -> None:
     """
     グループの一覧を返す
     """
@@ -369,7 +373,7 @@ def gadmin_group_list(message):
     botsend(message, msg)
 
 
-def _gadmin_group_insert(message, service, group, name):
+def _gadmin_group_insert(message: Message, service: Resource, group: str, name: str) -> None:
     """
     指定したグループを追加する
 
@@ -390,7 +394,7 @@ def _gadmin_group_insert(message, service, group, name):
     botsend(message, f"`$gadmin member insert {group} メールアドレス` コマンドでメンバーを追加してください")
 
 
-def _gadmin_group_delete(message, service, group):
+def _gadmin_group_delete(message: Message, service: Resource, group: str) -> None:
     """
     指定したグループを削除する
 
@@ -420,7 +424,7 @@ def _gadmin_group_delete(message, service, group):
 
 @respond_to(r"^gadmin\s+group\s+(insert)\s+(.*)\s+(.*)")
 @respond_to(r"^gadmin\s+group\s+(delete)\s+(.*)")
-def gadmin_group_insert_delete(message, command, group, name=None):
+def gadmin_group_insert_delete(message: Message, command: str, group: str, name: str = "") -> None:
     """
     指定したグループを追加/削除する
 
@@ -446,7 +450,7 @@ def gadmin_group_insert_delete(message, command, group, name=None):
 
 
 @respond_to(r"^gadmin\s+member\s+list\s+(.*)")
-def gadmin_member_list(message, group):
+def gadmin_member_list(message: Message, group: str) -> None:
     """
     グループのメンバー一覧を返す
 
@@ -470,7 +474,7 @@ def gadmin_member_list(message, group):
     botsend(message, msg)
 
 
-def _gadmin_member_insert(message, service, group, emails):
+def _gadmin_member_insert(message: Message, service: Resource, group: str, emails: list[str]) -> None:
     """
     指定したメンバーを指定したグループに追加する
 
@@ -491,7 +495,7 @@ def _gadmin_member_insert(message, service, group, emails):
             botsend(message, f"メンバーの追加に失敗しました\n`{e}`")
 
 
-def _gadmin_member_delete(message, service, group, emails):
+def _gadmin_member_delete(message: Message, service: Resource, group: str, emails: list[str]) -> None:
     """
     指定したメンバーを指定したグループから削除する
 
@@ -510,7 +514,7 @@ def _gadmin_member_delete(message, service, group, emails):
 
 
 @respond_to(r"^gadmin\s+member\s+(insert|delete)\s+(\S*)\s+(.*)")
-def gadmin_member_insert_delete(message, command, group, email):
+def gadmin_member_insert_delete(message: Message, command: str, group: str, email: str) -> None:
     """
     指定したメンバーを指定したグループに追加/削除する
 
@@ -546,7 +550,7 @@ def gadmin_member_insert_delete(message, command, group, email):
 
 
 @respond_to(r"^gadmin\s+help")
-def gadmin_help(message):
+def gadmin_help(message: Message) -> None:
     """
     コマンドのヘルプを表示
     """

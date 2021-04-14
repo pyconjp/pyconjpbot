@@ -1,14 +1,15 @@
-from urllib.request import quote, unquote
+from urllib.parse import quote, unquote
 
 import requests
 from bs4 import BeautifulSoup
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend
 
 
 @respond_to(r"google\s+(.*)")
-def google(message, keywords):
+def google(message: Message, keywords: str) -> None:
     """
     google で検索した結果を返す
     """
@@ -39,7 +40,7 @@ def google(message, keywords):
         botsend(message, f"`{keywords}` での検索結果はありませんでした")
 
 
-def unescape(url):
+def unescape(url: str) -> str:
     """
     for unclear reasons, google replaces url escapes with \\x escapes
     """
@@ -47,7 +48,7 @@ def unescape(url):
 
 
 @respond_to(r"image\s+(.*)")
-def google_image(message, keywords):
+def google_image(message: Message, keywords: str) -> None:
     """
     google で画像検索した結果を返す
 
@@ -74,7 +75,7 @@ def google_image(message, keywords):
 
 
 @respond_to(r"google\s+help$")
-def google_help(message):
+def google_help(message: Message) -> None:
     botsend(
         message,
         """- `$google keywords`: 指定したキーワードでgoogle検索した結果を返す
