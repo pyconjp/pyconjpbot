@@ -15,8 +15,6 @@ def calc(message: Message, expression: str, dummy_: str) -> None:
     """
     数式っぽい文字列だったら計算して結果を返す
     """
-    breakpoint()
-
     # 単一の数字っぽいパターンは無視する
     if NUM_PATTERN.match(expression):
         return
