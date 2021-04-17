@@ -178,7 +178,7 @@ def get_subtask_template(service):
         .get(spreadsheetId=SHEET_ID, range="サブタスク!A2:E")
         .execute()
     )
-    subtask_template = {}
+    subtask_template: dict[str, list] = {}
     for row in result.get("values", []):
         category = row[0]
         template = {
@@ -437,7 +437,7 @@ def get_connpass_info(connpass_url: str) -> dict:
             ]
         }
     """
-    result: dict[str, str|list] = {"url": connpass_url}
+    result: dict[str, str | list] = {"url": connpass_url}
     # イベントIDを取り出す
     event_id = connpass_url.split("/")[4]
 
@@ -485,7 +485,7 @@ def get_staff_info(pycamp_dict):
     CANCELS = ["https://pyconjp.connpass.com/event/96844/"]
 
     staff_name_dict = {}  # スタッフのURLと名前の辞書
-    staff_attend_dict = {}  # スタッフが参加したイベント情報の辞書
+    staff_attend_dict: dict[str, list] = {}  # スタッフが参加したイベント情報の辞書
     for connpass_info in pycamp_dict.values():
         if connpass_info["url"] in CANCELS:
             continue
