@@ -437,7 +437,7 @@ def get_connpass_info(connpass_url: str) -> dict:
             ]
         }
     """
-    result = {"url": connpass_url}
+    result: dict[str, str|list] = {"url": connpass_url}
     # イベントIDを取り出す
     event_id = connpass_url.split("/")[4]
 
