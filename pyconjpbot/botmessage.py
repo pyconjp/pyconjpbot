@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 from slackbot.dispatcher import Message
@@ -33,7 +35,7 @@ def botreply(message: Message, text: str) -> None:
         message.reply(text)
 
 
-def botwebapi(message: Message, attachments) -> None:
+def botwebapi(message: Message, attachments: list[dict] | str) -> None:
     """
     スレッドの親かどうかで応答先を切り替える message.send_webapi() の代わりの関数
 
