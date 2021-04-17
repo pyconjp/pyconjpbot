@@ -1,7 +1,7 @@
 from urllib.parse import quote_plus
 
 from slackbot.bot import respond_to
-from slackbot.displatcher import Message
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend
 
