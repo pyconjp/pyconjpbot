@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -6,6 +8,7 @@ from urllib.parse import urlparse
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend
 
@@ -20,7 +23,7 @@ FILL = "white"
 SHADOW = "black"
 
 
-def get_font_size(size, font_file, text):
+def get_font_size(size: int, font_file: str, text: str) -> ImageFont:
     """
     指定したテキストを画像に配置する時にいい感じのフォントサイズを返す
 
@@ -40,7 +43,9 @@ def get_font_size(size, font_file, text):
     return font_size
 
 
-def get_text_xy(width, height, font, text):
+def get_text_xy(
+    width: int, height: int, font: ImageFont, text: str
+) -> tuple[int, int, int, int]:
     """
     指定したテキストを配置する位置を返す
 
@@ -60,7 +65,7 @@ def get_text_xy(width, height, font, text):
     return x_center, y_center, y_top, y_bottom
 
 
-def generate_lgtm_image(im, text):
+def generate_lgtm_image(im: Image, text: str) -> list[Image]:
     """
     LGTM画像を生成して返す
 
@@ -98,7 +103,7 @@ def generate_lgtm_image(im, text):
 
 @respond_to(r"^lgtm\s+create\s+(\S+)$")
 @respond_to(r"^lgtm\s+create\s+(\S+)\s+(.+)")
-def lgtm_create(message, url, text="LGTM"):
+def lgtm_create(message: Message, url: str, text: str = "LGTM") -> None:
     try:
         url = url.replace("<", "").replace(">", "")
         r = requests.get(url)
@@ -132,7 +137,7 @@ def lgtm_create(message, url, text="LGTM"):
 
 
 @respond_to(r"^lgtm\s+help")
-def lgtm_help(message):
+def lgtm_help(message: Message):
     """
     ヘルプメッセージを返す
     """

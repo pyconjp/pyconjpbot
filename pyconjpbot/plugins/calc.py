@@ -1,6 +1,7 @@
 import re
 
 from slackbot.bot import listen_to
+from slackbot.dispatcher import Message
 from sympy import SympifyError, sympify
 
 from ..botmessage import botsend
@@ -10,11 +11,10 @@ NUM_PATTERN = re.compile(r"^\s*[-+]?[\d.,]+\s*$")
 
 
 @listen_to(r"^(([-+*/^%!(),.\d\s]|pi|e|sqrt|sin|cos|tan)+)$")
-def calc(message, expression, dummy_):
+def calc(message: Message, expression: str, dummy_: str) -> None:
     """
     数式っぽい文字列だったら計算して結果を返す
     """
-
     # 単一の数字っぽいパターンは無視する
     if NUM_PATTERN.match(expression):
         return
@@ -27,14 +27,14 @@ def calc(message, expression, dummy_):
         return
 
     if result.is_Integer:
-        # 整数だったらそのまま出力
-        answer = int(result)
+        # カンマをつけて出力する
+        answer = f"{int(result):,}"
     else:
         try:
-            answer = float(result)
+            # カンマをつけて出力する
+            answer = f"{float(result):,}"
         except SympifyError:
             # 答えが数値じゃなかったら無視する
             return
 
-    # カンマをつけて出力する
-    botsend(message, f"{answer:,}")
+    botsend(message, answer)

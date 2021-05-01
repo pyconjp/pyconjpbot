@@ -2,11 +2,12 @@ import re
 from unicodedata import east_asian_width
 
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botsend
 
 
-def _message_length(message):
+def _message_length(message: str) -> int:
     """
     メッセージの長さを返す
     """
@@ -23,7 +24,7 @@ def _message_length(message):
 
 @respond_to(r"^suddendeath$")
 @respond_to(r"^suddendeath\s+(.*)")
-def suddendeath(message, words="突然の死"):
+def suddendeath(message: Message, words: str = "突然の死") -> None:
     """
     突然の死のメッセージを返す
     """
@@ -43,7 +44,7 @@ def suddendeath(message, words="突然の死"):
 
 
 @respond_to(r"^suddendeath\s+help")
-def suddendeath_help(message):
+def suddendeath_help(message: Message) -> None:
     botsend(
         message,
         """- `$suddendeath`: 突然の死のメッセージを返す

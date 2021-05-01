@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import re
 
 from slackbot.bot import listen_to
+from slackbot.dispatcher import Message
 from slacker import Error
 
 # リアクション対象のキーワードと絵文字
 REACTION = {
     ("肉", "meat"): "meat_on_bone",
-    "カレーメシ": ("curry", "boom"),
+    "カレーメシ": ["curry", "boom"],
     ("ピザ", "pizza"): "pizza",
     ("sushi", "寿司", "おすし"): "sushi",
     "酒": "sake",
@@ -19,13 +22,10 @@ REACTION = {
 }
 
 
-def _react(message, emojis):
+def _react(message: Message, emojis: list[str]) -> None:
     """
     指定された emoji を reaction で返す
     """
-    if isinstance(emojis, str):
-        # tuple に変換する
-        emojis = (emojis,)
     for emoji in emojis:
         try:
             message.react(emoji)
@@ -38,7 +38,7 @@ def _react(message, emojis):
 
 
 @listen_to(".")
-def reaction(message):
+def reaction(message: Message) -> None:
     """
     メッセージの中にリアクションする文字列があれば、emojiでリアクションする
     """
@@ -46,9 +46,9 @@ def reaction(message):
     text = message.body["text"].lower()
     for words, emojis in REACTION.items():
         if isinstance(words, str):
-            if words in text:
-                _react(message, emojis)
-        else:
-            # 正規表現で指定した単語が存在するかチェックする
-            if re.search("|".join(words), text):
-                _react(message, emojis)
+            words = (words,)
+        # 正規表現で指定した単語が存在するかチェックする
+        if re.search("|".join(words), text):
+            if isinstance(emojis, str):
+                emojis = [emojis]
+            _react(message, list(emojis))

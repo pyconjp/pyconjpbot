@@ -254,7 +254,7 @@ $ . env/bin/activate
 (env) $ pip install -r requirements-dev.txt
 ```
 
-* toxでisort, black, flake8のチェックが実行できます
+* toxでisort, black, flake8とmypyのチェックが実行できます
 
 ```bash
 $ tox

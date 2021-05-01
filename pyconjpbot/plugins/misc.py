@@ -6,12 +6,13 @@ import git
 import slacker
 from slackbot import settings
 from slackbot.bot import respond_to
+from slackbot.dispatcher import Message
 
 from ..botmessage import botreply, botsend, botwebapi
 
 
 @respond_to(r"^help$")
-def help(message):
+def help(message: Message) -> None:
     """
     helpページのURLを返す
     """
@@ -19,11 +20,11 @@ def help(message):
 
 
 @respond_to(r"^shuffle\s+(.*)")
-def shuffle(message, words):
+def shuffle(message: Message, words_str: str) -> None:
     """
     指定したキーワードをシャッフルして返す
     """
-    words = words.split()
+    words = words_str.split()
     if len(words) == 1:
         botsend(message, "キーワードを複数指定してください\n`$shuffle word1 word2...`")
     else:
@@ -32,11 +33,11 @@ def shuffle(message, words):
 
 
 @respond_to(r"^choice\s+(.*)")
-def choice(message, words):
+def choice(message: Message, words_str: str) -> None:
     """
     指定したキーワードから一つを選んで返す
     """
-    words = words.split()
+    words = words_str.split()
     if len(words) == 1:
         botsend(message, "キーワードを複数指定してください\n`$choice word1 word2...`")
     else:
@@ -44,7 +45,7 @@ def choice(message, words):
 
 
 @respond_to(r"^ping$")
-def ping(message):
+def ping(message: Message) -> None:
     """
     pingに対してpongで応答する
     """
@@ -52,7 +53,7 @@ def ping(message):
 
 
 @respond_to(r"^version$")
-def version(message):
+def version(message: Message) -> None:
     """
     バージョン情報を返す
     """
@@ -72,7 +73,7 @@ def version(message):
 
 @respond_to(r"^random$")
 @respond_to(r"^random\s+(active|help)$")
-def random_command(message, subcommand=None):
+def random_command(message: Message, subcommand: str = "") -> None:
     """
     チャンネルにいるメンバーからランダムに一人を選んで返す
 
@@ -120,13 +121,13 @@ def random_command(message, subcommand=None):
 @respond_to(r"^cal$")
 @respond_to(r"^cal\s+(\d+)$")
 @respond_to(r"^cal\s+(\d+)\s+(\d+)$")
-def cal_command(message, month=None, year=None):
+def cal_command(message: Message, month_str: str = "", year_str: str = "") -> None:
     """
     一ヶ月のカレンダーを返す
     """
     today = date.today()
-    month = int(month) if month else today.month
-    year = int(year) if year else today.year
+    month = int(month_str) if month_str else today.month
+    year = int(year_str) if year_str else today.year
 
     cal = calendar.TextCalendar(firstweekday=calendar.SUNDAY)
     try:
@@ -137,7 +138,7 @@ def cal_command(message, month=None, year=None):
 
 
 @respond_to(r"^cal\s+help$")
-def cal_help(message):
+def cal_help(message: Message) -> None:
     """
     cal コマンドのヘルプを返す
     """
