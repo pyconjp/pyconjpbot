@@ -1,5 +1,8 @@
 Unreleased
 ----------
+
+Release Notes - 2021-05-01
+--------------------------
 - [ISSHA-2354] add mypy support
 
 Release Notes - 2021-04-01
