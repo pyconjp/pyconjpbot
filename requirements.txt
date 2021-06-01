@@ -44,7 +44,7 @@ smmap==3.0.5
 soupsieve==2.2.1
 sympy==1.7.1
 uritemplate==3.0.1
-urllib3==1.26.4
+urllib3==1.26.5
 websocket-client==0.44.0
 wikipedia==1.4.0
 wrapt==1.12.1
