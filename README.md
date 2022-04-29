@@ -27,7 +27,7 @@
 
 ### github plugin
 
-- `$gihub repos`: pyconjp organization のリポジトリ一覧を返す
+- `$github repos`: pyconjp organization のリポジトリ一覧を返す
 - `$github search keywords`: 指定されたキーワードにマッチするissueを返す
 - `$github code keywords`: 指定されたキーワードにマッチするコードを返す
 
