@@ -165,7 +165,7 @@ def plusplus_search(message: Message, keyword: str) -> None:
     指定されたキーワードを含む名前とカウントの一覧を返す
     """
     pattern = f"%{keyword}%"
-    pluses = Plusplus.select().where(Plusplus.name ** pattern)
+    pluses = Plusplus.select().where(Plusplus.name**pattern)
 
     if len(pluses) == 0:
         botsend(message, f"`{keyword}` を含む名前はありません")
