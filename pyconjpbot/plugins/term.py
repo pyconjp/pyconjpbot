@@ -304,7 +304,7 @@ def search_responses(message: Message, command: str, keyword: str) -> None:
     """
     term = Term.get(command=command)
     pat = f"%{keyword}%"
-    responses = Response.select().where(term == term, Response.text ** pat)
+    responses = Response.select().where(term == term, Response.text**pat)
 
     if len(responses) == 0:
         botsend(message, f"コマンド `${command}` に `{keyword}` を含む応答はありません")
