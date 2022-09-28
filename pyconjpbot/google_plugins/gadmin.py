@@ -5,10 +5,10 @@ import string
 
 from googleapiclient.discovery import Resource
 from googleapiclient.errors import HttpError
+from slack_sdk import WebClient
 from slackbot import settings
 from slackbot.bot import respond_to
 from slackbot.dispatcher import Message
-from slacker import Slacker
 
 from ..botmessage import botsend
 from .google_api import get_service
@@ -63,9 +63,9 @@ def _is_admin(user: str) -> bool:
 
     :param user: SlackのユーザーID
     """
-    slack = Slacker(settings.API_TOKEN)
-    user_info = slack.users.info(user)
-    return user_info.body["user"]["is_admin"]
+    client = WebClient(token=settings.API_TOKEN)
+    user_info = client.users_info(user=user)
+    return user_info["user"]["is_admin"]
 
 
 def _remove_email_link(email: str) -> str:
@@ -110,13 +110,13 @@ def _send_password_on_dm(message: Message, email: str, password: str) -> None:
     """
     # ユーザーとのDMのチャンネルIDを取得
     user = message._body["user"]
-    slack = Slacker(settings.API_TOKEN)
-    result = slack.im.open(user)
-    dm_channel = result.body["channel"]["id"]
+    client = WebClient(token=settings.API_TOKEN)
+    result = client.conversations_open(users=user)
+    dm_channel = result["channel"]["id"]
 
     msg = f"ユーザー `{email}` のパスワードは `{password}` です"
     # DMチャンネルにメッセージを送信する
-    message._client.rtm_send_message(dm_channel, msg)
+    client.chat_postMessage(channel=dm_channel, text=msg)
 
 
 @respond_to(r"^gadmin\s+user\s+list")
