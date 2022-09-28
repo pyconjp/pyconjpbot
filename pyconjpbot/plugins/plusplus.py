@@ -1,6 +1,7 @@
 import random
 
-import slacker
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 from slackbot import settings
 from slackbot.bot import listen_to, respond_to
 from slackbot.dispatcher import Message
@@ -27,15 +28,14 @@ def _get_user_name(user_id: str) -> str:
     """
     指定された Slack の user_id に対応する username を返す
 
-    Slacker で users.list API を呼び出す
-    - https://github.com/os/slacker
+    WebClient で users.list API を呼び出す
     - https://api.slack.com/methods/users.info
     """
-    webapi = slacker.Slacker(settings.API_TOKEN)
-    response = webapi.users.info(user_id)
-    if response.body["ok"]:
-        return response.body["user"]["name"]
-    else:
+    client = WebClient(token=settings.API_TOKEN)
+    try:
+        response = client.users_info(user=user_id)
+        return response["user"]["name"]
+    except SlackApiError:
         return ""
 
 
