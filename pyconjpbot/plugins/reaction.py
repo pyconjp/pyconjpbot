@@ -4,7 +4,6 @@ import re
 
 from slackbot.bot import listen_to
 from slackbot.dispatcher import Message
-from slacker import Error
 
 # リアクション対象のキーワードと絵文字
 REACTION = {
@@ -27,14 +26,7 @@ def _react(message: Message, emojis: list[str]) -> None:
     指定された emoji を reaction で返す
     """
     for emoji in emojis:
-        try:
-            message.react(emoji)
-        except Error as error:
-            # 同じリアクションをすると例外が発生するので、無視する
-            if error.args[0] == "already_reacted":
-                pass
-            else:
-                raise
+        message.react(emoji)
 
 
 @listen_to(".")

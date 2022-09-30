@@ -3,7 +3,7 @@ import random
 from datetime import date
 
 import git
-import slacker
+from slack_sdk import WebClient
 from slackbot import settings
 from slackbot.bot import respond_to
 from slackbot.dispatcher import Message
@@ -77,7 +77,6 @@ def random_command(message: Message, subcommand: str = "") -> None:
     """
     チャンネルにいるメンバーからランダムに一人を選んで返す
 
-    - https://github.com/os/slacker
     - https://api.slack.com/methods/conversations.members
     - https://api.slack.com/methods/users.getPresence
     - https://api.slack.com/methods/users.info
@@ -94,9 +93,9 @@ def random_command(message: Message, subcommand: str = "") -> None:
 
     # チャンネルのメンバー一覧を取得
     channel = message.body["channel"]
-    webapi = slacker.Slacker(settings.API_TOKEN)
-    result = webapi.conversations.members(channel)
-    members = result.body["members"]
+    client = WebClient(token=settings.API_TOKEN)
+    result = client.conversations_members(channel=channel)
+    members = result["members"]
 
     # bot の id は除く
     bot_id = message._client.login_data["self"]["id"]
@@ -108,13 +107,13 @@ def random_command(message: Message, subcommand: str = "") -> None:
         member_id = random.choice(members)
         if subcommand == "active":
             # active が指定されている場合は presence を確認する
-            presence = webapi.users.get_presence(member_id)
-            if presence.body["presence"] == "away":
+            presence = client.users_getPresence(user=member_id)
+            if presence["presence"] == "away":
                 members.remove(member_id)
                 member_id = None
 
-    user_info = webapi.users.info(member_id)
-    name = user_info.body["user"]["name"]
+    user_info = client.users_info(user=member_id)
+    name = user_info["user"]["name"]
     botsend(message, f"{name} さん、君に決めた！")
 
 
