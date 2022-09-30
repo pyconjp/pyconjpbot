@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Release Notes - 2022-09-30
+--------------------------
+- [ISSHA-2669] rtm connect support
+
 Release Notes - 2021-05-01
 --------------------------
 - [ISSHA-2354] add mypy support
