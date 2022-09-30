@@ -234,7 +234,7 @@ BOT: @takanory おはようございます
 ```bash
 $ git clone git@github.com:pyconjp/pyconjpbot.git
 $ cd pyconjpbot
-$ python3.8 -m venv env
+$ python3.9 -m venv env
 $ . env/bin/activate
 (env) $ pip install -r requirements.txt
 (env) $ cp slackbot_settings.py.sample slackbot_settings.py
@@ -249,7 +249,7 @@ $ . env/bin/activate
 ```
 $ git clone git@github.com:pyconjp/pyconjpbot.git
 $ cd pyconjpbot
-$ python3.8 -m venv env
+$ python3.9 -m venv env
 $ . env/bin/activate
 (env) $ pip install -r requirements-dev.txt
 ```
