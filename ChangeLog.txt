@@ -3,8 +3,8 @@ Unreleased
 
 Release Notes - 2022-09-30
 --------------------------
-- [ISSHA-2669] update 3rd party packages
-- [ISSHA-2702] rtm connect support
+- [ISSHA-2669] rtm connect support
+- [ISSHA-2702] update 3rd party packages
 
 Release Notes - 2021-05-01
 --------------------------
