@@ -1,5 +1,5 @@
 beautifulsoup4==4.11.1
-GitPython==3.1.27
+GitPython==3.1.30
 google-api-python-client==2.63.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.5.3
