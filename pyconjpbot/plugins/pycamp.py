@@ -46,6 +46,7 @@ LECTURER_DICT = {
     "terada": "Manabu Terada",
     "shimizukawa": "Takayuki Shimizukawa",
     "arai": "Masataka Arai",
+    "ryu22e": "Ryuji Tsutsui",
 }
 
 ASSIGNEE_TYPE = {
