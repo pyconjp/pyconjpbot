@@ -1,6 +1,11 @@
 Unreleased
 ----------
 
+Release Notes - 2023-08-20
+--------------------------
+- [ISSHA-3000] update libraries
+- [ISSHA-2974] add ryu22e to pycamp lecturer
+
 Release Notes - 2022-09-30
 --------------------------
 - [ISSHA-2669] rtm connect support
