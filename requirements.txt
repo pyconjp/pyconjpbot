@@ -11,6 +11,6 @@ PyGithub==1.59.1
 python-dateutil==2.8.2
 requests==2.31.0
 slack-sdk==3.21.3
-slackbot==1.0.5
+git+https://git@github.com/ebmdatalab/slackbot@develop#egg=slackbot
 sympy==1.12
 wikipedia==1.4.0
