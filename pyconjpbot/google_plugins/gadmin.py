@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import random
 import string
+import time
+from typing import Any
 
 from googleapiclient.discovery import Resource
 from googleapiclient.errors import HttpError
@@ -14,6 +16,7 @@ from ..botmessage import botsend
 from .google_api import get_service
 
 DOMAIN = "pycon.jp"
+LINES_PER_MESSAGE = 100
 
 # https://developers.google.com/admin-sdk/directory
 # https://developers.google.com/resources/api-libraries/documentation/admin/directory_v1/python/latest/index.html
@@ -55,6 +58,32 @@ def _get_service() -> Resource:
     """
     service = get_service("admin", "directory_v1")
     return service
+
+
+def _list_all(collection: Resource, key: str, **params: Any) -> list[dict]:
+    """ページングをたどって list の結果をすべて返す"""
+    items: list[dict] = []
+    request = collection.list(**params)
+    while request is not None:
+        response = request.execute()
+        items.extend(response.get(key, []))
+        request = collection.list_next(request, response)
+    return items
+
+
+def _send_lines(message: Message, header: str, lines: list[str]) -> None:
+    """一覧を100行ずつに分け、送信間隔を1秒空けて送る"""
+    if not lines:
+        botsend(message, header)
+        return
+
+    for start in range(0, len(lines), LINES_PER_MESSAGE):
+        msg = "\n".join(lines[start : start + LINES_PER_MESSAGE])
+        if start == 0:
+            msg = f"{header}\n{msg}"
+        else:
+            time.sleep(1)
+        botsend(message, msg)
 
 
 def _is_admin(user: str) -> bool:
@@ -126,17 +155,17 @@ def gadmin_user_list(message: Message) -> None:
     """
 
     service = _get_service()
-    users_list = service.users().list(orderBy="email", domain=DOMAIN).execute()
+    users_list = _list_all(
+        service.users(), "users", orderBy="email", domain=DOMAIN, maxResults=500
+    )
 
-    count = 0
-    msg = ""
-    for user in users_list.get("users", []):
+    lines = []
+    for user in users_list:
         email = user["primaryEmail"]
         fullname = user["name"]["fullName"]
-        msg += f"- {email} {fullname}\n"
-        count += 1
-    msg = f"{DOMAIN}ドメインのユーザー一覧({count}ユーザー)\n{msg}"
-    botsend(message, msg)
+        lines.append(f"- {email} {fullname}")
+    header = f"{DOMAIN}ドメインのユーザー一覧({len(lines)}ユーザー)"
+    _send_lines(message, header, lines)
 
 
 def _gadmin_user_insert(
@@ -373,18 +402,16 @@ def gadmin_group_list(message: Message) -> None:
     グループの一覧を返す
     """
     service = _get_service()
-    groups_list = service.groups().list(domain=DOMAIN).execute()
+    groups_list = _list_all(service.groups(), "groups", domain=DOMAIN, maxResults=200)
 
-    count = 0
-    msg = ""
-    for group in groups_list.get("groups", []):
+    lines = []
+    for group in groups_list:
         email = group["email"]
         name = group["name"]
         member_count = group["directMembersCount"]
-        msg += f"- {email} {name}({member_count}ユーザー)\n"
-        count += 1
-    msg = f"{DOMAIN}ドメインのグループ一覧({count}グループ)\n{msg}"
-    botsend(message, msg)
+        lines.append(f"- {email} {name}({member_count}ユーザー)")
+    header = f"{DOMAIN}ドメインのグループ一覧({len(lines)}グループ)"
+    _send_lines(message, header, lines)
 
 
 def _gadmin_group_insert(
@@ -477,19 +504,22 @@ def gadmin_member_list(message: Message, group: str) -> None:
     service = _get_service()
     group = _get_default_domain_email(group)
     try:
-        members_list = service.members().list(groupKey=group).execute()
-    except HttpError:
-        botsend(message, f"`{group}` に合致するグループはありません")
+        members_list = _list_all(
+            service.members(), "members", groupKey=group, maxResults=200
+        )
+    except HttpError as e:
+        if e.resp.status == 404:
+            botsend(message, f"`{group}` に合致するグループはありません")
+        else:
+            botsend(message, f"メンバー一覧の取得に失敗しました\n`{e}`")
         return
 
-    count = 0
-    msg = ""
-    for member in members_list.get("members", []):
+    lines = []
+    for member in members_list:
         email = member["email"]
-        msg += f"- {email}\n"
-        count += 1
-    msg = f"*{group}* グループのメンバー({count}ユーザー)\n{msg}"
-    botsend(message, msg)
+        lines.append(f"- {email}")
+    header = f"*{group}* グループのメンバー({len(lines)}ユーザー)"
+    _send_lines(message, header, lines)
 
 
 def _gadmin_member_insert(
